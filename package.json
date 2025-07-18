@@ -48,7 +48,7 @@
 		"busboy": "^1.6.0",
 		"cookie": "^1.0.2",
 		"dotenv": "^17.2.0",
-		"ws": "^8.18.2"
+		"ws": "^8.18.3"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.31.0",
