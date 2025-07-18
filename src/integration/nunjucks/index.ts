@@ -14,10 +14,12 @@ let njk: typeof import('nunjucks');
 
 async function loadNunjucks() {
 	try {
-		njk = await import('nunjucks');
+		const njkModule = await import('nunjucks');
+		njk = njkModule.default || njkModule;
 	} catch (err: any) {
 		Log.error('Nunjucks is not installed.');
 		Log.error('Please install it with: §l§fnpm install nunjucks§r');
+		Log.error('(Optional) if you use typescript: §l§fnpm install --save-dev @types/nunjucks§r');
 		process.exit(1);
 	}
 }
@@ -94,33 +96,37 @@ const defaultOps: GamanNunjucksOptions = {
 	extension: '.njk',
 };
 
-export async function nunjucks(ops: GamanNunjucksOptions = {}) {
-	await loadNunjucks();
-
+export function nunjucks(ops: GamanNunjucksOptions = {}) {
 	const { viewPath = 'src/views', ...njkOps } = { ...defaultOps, ...ops };
 
-	// Init Nunjucks Environment
-	const env = njk.configure(join(process.cwd(), viewPath), njkOps);
+	let env: Environment;
 
-	if (njkOps.env) {
-		if (Array.isArray(njkOps.env)) {
-			for (const fn of njkOps.env) {
-				fn(env);
-			}
-		} else {
-			njkOps.env(env);
-		}
-	}
 	return defineIntegration({
 		name: 'nunjucks',
 		priority: ops.priority || 'normal',
+		async onLoad() {
+			await loadNunjucks();
+
+			// Init Nunjucks Environment
+			env = njk.configure(join(process.cwd(), viewPath), njkOps);
+
+			if (njkOps.env) {
+				if (Array.isArray(njkOps.env)) {
+					for (const fn of njkOps.env) {
+						fn(env);
+					}
+				} else {
+					njkOps.env(env);
+				}
+			}
+		},
 		async onResponse(_app, _ctx, res) {
 			const renderData = res.renderData;
 			if (renderData == null) return res;
 
 			const pathname = renderData.getName().includes('.')
 				? renderData.getName()
-				: `${renderData.getName()}.${njkOps.extension}`;
+				: `${renderData.getName()}${njkOps.extension}`;
 
 			return new Promise((resolve, reject) => {
 				env.render(pathname, renderData.getData(), (err, html) => {
