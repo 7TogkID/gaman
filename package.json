@@ -53,7 +53,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.31.0",
-		"@gaman/cors": "^0.0.2",
+		"@gaman/cors": "^0.0.3",
 		"@gaman/ejs": "^0.0.8",
 		"@gaman/static": "^0.0.2",
 		"@types/bun": "^1.2.17",
