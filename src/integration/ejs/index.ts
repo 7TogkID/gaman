@@ -1,13 +1,27 @@
 /**
- * @package @gaman/ejs
+ * @module 
  * GamanJS integration for EJS view rendering.
  */
-import * as _ejs from 'ejs';
 import { type Options } from 'ejs';
 import { join } from 'path';
 import { Priority } from '../../types';
 import { defineIntegration } from '..';
 import { Response } from '../../response';
+import { Log } from '../../utils/logger';
+
+let _ejs: typeof import('ejs');
+
+async function loadEJS() {
+	try {
+		const njkModule = await import('ejs');
+		_ejs = njkModule.default || njkModule;
+	} catch (err: any) {
+		Log.error('ejs is not installed.');
+		Log.error('Please install it with: §l§fnpm install ejs§r');
+		Log.error('(Optional) if you use typescript: §l§fnpm install --save-dev @types/ejs§r');
+		process.exit(1);
+	}
+}
 
 /**
  * EJS rendering options.
@@ -30,11 +44,17 @@ export interface GamanEJSOptions extends Options {
 	priority?: Priority;
 }
 
-export function ejs(ops: GamanEJSOptions = {}) {
+export function ejs(ops: GamanEJSOptions = {
+
+}) {
 	const { viewPath, ...ejsOps } = ops;
 	return defineIntegration({
 		name: 'ejs',
 		priority: ops.priority || 'normal',
+		async onLoad(){
+			await loadEJS();
+			
+		},
 		async onResponse(_app, _ctx, res) {
 			const renderData = res.renderData;
 			if (renderData == null) return res; // ! next() if renderData null
