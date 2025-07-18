@@ -46,14 +46,14 @@ export const cors = (options: CorsOptions): Handler<AppConfig> => {
   return async (ctx: Context) => {
     const requestOrigin = ctx.header("Origin");
     // Determine allowed origin
-    let allowedOrigin: string | null = "*";
+    let allowedOrigin: string | undefined = "*";
 
     if (typeof origin === "string") {
       allowedOrigin = origin;
-    } else if (Array.isArray(origin) && origin.includes(requestOrigin)) {
+    } else if (Array.isArray(origin) && origin.includes(requestOrigin || '')) {
       allowedOrigin = requestOrigin;
     } else {
-      allowedOrigin = null;
+      allowedOrigin = undefined;
     }
 
     // Set CORS headers
