@@ -1,26 +1,21 @@
 {
 	"name": "gaman",
-	"version": "0.0.40",
+	"version": "0.0.41",
 	"type": "module",
-	"main": "./dist/index.js",
+	"main": "./dist/cjs/index.js",
 	"module": "./dist/index.js",
-	"types": "./dist/index.d.ts",
+	"types": "dist/types/index.d.ts",
 	"files": [
 		"dist"
 	],
 	"engines": {
-		"node": ">=18"
+		"node": ">=16"
 	},
 	"scripts": {
 		"clean": "rimraf dist",
-		"build:cjs_ts": "tsc --project tsconfig.cjs.json && tsc-alias -p tsconfig.cjs.json",
-		"build:esm_ts": "tsc --project tsconfig.esm.json && tsc-alias -p tsconfig.esm.json",
-		"build:cjs": "node build-cjs.js",
-		"build:esm": "node build-esm.js",
-		"build": "npm run clean  && npm run build:cjs && npm run build:esm && tsc",
-		"build:bun": "npm run clean && bun ./build/build.ts",
-		"test": "npm run build:bun && bun --watch test/src/main",
-		"release": "npm run build:bun && npm publish",
+		"build": "npm run clean && tsx ./build/build.ts",
+		"test": "vitest run",
+		"release": "npm run build && npm publish",
 		"lint:src": "eslint src/ --ext .ts",
 		"lint:fix": "eslint src/ --ext .ts --fix"
 	},
@@ -32,9 +27,28 @@
 	"bugs": {
 		"url": "https://github.com/7TogkID/gaman/issues"
 	},
+	"homepage": "https://gaman.7togk.id",
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/cjs/index.js"
+		},
+		"./nunjucks": {
+			"types": "./dist/integration/nunjucks/index.d.ts",
+			"import": "./dist/integration/nunjucks/index.js",
+			"require": "./dist/cjs/integration/nunjucks/index.js"
+		}
+	},
 	"dependencies": {
 		"@gaman/cli": "0.0.12",
-		"cookie": "^1.0.2"
+		"busboy": "^1.6.0",
+		"cookie": "^1.0.2",
+		"dotenv": "^17.2.0",
+		"ws": "^8.18.2"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.31.0",
@@ -44,22 +58,21 @@
 		"@types/bun": "^1.2.17",
 		"@types/busboy": "^1.5.4",
 		"@types/ejs": "^3.1.5",
+		"@types/nunjucks": "^3.2.6",
 		"@types/ws": "^8.18.1",
 		"arg": "^5.0.2",
-		"busboy": "^1.6.0",
-		"dotenv": "^17.2.0",
 		"ejs": "^3.1.10",
 		"eslint": "^9.31.0",
-		"gaman": "^0.0.23",
 		"glob": "^11.0.3",
 		"globals": "^16.3.0",
+		"k6": "^0.0.0",
 		"rimraf": "^6.0.1",
+		"ts-jest": "^29.4.0",
 		"tsc-alias": "^1.8.16",
 		"tslib": "^2.8.1",
-		"tsup": "^8.5.0",
 		"tsx": "^4.20.3",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.36.0",
-		"ws": "^8.18.2"
+		"vitest": "^3.2.4"
 	}
 }

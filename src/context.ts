@@ -37,7 +37,7 @@ export async function createContext<A extends AppConfig>(
 		// body akan menjadi raw buffer untuk non-multipart, atau null/undefined untuk multipart
 
 		query: createQuery(url.searchParams),
-		
+
 		body: async () => {
 			if (body == null) {
 				body = await getRequestBodyBuffer(req);
@@ -90,6 +90,8 @@ export async function createContext<A extends AppConfig>(
 		request: gamanRequest,
 
 		// data dari request
+		headers: gamanRequest.headers,
+		header: gamanRequest.header,
 		param: gamanRequest.param,
 		params: gamanRequest.params,
 		query: gamanRequest.query,
@@ -98,7 +100,7 @@ export async function createContext<A extends AppConfig>(
 		formData: gamanRequest.formData,
 		input: gamanRequest.input,
 
-		// data tersembunyi 
+		// data tersembunyi
 		[HTTP_REQUEST_SYMBOL]: req,
 		[HTTP_RESPONSE_SYMBOL]: res,
 	};
@@ -106,25 +108,24 @@ export async function createContext<A extends AppConfig>(
 }
 
 // * sementara gini dulu ntar saya tambahin @gaman/trust-proxy
-const TRUST_PROXY_IPS = ["127.0.0.1", "::1"]; // atau IP proxy kamu
+const TRUST_PROXY_IPS = ['127.0.0.1', '::1']; // atau IP proxy kamu
 
 function getClientIP(req: http.IncomingMessage): string {
-  const remoteIP = req.socket.remoteAddress || "";
+	const remoteIP = req.socket.remoteAddress || '';
 
-  // Cek apakah request datang dari proxy yang kita percaya
-  const isTrustedProxy = TRUST_PROXY_IPS.includes(remoteIP);
+	// Cek apakah request datang dari proxy yang kita percaya
+	const isTrustedProxy = TRUST_PROXY_IPS.includes(remoteIP);
 
-  if (isTrustedProxy) {
-    const xff = req.headers["x-forwarded-for"];
-    if (typeof xff === "string") {
-      const ips = xff.split(",").map(ip => ip.trim());
-      return ips[0]; // Ambil IP paling awal (IP client asli)
-    }
-  }
+	if (isTrustedProxy) {
+		const xff = req.headers['x-forwarded-for'];
+		if (typeof xff === 'string') {
+			const ips = xff.split(',').map((ip) => ip.trim());
+			return ips[0]; // Ambil IP paling awal (IP client asli)
+		}
+	}
 
-  return remoteIP;
+	return remoteIP;
 }
-
 
 async function getRequestBodyBuffer(req: http.IncomingMessage): Promise<Buffer> {
 	const chunks: Buffer[] = [];

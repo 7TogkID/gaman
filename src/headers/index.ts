@@ -5,7 +5,7 @@ export class GamanHeaders {
     headers: Record<string, string | string[] | undefined> = {}
   ) {
     for (const [key, value] of Object.entries(headers)) {
-      this.#data.set(key, value);
+      this.#data.set(key.toLowerCase(), value);
     }
   }
 

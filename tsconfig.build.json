@@ -2,6 +2,7 @@
 	"extends": "./tsconfig.json",
 	"compilerOptions": {
 		"module": "ES2020",
+		"moduleResolution": "node",
 		"rootDir": "./src/",
 		"outDir": "./dist/",
 		"noUnusedLocals": true,
@@ -9,5 +10,9 @@
 
 		"typeRoots": ["src/types", "./node_modules/@types"]
 	},
-	"include": ["src/**/*.ts"]
+	"include": ["src/**/*.ts"],
+	"tsc-alias": {
+		"resolveFullPaths": true,
+		"verbose": false
+	}
 }

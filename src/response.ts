@@ -99,7 +99,7 @@ export class Response {
 		return res;
 	}
 
-	static stream(readableStream: NodeJS.ReadableStream, init?: IResponseOptions): Response {
+	static stream(readableStream: NodeJS.ReadableStream, init: IResponseOptions = {}): Response {
 		return new Response(readableStream, {
 			...init,
 			headers: {

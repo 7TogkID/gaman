@@ -11,6 +11,7 @@ export class GamanWebSocket<A extends AppConfig> {
   // * <path, WebSocketServer>
   #wss: { [path: string]: WebSocketServer } = {};
 
+  // @ts-ignore
   constructor(private app: GamanBase<A>) {}
 
   getWebSocketServer(path: string): WebSocketServer | undefined {

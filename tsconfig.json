@@ -5,6 +5,7 @@
     "moduleResolution": "Bundler",
     "outDir": "./dist",
     "esModuleInterop": true,
+    "module": "es2020",
     "forceConsistentCasingInFileNames": true,
     "strict": false,
     "skipLibCheck": false,
@@ -12,6 +13,7 @@
     "noUnusedParameters": false,
     "types": ["node"]
   },
+  "jest": {},
   "tsc-alias": {
     "resolveFullPaths": true,
     "verbose": false

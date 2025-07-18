@@ -14,11 +14,10 @@ import { formatPath, isHtmlString, removeEndSlash } from './utils/utils';
 import { Response } from './response';
 import { sortArrayByPriority } from './utils/priority';
 import { performance } from 'perf_hooks';
-import { Color } from './utils/color';
 import HttpError from './error/HttpError';
 import { GamanWebSocket } from './web-socket';
 import { Readable } from 'node:stream';
-import path, { normalize } from 'node:path';
+import path from 'node:path';
 import { HTTP_RESPONSE_SYMBOL } from './symbol';
 import { GamanCookies } from './cookies';
 import { IGNORED_LOG_FOR_PATH_REGEX } from './constant';
@@ -105,7 +104,6 @@ export class GamanBase<A extends AppConfig> {
 	}
 
 	registerBlock(block: IBlock<A>) {
-
 		// * tambahin "/" di belakang kalau strict
 		const _path = formatPath(block.path, this.strict);
 		this.#blocks.push({
@@ -118,6 +116,7 @@ export class GamanBase<A extends AppConfig> {
 		const startTime = performance.now();
 		const ctx = await createContext<A>(req, res);
 		Log.setRoute(ctx.request.pathname || '/');
+		Log.setMethod(ctx.request.method.toUpperCase());
 		try {
 			const blocksAndIntegrations = sortArrayByPriority<IBlock<A> | IIntegration<A>>(
 				[...this.#blocks, ...this.#integrations],
@@ -220,15 +219,13 @@ export class GamanBase<A extends AppConfig> {
 			if (
 				Log.response.route &&
 				Log.response.status &&
+				Log.response.method &&
 				!IGNORED_LOG_FOR_PATH_REGEX.test(Log.response.route)
 			) {
-				Log.log(
-					`Request processed in ${Color.fg.green}(${(endTime - startTime).toFixed(
-						1,
-					)}ms)${Color.reset}`,
-				);
+				Log.log(`Request processed in §a(${(endTime - startTime).toFixed(1)}ms)§r`);
 			}
 			Log.setRoute('');
+			Log.setMethod('');
 			Log.setStatus(null);
 		}
 	}

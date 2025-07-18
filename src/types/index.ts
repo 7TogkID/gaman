@@ -2,7 +2,7 @@ import type { WebSocket, WebSocketServer } from 'ws';
 import type HttpError from '../error/HttpError';
 import { ClientRequest } from 'http';
 import { GamanHeaders } from '../headers';
-import { FormData, IFormDataEntryValue } from '../utils/form-data';
+import { FormData } from '../utils/form-data';
 import { GamanCookies } from '../cookies';
 import { Response } from '../response';
 
@@ -133,101 +133,99 @@ export type WebSocketHandler = {
 export type QueryValue = string | number | string[];
 export type Query = ((name: string) => QueryValue) & Record<string, QueryValue>;
 
-
 /**
  * Represents an HTTP request in the GamanJS framework.
  */
 export interface Request {
-  /**
-   * HTTP method (e.g., GET, POST, PUT, DELETE).
-   */
-  method: string;
+	/**
+	 * HTTP method (e.g., GET, POST, PUT, DELETE).
+	 */
+	method: string;
 
-  /**
-   * Full request URL including query string and host (e.g., "http://localhost/home?search=test").
-   */
-  url: string;
+	/**
+	 * Full request URL including query string and host (e.g., "http://localhost/home?search=test").
+	 */
+	url: string;
 
-  /**
-   * Pathname portion of the URL (e.g., "/home/user"), excludes query string and host.
-   */
-  pathname: string;
+	/**
+	 * Pathname portion of the URL (e.g., "/home/user"), excludes query string and host.
+	 */
+	pathname: string;
 
-  /**
-   * An instance of GamanHeaders for easier and normalized access to request headers.
-   */
-  headers: GamanHeaders;
+	/**
+	 * An instance of GamanHeaders for easier and normalized access to request headers.
+	 */
+	headers: GamanHeaders;
 
-  /**
-   * Get the value of a specific header (case-insensitive).
-   * @param key - The header name (e.g., "Content-Type")
-   * @returns The value of the specified header or undefined if not present.
-   */
-  header: (key: string) => string;
+	/**
+	 * Get the value of a specific header (case-insensitive).
+	 * @param key - The header name (e.g., "Content-Type")
+	 * @returns The value of the specified header or undefined if not present.
+	 */
+	header: (key: string) => string;
 
-  /**
-   * Get a single route parameter by name.
-   * For example, in route "/user/:id", `param("id")` would return the dynamic value.
-   * @param name - The name of the route parameter.
-   */
-  param: (name: string) => any;
+	/**
+	 * Get a single route parameter by name.
+	 * For example, in route "/user/:id", `param("id")` would return the dynamic value.
+	 * @param name - The name of the route parameter.
+	 */
+	param: (name: string) => any;
 
-  /**
-   * All route parameters extracted from the dynamic route.
-   * For example, "/post/:postId/comment/:commentId" => { postId: "123", commentId: "456" }
-   */
-  params: Record<string, any>;
+	/**
+	 * All route parameters extracted from the dynamic route.
+	 * For example, "/post/:postId/comment/:commentId" => { postId: "123", commentId: "456" }
+	 */
+	params: Record<string, any>;
 
-  /**
-   * Query parameters parsed from the URL.
-   * For example, "/search?q=test&page=2" => { q: "test", page: "2" }
-   */
-  query: Query;
+	/**
+	 * Query parameters parsed from the URL.
+	 * For example, "/search?q=test&page=2" => { q: "test", page: "2" }
+	 */
+	query: Query;
 
-  /**
-   * Returns the raw request body as a Buffer.
-   * Useful for binary uploads or low-level processing.
-   */
-  body: () => Promise<Buffer<ArrayBufferLike>>;
+	/**
+	 * Returns the raw request body as a Buffer.
+	 * Useful for binary uploads or low-level processing.
+	 */
+	body: () => Promise<Buffer<ArrayBufferLike>>;
 
-  /**
-   * Reads the request body as plain text.
-   * Suitable for `Content-Type: text/plain`.
-   */
-  text: () => Promise<string>;
+	/**
+	 * Reads the request body as plain text.
+	 * Suitable for `Content-Type: text/plain`.
+	 */
+	text: () => Promise<string>;
 
-  /**
-   * Parses the request body as JSON.
-   * Suitable for `Content-Type: application/json`.
-   * @returns A typed JSON object.
-   */
-  json: <T>() => Promise<T>;
+	/**
+	 * Parses the request body as JSON.
+	 * Suitable for `Content-Type: application/json`.
+	 * @returns A typed JSON object.
+	 */
+	json: <T>() => Promise<T>;
 
-  /**
-   * Parses the request body as FormData.
-   * Supports `multipart/form-data` and `application/x-www-form-urlencoded`.
-   */
-  formData: () => Promise<FormData>;
+	/**
+	 * Parses the request body as FormData.
+	 * Supports `multipart/form-data` and `application/x-www-form-urlencoded`.
+	 */
+	formData: () => Promise<FormData>;
 
-  /**
-   * Gets a single field value from form data by name.
-   * Equivalent to `formData().get(name)`.
-   * @param name - The form field name.
-   */
-  input: (name: string) => Promise<string>;
+	/**
+	 * Gets a single field value from form data by name.
+	 * Equivalent to `formData().get(name)`.
+	 * @param name - The form field name.
+	 */
+	input: (name: string) => Promise<string>;
 
-  /**
-   * The client's IP address.
-   * Useful for logging, rate limiting, or geo-location.
-   */
-  ip: string;
+	/**
+	 * The client's IP address.
+	 * Useful for logging, rate limiting, or geo-location.
+	 */
+	ip: string;
 }
-
 
 export interface Context<A extends AppConfig = AppConfig>
 	extends Pick<
 		Request,
-		'param' | 'params' | 'query' | 'text' | 'json' | 'formData' | 'input'
+		'header' | 'headers' | 'param' | 'params' | 'query' | 'text' | 'json' | 'formData' | 'input'
 	> {
 	locals: A['Locals'];
 	env: A['Env'];
@@ -262,10 +260,6 @@ export interface RoutesDefinition<A extends AppConfig> {
 /* -------------------------------------------------------------------------- */
 /*                                    Block                                   */
 /* -------------------------------------------------------------------------- */
-
-export interface BlockConfig {
-	Services?: object;
-}
 
 /**
  * Represents the structure of a block in the application.

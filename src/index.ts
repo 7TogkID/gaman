@@ -10,7 +10,7 @@ export * from "./middleware";
 export * from "./error/HttpError";
 export * from "./block";
 export * from "./utils/logger";
-export * from "./utils/color";
+export * from "./utils/textformat";
 export * from "./utils/form-data";
 export * from "./headers";
 export * from "./integration";
