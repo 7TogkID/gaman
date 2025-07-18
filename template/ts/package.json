@@ -13,6 +13,6 @@
 	"license": "ISC",
 	"description": "",
 	"dependencies": {
-		"gaman": "^0.0.40"
+		"gaman": "^0.0.47"
 	}
 }
