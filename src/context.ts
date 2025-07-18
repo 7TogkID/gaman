@@ -18,9 +18,9 @@ export async function createContext<A extends AppConfig>(
 	const headers = new GamanHeaders(req.headers);
 
 	/** FormData state */
-	let form: FormData = null;
+	let form: FormData | null = null;
 
-	let body: Buffer<ArrayBufferLike> = null;
+	let body: Buffer<ArrayBufferLike> | null = null;
 
 	const gamanRequest: Request = {
 		method,
@@ -70,7 +70,10 @@ export async function createContext<A extends AppConfig>(
 			}
 
 			if (contentType.includes('application/x-www-form-urlencoded') && method !== 'HEAD') {
-				form = parseFormUrlEncoded(body.toString() || '{}');
+				if (body == null) {
+					body = await getRequestBodyBuffer(req);
+				}
+				form = parseFormUrlEncoded(body?.toString() || '{}');
 			} else if (contentType.includes('multipart/form-data') && method !== 'HEAD') {
 				const formData = await parseMultipartFormWithBusboy(req);
 				form = formData;

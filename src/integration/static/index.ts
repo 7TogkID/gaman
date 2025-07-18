@@ -1,11 +1,14 @@
 /**
- * @package @gaman/static
+ * @module
  * GamanJS integration for serving static files.
  */
 
-import { defineIntegration, Log, Priority, Response } from 'gaman';
 import { createReadStream, promises as fsPromises } from 'fs';
 import { join, extname } from 'path';
+import { Priority } from '../../types';
+import { defineIntegration } from '..';
+import { Log } from '../../utils/logger';
+import { Response } from '../../response';
 
 /**
  * MIME type mappings for static file responses.
@@ -51,7 +54,7 @@ export interface StaticFileOptions {
 	priority?: Priority;
 }
 
-export function staticGaman(options: StaticFileOptions = {}) {
+export function gamanStatic(options: StaticFileOptions = {}) {
 	const staticPath = options.path || 'public';
 	const mimeTypes = { ...mimeType, ...(options.newMimeTypes || {}) };
 
@@ -61,7 +64,7 @@ export function staticGaman(options: StaticFileOptions = {}) {
 		async onRequest(_app, ctx) {
 			try {
 				// Resolve the file path
-				const filePath = join(process.cwd(), staticPath, ctx.pathname);
+				const filePath = join(process.cwd(), staticPath, ctx.request.pathname);
 
 				// Check if the file exists
 				const stats = await fsPromises.stat(filePath);
@@ -71,6 +74,7 @@ export function staticGaman(options: StaticFileOptions = {}) {
 
 				// ! cegah kirim log request
 				Log.setRoute('');
+				Log.setMethod('');
 				Log.setStatus(null);
 
 				// Determine MIME type

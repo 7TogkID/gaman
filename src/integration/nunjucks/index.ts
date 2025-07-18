@@ -125,7 +125,7 @@ export async function nunjucks(ops: GamanNunjucksOptions = {}) {
 			return new Promise((resolve, reject) => {
 				env.render(pathname, renderData.getData(), (err, html) => {
 					if (err) return reject(err);
-					resolve(Response.html(html || null, { status: 200 }));
+					resolve(Response.html(html || '', { status: 200 }));
 				});
 			});
 		},

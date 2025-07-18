@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "module": "es2020",
     "forceConsistentCasingInFileNames": true,
-    "strict": false,
+    "strict": true,
     "skipLibCheck": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -18,6 +18,6 @@
     "resolveFullPaths": true,
     "verbose": false
   },
-  "include": ["src/**/*.ts", "packages/gaman-ejs/ejs-int.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
 }

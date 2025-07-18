@@ -6,7 +6,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const entryPoints = glob.sync('./src/**/*.ts', {
-	ignore: [],
+	ignore: ["./src/**/*.test.*"],
 });
 
 /*

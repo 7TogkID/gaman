@@ -162,7 +162,7 @@ export interface Request {
 	 * @param key - The header name (e.g., "Content-Type")
 	 * @returns The value of the specified header or undefined if not present.
 	 */
-	header: (key: string) => string;
+	header: (key: string) => string | undefined;
 
 	/**
 	 * Get a single route parameter by name.
@@ -213,7 +213,7 @@ export interface Request {
 	 * Equivalent to `formData().get(name)`.
 	 * @param name - The form field name.
 	 */
-	input: (name: string) => Promise<string>;
+	input: (name: string) => Promise<string | undefined>;
 
 	/**
 	 * The client's IP address.
