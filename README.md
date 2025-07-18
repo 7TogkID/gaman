@@ -26,19 +26,6 @@
 
 "Gaman" (我慢) — patience, perseverance, and resilience. These principles are at the heart of GamanJS, empowering developers to build robust and modular web applications effortlessly.
 
-## ✨ Packages
-
-| Package                                        | Release Notes |
-| ---------------------------------------------- | ------------- |
-| [gaman](https://github.com/7TogkID/gaman)      | v0.0.36       |
-| [create-gaman](packages/create-gaman)          | v0.0.1        |
-| [@gaman/ejs](packages/gaman-ejs)               | v0.0.12       |
-| [@gaman/nunjucks](packages/gaman-nunjucks)     | v0.0.1        |
-| [@gaman/static](packages/gaman-static)         | v0.0.6        |
-| [@gaman/cors](packages/gaman-cors)             | v0.0.2        |
-| [@gaman/basic-auth](packages/gaman-basic-auth) | v0.0.2        |
-| [@gaman/cli](packages/gaman-cli)               | v0.0.8        |
-
 ## 🚀 Get Started
 
 For complete documentation, examples, and best practices, visit the **Gaman Docs**:  

@@ -1,14 +1,21 @@
 import type { WebSocket, WebSocketServer } from 'ws';
-import type HttpError from '../error/HttpError';
+import type { HttpException } from './error/http-exception';
 import { ClientRequest } from 'http';
-import { GamanHeaders } from '../headers';
-import { FormData } from '../utils/form-data';
-import { GamanCookies } from '../cookies';
-import { Response } from '../response';
+import { GamanHeaders } from './headers';
+import { FormData } from './utils/form-data';
+import { GamanCookies } from './cookies';
+import { Response } from './response';
 
 /* -------------------------------------------------------------------------- */
 /*                              Interface Global                              */
 /* -------------------------------------------------------------------------- */
+declare global {
+	namespace Gaman {
+		interface Locals {}
+		interface Env {}
+	}
+}
+export {};
 
 /* -------------------------------------------------------------------------- */
 /*                                    Types                                   */
@@ -312,7 +319,7 @@ export interface IBlock<A extends AppConfig> {
 	 * @param ctx - The context object representing the current request.
 	 * @returns A `NextResponse` to handle the error gracefully.
 	 */
-	error?: (error: HttpError, ctx: Context<A>) => NextResponse;
+	error?: (error: HttpException, ctx: Context<A>) => NextResponse;
 
 	/**
 	 * Defines a set of routes for this block.

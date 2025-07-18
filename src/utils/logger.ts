@@ -46,7 +46,7 @@ export const Logger = {
 
 		console[type === 'error' ? 'error' : type === 'warn' ? 'warn' : 'log'](
 			TextFormat.format(text) + TextFormat.format(color[type]),
-			...msg.map(TextFormat.format),
+			...msg.map((m) => TextFormat.format(String(m))),
 		);
 	},
 
@@ -83,6 +83,7 @@ export const Logger = {
 	},
 
 	setStatus(status: number | null) {
+		//@ts-ignore
 		Logger.response.status = status;
 	},
 

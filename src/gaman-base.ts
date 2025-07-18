@@ -14,7 +14,7 @@ import { formatPath, isHtmlString, removeEndSlash } from './utils/utils';
 import { Response } from './response';
 import { sortArrayByPriority } from './utils/priority';
 import { performance } from 'perf_hooks';
-import HttpError from './error/HttpError';
+import { HttpException } from './error/http-exception';
 import { GamanWebSocket } from './web-socket';
 import { Readable } from 'node:stream';
 import path from 'node:path';
@@ -66,7 +66,7 @@ export class GamanBase<A extends AppConfig> {
 				// Initialize block childrens
 				function initChilderns(basePath: string, childrens: Array<IBlock<A>>, app: GamanBase<A>) {
 					for (const blockChild of childrens) {
-						const childPath = path.join(basePath, blockChild.path);
+						const childPath = path.join(basePath, blockChild.path || '/');
 						if (app.#blocks.some((b) => b.path === childPath)) {
 							throw new Error(`Block '${childPath}' already exists!`);
 						}
@@ -98,14 +98,14 @@ export class GamanBase<A extends AppConfig> {
 	getBlock(blockPath: string): IBlock<A> | undefined {
 		const path = formatPath(blockPath, this.strict);
 		const block: IBlock<A> | undefined = this.#blocks.find(
-			(b) => formatPath(b.path, this.strict) === path,
+			(b) => formatPath(b.path || '/', this.strict) === path,
 		);
 		return block;
 	}
 
 	registerBlock(block: IBlock<A>) {
 		// * tambahin "/" di belakang kalau strict
-		const _path = formatPath(block.path, this.strict);
+		const _path = formatPath(block.path || '/', this.strict);
 		this.#blocks.push({
 			...block,
 			path: _path,
@@ -178,13 +178,13 @@ export class GamanBase<A extends AppConfig> {
 					} catch (error: any) {
 						if (block.error) {
 							// ! Block Error handler
-							const result = await block.error(new HttpError(403, error.message), ctx);
+							const result = await block.error(new HttpException(403, error.message), ctx);
 							if (result) {
 								return await this.handleResponse(result, ctx);
 							}
 						}
 						Log.error(error);
-						throw new HttpError(403, error.message);
+						throw new HttpException(403, error.message);
 					}
 				} else if ('onRequest' in blockOrIntegration) {
 					const integration = blockOrIntegration as IIntegration<A>;
@@ -320,25 +320,31 @@ export class GamanBase<A extends AppConfig> {
 							if (result) return result;
 						}
 					} else {
-						// * Lakukan Proses Nested jika ada pathNested
-						const result = await this.handleRoutes(
-							{ [methodOrPathNested]: nestedHandler },
-							ctx,
-							routeFullPath,
-						);
+						if (nestedHandler) {
+							// * Lakukan Proses Nested jika ada pathNested
+							const result = await this.handleRoutes(
+								{ [methodOrPathNested]: nestedHandler },
+								ctx,
+								routeFullPath,
+							);
 
-						/**
-						 * * Kalau kalau dia ada result langsung response
-						 * * Kalau gak ada lanjut ke route berikutnya...
-						 */
-						if (result) return result;
+							/**
+							 * * Kalau kalau dia ada result langsung response
+							 * * Kalau gak ada lanjut ke route berikutnya...
+							 */
+							if (result) return result;
+						}
 					}
 				}
 			}
 		}
 	}
 
-	private async handleResponse(result: string | object | any[] | Response, ctx: Context<A>) {
+	private async handleResponse(
+		result: string | object | any[] | Response | undefined,
+		ctx: Context<A>,
+	) {
+		//@ts-ignore
 		const res: http.ServerResponse = ctx[HTTP_RESPONSE_SYMBOL];
 		if (res.writableEnded) return; // * ignore process if response finished
 

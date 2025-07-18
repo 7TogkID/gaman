@@ -6,7 +6,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const entryPoints = glob.sync('./src/**/*.ts', {
-	ignore: ["./src/**/*.test.*"],
+	ignore: ['./src/**/*.test.*'],
 });
 
 /*
@@ -73,3 +73,5 @@ try {
 } catch (err) {
 	console.error('[build:error]', err);
 }
+
+await import('./copy-package');

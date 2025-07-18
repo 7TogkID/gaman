@@ -43,14 +43,14 @@ export class FormDataEntryValue implements IFormDataEntryValue {
     return this.toString();
   }
 
-  public asString(): string {
+  public asString(): string | undefined {
     if (typeof this.value === "string") return this.value;
-    return null;
+    return undefined;
   }
 
-  public asFile(): Blob {
+  public asFile(): Blob | undefined {
     if (this.value instanceof Blob) return this.value;
-    return null;
+    return undefined;
   }
 }
 
