@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import inquirer from 'inquirer';
 import { execSync } from 'child_process';
 import degit from 'degit';
+import { randomBytes } from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -94,31 +95,16 @@ async function main() {
 		}
 	}
 
-	await generateKey();
+	const envPath = path.join(targetDir, '.env');
+	const gamanKey = randomBytes(32).toString('hex');
+
+	await fs.writeFile(envPath, `GAMAN_KEY=${gamanKey}\n`);
+	console.log('🔐 Generated GAMAN_KEY and saved to .env');
 
 	console.log('\n🎉 Project created successfully!');
 	console.log(`\n🚀 Next steps:`);
 	console.log(`  cd ${answers.projectName}`);
 	console.log('  npm run dev');
-}
-
-export async function generateKey() {
-	const envPath = resolve(process.cwd(), '.env');
-	const key = randomBytes(32).toString('hex');
-
-	let envContent = '';
-	if (existsSync(envPath)) {
-		envContent = readFileSync(envPath, 'utf-8');
-		envContent = envContent
-			.split('\n')
-			.filter((line) => !line.trim().startsWith('GAMAN_KEY='))
-			.join('\n');
-	}
-
-	envContent += `\nGAMAN_KEY=${key}\n`;
-
-	writeFileSync(envPath, envContent.trim() + '\n');
-	console.log(`GAMAN_KEY generated and written to .env`);
 }
 
 process.on('SIGINT', () => {
