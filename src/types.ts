@@ -75,7 +75,7 @@ export type AppOptions<A extends AppConfig> = {
 	/**
 	 * List of blocks defining routes, middlewares, and other functionalities for the application.
 	 */
-	blocks?: Array<IBlock<A>>;
+	blocks?: Array<Promise<IBlock<A>>>;
 
 	/**
 	 * Global error handler for handling application-wide errors.

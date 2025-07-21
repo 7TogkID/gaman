@@ -47,8 +47,12 @@ export class GamanBase<A extends AppConfig> {
 		 * * EN: Initialize Blocks and childrens
 		 * * ID: inisialisasi blocks dan childrens nya
 		 */
-		if (options.blocks) {
-			for (const block of options.blocks) {
+		this.registerBlocks();
+	}
+
+	private async registerBlocks() {
+		if (this.options.blocks) {
+			for await (const block of this.options.blocks) {
 				const blockPath = block.path || '/';
 				if (this.#blocks.some((b) => b.path === blockPath)) {
 					throw new Error(`Block '${blockPath}' already exists!`);

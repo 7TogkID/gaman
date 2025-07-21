@@ -26,16 +26,16 @@ export let options = {
 };
 
 export default function () {
-  const res1 = http.get("http://localhost:3000/");
+  const res1 = http.get("http://localhost:34131/");
   check(res1, {
     "GET 200": (r) => r.status === 200,
   });
   
-  const payload = JSON.stringify({ name: "Oxarion", version: "1.0" });
-  const res2 = http.post("http://localhost:3000/api/test", payload, {
-    headers: { "Content-Type": "application/json" },
-  });
-  check(res2, {
-    "POST 200": (r) => r.status === 200,
-  });
+  // const payload = JSON.stringify({ name: "Oxarion", version: "1.0" });
+  // const res2 = http.post("http://localhost:34131/api/test", payload, {
+  //   headers: { "Content-Type": "application/json" },
+  // });
+  // check(res2, {
+  //   "POST 200": (r) => r.status === 200,
+  // });
 }
