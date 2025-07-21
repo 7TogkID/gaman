@@ -1,6 +1,6 @@
 {
   "name": "gaman",
-  "version": "0.0.47",
+  "version": "1.0.0",
   "type": "module",
   "main": "./dist/cjs/index.js",
   "module": "./dist/index.js",
@@ -34,8 +34,10 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
+  "peerDependencies": {
+    "@gaman/cli": ">=0.0.14"
+  },
   "dependencies": {
-    "@gaman/cli": "0.0.12",
     "@types/ws": "^8.18.1",
     "busboy": "^1.6.0",
     "cookie": "^1.0.2",

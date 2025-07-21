@@ -35,7 +35,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "dependencies": {
-    "@gaman/cli": "0.0.12",
+    "@gaman/cli": "0.0.14",
     "@types/ws": "^8.18.1",
     "busboy": "^1.6.0",
     "cookie": "^1.0.2",
@@ -101,5 +101,5 @@
       ]
     }
   },
-  "yalcSig": "2813fe20afa29f8913e16062355f067b"
+  "yalcSig": "4728c70c79619bc3596f25a9e10bea77"
 }

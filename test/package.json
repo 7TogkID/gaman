@@ -13,6 +13,7 @@
 	"license": "ISC",
 	"description": "",
 	"dependencies": {
+		"@gaman/cli": "^0.0.14",
 		"gaman": "file:.yalc/gaman",
 		"mongodb": "^6.17.0"
 	}

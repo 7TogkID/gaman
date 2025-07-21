@@ -4,6 +4,10 @@ dist/
 # dependencies
 node_modules/
 
+# file session
+session.db
+sessions/
+
 # logs
 npm-debug.log*
 yarn-debug.log*
@@ -13,6 +17,7 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.env.example
 
 # macOS-specific files
 .DS_Store

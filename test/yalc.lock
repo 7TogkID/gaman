@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "gaman": {
-      "signature": "2813fe20afa29f8913e16062355f067b",
+      "signature": "4728c70c79619bc3596f25a9e10bea77",
       "file": true,
       "replaced": "^0.0.47"
     }
