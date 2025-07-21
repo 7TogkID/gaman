@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { createContext } from './context';
+import { createContext } from '.';
 import type http from 'node:http';
 import { Readable } from 'stream';
 

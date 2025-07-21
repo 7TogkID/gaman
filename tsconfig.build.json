@@ -11,6 +11,7 @@
 		"typeRoots": ["src/types", "./node_modules/@types"]
 	},
 	"include": ["src/**/*.ts"],
+	"exclude": ["src/**/*.test.*"],
 	"tsc-alias": {
 		"resolveFullPaths": true,
 		"verbose": false

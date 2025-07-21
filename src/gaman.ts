@@ -1,18 +1,26 @@
-import { GamanBase } from "./gaman-base";
-import type { AppConfig, AppOptions } from "./types";
+import { GamanBase } from './gaman-base';
+import type { AppConfig, AppOptions } from './types';
+import { Log } from './utils';
 
 const defaultOptions = {
-  server: {
-    host: "localhost",
-    port: 3431,
-  },
+	server: {
+		host: 'localhost',
+		port: 3431,
+	},
 };
 
-export function serv<A extends AppConfig>(
-  options: AppOptions<A> = defaultOptions
-): GamanBase<A> {
-  const app = new GamanBase<A>(options);
-  app.listen();
+export function serv<A extends AppConfig>(options: AppOptions<A> = defaultOptions): GamanBase<A> {
+	const app = new GamanBase<A>(options);
+	app.listen();
 
-  return app;
+	if (!process.env.GAMAN_KEY) {
+		Log.error(
+			'Missing GAMAN_KEY in your environment.\n' +
+				'Please generate one by running the following command:\n\n' +
+				'  npx gaman key:generate\n',
+		);
+		process.exit(1);
+	}
+
+	return app;
 }

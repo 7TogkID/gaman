@@ -19,10 +19,10 @@ import { GamanWebSocket } from './web-socket';
 import { Readable } from 'node:stream';
 import path from 'node:path';
 import { HTTP_RESPONSE_SYMBOL } from './symbol';
-import { GamanCookies } from './cookies';
+import { GamanCookies } from './context/cookies';
 import { IGNORED_LOG_FOR_PATH_REGEX } from './constant';
 
-export class GamanBase<A extends AppConfig> {
+export class GamanBase<A extends AppConfig = any> {
 	#blocks: IBlock<A>[] = [];
 	#websocket: GamanWebSocket<A>;
 	#integrations: Array<IIntegration<A>> = [];
@@ -39,7 +39,7 @@ export class GamanBase<A extends AppConfig> {
 		if (options.integrations) {
 			for (const integration of options.integrations) {
 				this.#integrations.push(integration);
-				integration.onLoad?.(this.options);
+				integration.onLoad?.(this);
 			}
 		}
 
@@ -95,6 +95,10 @@ export class GamanBase<A extends AppConfig> {
 		}
 	}
 
+	getOptions() {
+		return this.options;
+	}
+
 	getBlock(blockPath: string): IBlock<A> | undefined {
 		const path = formatPath(blockPath, this.strict);
 		const block: IBlock<A> | undefined = this.#blocks.find(
@@ -114,7 +118,7 @@ export class GamanBase<A extends AppConfig> {
 
 	private async requestHandle(req: http.IncomingMessage, res: http.ServerResponse) {
 		const startTime = performance.now();
-		const ctx = await createContext<A>(req, res);
+		const ctx = await createContext<A>(this, req, res);
 		Log.setRoute(ctx.request.pathname || '/');
 		Log.setMethod(ctx.request.method.toUpperCase());
 		try {
@@ -188,7 +192,7 @@ export class GamanBase<A extends AppConfig> {
 					}
 				} else if ('onRequest' in blockOrIntegration) {
 					const integration = blockOrIntegration as IIntegration<A>;
-					const result = await integration.onRequest?.(this.options, ctx);
+					const result = await integration.onRequest?.(this, ctx);
 					if (result) {
 						return await this.handleResponse(result, ctx);
 					}
@@ -394,7 +398,7 @@ export class GamanBase<A extends AppConfig> {
 
 			for (const integration of integrations) {
 				if (integration.onResponse) {
-					const integrationResponse = await integration.onResponse(this.options, ctx, response);
+					const integrationResponse = await integration.onResponse(this, ctx, response);
 					if (integrationResponse) {
 						response = integrationResponse;
 						break;

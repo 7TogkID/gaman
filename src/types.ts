@@ -3,8 +3,10 @@ import type { HttpException } from './error/http-exception';
 import { ClientRequest } from 'http';
 import { GamanHeaders } from './headers';
 import { FormData } from './utils/form-data';
-import { GamanCookies } from './cookies';
+import { GamanCookies } from './context/cookies';
 import { Response } from './response';
+import { GamanSession } from './context/session';
+import { GamanBase } from './gaman-base';
 
 /* -------------------------------------------------------------------------- */
 /*                              Interface Global                              */
@@ -38,25 +40,25 @@ export type IIntegration<A extends AppConfig = AppConfig> = {
 	 * Callback executed when the integration is loaded.
 	 * Use this to perform setup or initialization tasks.
 	 */
-	onLoad?: (app: AppOptions<A>) => void;
+	onLoad?: (app: GamanBase<A>) => void;
 
 	/**
 	 * Callback executed when the integration is disabled.
 	 * Use this to clean up or remove configurations.
 	 */
-	onDisabled?: (app: AppOptions<A>) => void;
+	onDisabled?: (app: GamanBase<A>) => void;
 
 	/**
 	 * Callback executed when a client makes a request to the server.
 	 * This allows you to modify the context or handle specific request logic.
 	 */
-	onRequest?: (app: AppOptions<A>, ctx: Context<A>) => NextResponse;
+	onRequest?: (app: GamanBase<A>, ctx: Context<A>) => NextResponse;
 
 	/**
 	 * Callback executed before the response is sent to the client.
 	 * Use this to modify or enhance the response.
 	 */
-	onResponse?: (app: AppOptions<A>, ctx: Context<A>, res: Response) => Promise<Response> | Response;
+	onResponse?: (app: GamanBase<A>, ctx: Context<A>, res: Response) => Promise<Response> | Response;
 };
 
 export type AppOptions<A extends AppConfig> = {
@@ -239,6 +241,7 @@ export interface Context<A extends AppConfig = AppConfig>
 	url: URL;
 	cookies: GamanCookies;
 	request: Request;
+	session: GamanSession;
 }
 
 export type NextResponse =

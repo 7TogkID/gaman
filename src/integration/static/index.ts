@@ -1,5 +1,5 @@
 import { createReadStream, promises as fsPromises, statSync } from 'fs';
-import { join, extname } from 'path';
+import { join } from 'path';
 import { defineIntegration } from '..';
 import { Response } from '../../response';
 import { Log } from '../../utils/logger';
@@ -132,7 +132,6 @@ export function gamanStatic(options: StaticFileOptions = {}) {
 			}
 
 			// Cari MIME type dari ekstensi
-			const ext = extname(filePath);
 			const contentType = detectMime(filePath, options.mimes) || 'application/octet-stream';
 
 			// Matikan log route bawaan GamanJS (supaya tidak log 2x)
