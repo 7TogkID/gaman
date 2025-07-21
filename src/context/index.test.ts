@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
-import { createContext } from './context';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { createContext } from '.';
 import type http from 'node:http';
 import { Readable } from 'stream';
+import { GamanBase } from '../gaman-base';
 
 function mockRequest({
 	method = 'GET',
@@ -46,7 +47,12 @@ function mockResponse(): http.ServerResponse {
 	} as unknown as http.ServerResponse;
 }
 
-describe('createContext()', () => {
+describe('createContext(app, )', () => {
+	var app: GamanBase<any>;
+	beforeAll(() => {
+		app = new GamanBase<any>({});
+	});
+
 	it('parses query and headers', async () => {
 		const req = mockRequest({
 			url: '/?name=joni',
@@ -57,7 +63,7 @@ describe('createContext()', () => {
 		});
 		const res = mockResponse();
 
-		const ctx = await createContext(req, res);
+		const ctx = await createContext(app, req, res);
 
 		expect(ctx.query('name')).toBe('joni');
 		expect(ctx.header('x-forwarded-for')).toBe('1.2.3.4');
@@ -76,7 +82,7 @@ describe('createContext()', () => {
 		});
 		const res = mockResponse();
 
-		const ctx = await createContext(req, res);
+		const ctx = await createContext(app, req, res);
 		const json = await ctx.json<{ message: string }>();
 
 		expect(json.message).toBe('hello');
@@ -95,7 +101,7 @@ describe('createContext()', () => {
 		});
 		const res = mockResponse();
 
-		const ctx = await createContext(req, res);
+		const ctx = await createContext(app, req, res);
 		const form = await ctx.formData();
 
 		expect(form.get('username')?.asString()).toBe('joni');
@@ -127,7 +133,7 @@ describe('createContext()', () => {
 			body: body,
 		});
 		const res = mockResponse();
-		const ctx = await createContext(req, res);
+		const ctx = await createContext(app, req, res);
 
 		const form = await ctx.formData();
 		expect(form.get('username')?.asString()).toBe('joni');

@@ -81,17 +81,6 @@ export function sortArray<T>(array: T[], key: keyof T, order: 'asc' | 'desc' = '
 	});
 }
 
-/**
- * Encode data to Base64URL format
- * @param data - Data to encode
- */
-export function base64UrlEncode(data: string): string {
-	return Buffer.from(data)
-		.toString('base64')
-		.replace(/=/g, '') // Remove padding
-		.replace(/\+/g, '-') // Replace "+" with "-"
-		.replace(/\//g, '_'); // Replace "/" with "_"
-}
 
 export function parseBoolean(value: string) {
 	if (typeof value === 'boolean') return value;

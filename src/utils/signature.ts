@@ -1,37 +1,39 @@
-import { base64UrlEncode } from "./utils";
-import crypto from "node:crypto";
+import crypto from 'node:crypto';
+import { base64UrlEncode, base64UrlDecode } from './encode';
 
 /**
- * Create a signature token
- * @param payload - Data to include in the token
- * @param secret - Secret key for signing the token
- * @param alg - Algorithm (default: HS256)
+ * Sign a payload using HMAC SHA256 (HS256)
  */
-export function createSignature(payload: object, secret: crypto.BinaryLike): string {
-  // Encode Payload
-  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+export function sign(payload: object | string | Buffer, secret: crypto.BinaryLike): string {
+	const json =
+		typeof payload === 'string' || Buffer.isBuffer(payload)
+			? payload.toString()
+			: JSON.stringify(payload);
 
-  const signature = crypto
-    .createHmac("sha256", secret) // Use HMAC-SHA256 (HS256)
-    .update(encodedPayload)
-    .digest("base64");
+	const encodedPayload = base64UrlEncode(json);
 
-  const encodedSignature = base64UrlEncode(signature);
+	const signature = crypto.createHmac('sha256', secret).update(encodedPayload).digest('base64');
 
-  // Combine all parts
-  return `${encodedPayload}.${encodedSignature}`;
+	const encodedSignature = base64UrlEncode(signature);
+
+	return `${encodedPayload}.${encodedSignature}`;
 }
 
 /**
- * Verify a signature token
- * @param token - signature token
- * @param secret - Secret key for verification
+ * Verify the token and return payload if valid, or null if invalid
  */
-export function verifySignature(token: string, secret: crypto.BinaryLike): boolean {
-  const [payload, signature] = token.split(".");
-  const expectedSignature = crypto
-    .createHmac("sha256", secret)
-    .update(payload)
-    .digest("base64");
-  return base64UrlEncode(expectedSignature) === signature;
+export function verify(token: string, secret: crypto.BinaryLike): string | null {
+	const [encodedPayload, signature] = token.split('.');
+	if (!encodedPayload || !signature) return null;
+
+	const expectedSignature = crypto
+		.createHmac('sha256', secret)
+		.update(encodedPayload)
+		.digest('base64');
+
+	const valid = base64UrlEncode(expectedSignature) === signature;
+	if (!valid) return null;
+
+	const payload = base64UrlDecode(encodedPayload);
+	return payload;
 }

@@ -17,6 +17,7 @@ const addExtension = (extension: string = '.js', fileExtension: string = '.ts'):
 	name: 'add-extension',
 	setup(build: PluginBuild) {
 		build.onResolve({ filter: /.*/ }, (args) => {
+	
 			if (args.importer) {
 				const p = path.join(args.resolveDir, args.path);
 				let tsPath = `${p}${fileExtension}`;

@@ -5,6 +5,7 @@ const exportsMap: Record<string, string> = {
 	nunjucks: 'integration/nunjucks/index',
 	ejs: 'integration/ejs/index',
 	static: 'integration/static/index',
+	session: 'integration/session/index',
 
 	// Middlewares
 	cors: 'middleware/cors/index',

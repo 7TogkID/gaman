@@ -1,13 +1,16 @@
 import http from 'node:http';
 import querystring from 'node:querystring';
-import type { Context, AppConfig, Request } from './types';
-import { FormData, type IFormDataEntryValue } from './utils/form-data';
+import type { Context, AppConfig, Request } from '../types';
+import { FormData, type IFormDataEntryValue } from '../utils/form-data';
 import Busboy from 'busboy'; // Import Busboy
-import { GamanHeaders } from './headers';
+import { GamanHeaders } from '../headers';
 import { GamanCookies } from './cookies';
-import { HTTP_REQUEST_SYMBOL, HTTP_RESPONSE_SYMBOL } from './symbol';
+import { HTTP_REQUEST_SYMBOL, HTTP_RESPONSE_SYMBOL } from '../symbol';
+import { GamanSession } from './session';
+import { GamanBase } from '../gaman-base';
 
 export async function createContext<A extends AppConfig>(
+	app: GamanBase<A>,
 	req: http.IncomingMessage,
 	res: http.ServerResponse,
 ): Promise<Context<A>> {
@@ -85,12 +88,14 @@ export async function createContext<A extends AppConfig>(
 		input: async (name: string) => (await gamanRequest.formData()).get(name)?.asString(),
 		ip: getClientIP(req),
 	};
+	const cookies = new GamanCookies(gamanRequest);
 	const ctx = {
 		locals: <A['Locals']>{},
 		env: <A['Env']>{},
 		url,
-		cookies: new GamanCookies(gamanRequest),
+		cookies,
 		request: gamanRequest,
+		session: new GamanSession(app, cookies, gamanRequest),
 
 		// data dari request
 		headers: gamanRequest.headers,
