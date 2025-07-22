@@ -21,6 +21,7 @@ import path from 'node:path';
 import { HTTP_RESPONSE_SYMBOL } from './symbol';
 import { GamanCookies } from './context/cookies';
 import { IGNORED_LOG_FOR_PATH_REGEX } from './constant';
+import { next } from './next';
 
 export class GamanBase<A extends AppConfig = any> {
 	#blocks: IBlock<A>[] = [];
@@ -141,7 +142,7 @@ export class GamanBase<A extends AppConfig = any> {
 
 						if (block.includes) {
 							for (const middleware of block.includes) {
-								const result = await middleware(ctx);
+								const result = await middleware(ctx, next);
 
 								/**
 								 * ? Kenapa harus di kurung di if(result){...} ???
@@ -156,7 +157,7 @@ export class GamanBase<A extends AppConfig = any> {
 
 						// Global middleware handler
 						if (block.all) {
-							const result = await block.all(ctx);
+							const result = await block.all(ctx, next);
 
 							/**
 							 * ? Kenapa harus di kurung di if(result){...} ???
@@ -285,14 +286,14 @@ export class GamanBase<A extends AppConfig = any> {
 				 * * jalanin handler jika ($handler) adalah type Array<Handler> dan pathMatch valid
 				 */
 				for await (const handle of handler) {
-					const result = await handle(ctx);
+					const result = await handle(ctx, next);
 					if (result) return result; // Lanjut handler lain jika tidak ada respon
 				}
 			} else if (typeof handler === 'function' && isValid) {
 				/**
 				 * * jalanin handler jika ($handler) adalah type Handler dan pathMatch valid
 				 */
-				const result = await handler(ctx);
+				const result = await handler(ctx, next);
 				if (result) return result; // Lanjut handler lain jika tidak ada respon
 			} else if (typeof handler === 'object') {
 				for await (const [methodOrPathNested, nestedHandler] of Object.entries(handler)) {
@@ -316,11 +317,11 @@ export class GamanBase<A extends AppConfig = any> {
 						 */
 						if (Array.isArray(nestedHandler) && isValid) {
 							for await (const handle of nestedHandler) {
-								const result = await handle(ctx);
+								const result = await handle(ctx, next);
 								if (result) return result;
 							}
 						} else if (typeof nestedHandler === 'function' && isValid) {
-							const result = await nestedHandler(ctx);
+							const result = await nestedHandler(ctx, next);
 							if (result) return result;
 						}
 					} else {

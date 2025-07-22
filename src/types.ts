@@ -116,7 +116,7 @@ export type Priority = 'very-high' | 'high' | 'normal' | 'low' | 'very-low';
 /*                                   Handler                                  */
 /* -------------------------------------------------------------------------- */
 
-export type Handler<A extends AppConfig> = (c: Context<A>) => NextResponse;
+export type Handler<A extends AppConfig> = (c: Context<A>, next: () => NextResponse) => NextResponse;
 // Tipe handler untuk event-event WebSocket
 
 export interface WebSocketContext extends WebSocket {
