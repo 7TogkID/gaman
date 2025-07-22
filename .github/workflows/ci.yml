@@ -50,3 +50,23 @@ jobs:
 
       - name: Run tests
         run: bun test
+
+  bun-windows:
+    name: Bun Windows
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Remove package-lock.json (to avoid npm lockfile conflict)
+        run: Remove-Item package-lock.json -ErrorAction SilentlyContinue
+        shell: pwsh
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run tests
+        run: bun test
