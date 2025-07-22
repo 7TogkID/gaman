@@ -47,6 +47,7 @@ export const Logger = {
 		console[type === 'error' ? 'error' : type === 'warn' ? 'warn' : 'log'](
 			TextFormat.format(text) + TextFormat.format(color[type]),
 			...msg.map((m) => TextFormat.format(String(m))),
+			TextFormat.RESET
 		);
 	},
 

@@ -183,13 +183,16 @@ export class GamanBase<A extends AppConfig = any> {
 					} catch (error: any) {
 						if (block.error) {
 							// ! Block Error handler
-							const result = await block.error(new HttpException(403, error.message), ctx);
+							const result = await block.error(
+								new HttpException(403, error.message, error),
+								ctx,
+								next,
+							);
 							if (result) {
 								return await this.handleResponse(result, ctx);
 							}
 						}
-						Log.error(error);
-						throw new HttpException(403, error.message);
+						throw new HttpException(403, error.message, error);
 					}
 				} else if ('onRequest' in blockOrIntegration) {
 					const integration = blockOrIntegration as IIntegration<A>;
@@ -201,19 +204,19 @@ export class GamanBase<A extends AppConfig = any> {
 			}
 
 			// not found
-			return await this.handleResponse(undefined, ctx);
+			return await this.handleResponse(new Response(undefined, { status: 404 }), ctx);
 		} catch (error: any) {
 			// ! Handler Error keseluruhan system
 
 			if (this.options.error) {
-				const result = await this.options.error(error, ctx);
+				const result = await this.options.error(error, ctx, next);
 				if (result) {
 					return await this.handleResponse(result, ctx);
 				}
 			}
 			Log.error(error.message);
-			res.statusCode = 500;
-			res.end('Internal Server Error');
+			console.error(error.details)
+			return await this.handleResponse(new Response(undefined, { status: 500 }), ctx);
 		} finally {
 			const endTime = performance.now();
 
@@ -361,7 +364,7 @@ export class GamanBase<A extends AppConfig = any> {
 		 * * substitue result
 		 * @default response 404
 		 */
-		let response: Response = new Response(null, { status: 404 });
+		let response: Response = new Response(undefined, { status: 404 });
 
 		if (isResponse(result)) {
 			response = result;

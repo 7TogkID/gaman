@@ -83,7 +83,7 @@ export type AppOptions<A extends AppConfig> = {
 	 * Global error handler for handling application-wide errors.
 	 * Called with the error and the current request context.
 	 */
-	error?: (error: Error, ctx: Context<A>) => NextResponse;
+	error?: (error: Error, ctx: Context<A>, next: () => NextResponse) => NextResponse;
 
 	/**
 	 * Server configuration options, including host and port.
@@ -116,7 +116,10 @@ export type Priority = 'very-high' | 'high' | 'normal' | 'low' | 'very-low';
 /*                                   Handler                                  */
 /* -------------------------------------------------------------------------- */
 
-export type Handler<A extends AppConfig> = (c: Context<A>, next: () => NextResponse) => NextResponse;
+export type Handler<A extends AppConfig> = (
+	c: Context<A>,
+	next: () => NextResponse,
+) => NextResponse;
 // Tipe handler untuk event-event WebSocket
 
 export interface WebSocketContext extends WebSocket {
@@ -322,7 +325,7 @@ export interface IBlock<A extends AppConfig> {
 	 * @param ctx - The context object representing the current request.
 	 * @returns A `NextResponse` to handle the error gracefully.
 	 */
-	error?: (error: HttpException, ctx: Context<A>) => NextResponse;
+	error?: (error: HttpException, ctx: Context<A>, next: () => NextResponse) => NextResponse;
 
 	/**
 	 * Defines a set of routes for this block.
