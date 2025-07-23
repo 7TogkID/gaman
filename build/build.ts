@@ -74,5 +74,3 @@ try {
 } catch (err) {
 	console.error('[build:error]', err);
 }
-
-await import('./copy-package');
