@@ -88,7 +88,7 @@ async function main() {
 
   // Ambil versi terbaru gaman dari registry
   const latestGaman = (await getPackageLatest()).version;
-  if (packageJson.dependencies && packageJson.dependencies.gaman) {
+  if (packageJson.dependencies) {
     packageJson.dependencies.gaman = `^${latestGaman}`;
   }
 
