@@ -17,6 +17,7 @@
     "test": "vitest run",
     "test:push": "npm run gen:exports && npm run build && yalc push",
     "gen:exports": "tsx build/generate-exports.ts",
+    "gen:key": "tsx build/generate-key.ts",
     "release": "npm run gen:exports && npm run build && npm publish",
     "release:beta": "npm run gen:exports && npm run build && npm publish --tag beta",
     "lint:src": "eslint src/ --ext .ts",
@@ -65,7 +66,6 @@
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.36.0",
-    "undici": "^7.12.0",
     "vitest": "^3.2.4"
   },
   "exports": {
