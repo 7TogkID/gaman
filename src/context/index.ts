@@ -1,13 +1,16 @@
 import http from 'node:http';
 import querystring from 'node:querystring';
 import type { Context, AppConfig, Request } from '../types';
-import { FormData, type IFormDataEntryValue } from '../utils/form-data';
-import Busboy from 'busboy'; // Import Busboy
 import { GamanHeaders } from '../headers';
 import { GamanCookies } from './cookies';
 import { HTTP_REQUEST_SYMBOL, HTTP_RESPONSE_SYMBOL } from '../symbol';
 import { GamanSession } from './session';
 import { GamanBase } from '../gaman-base';
+import { parseMultipart } from '@mjackson/multipart-parser/node';
+import { Buffer } from 'node:buffer';
+import { FormData, FormDataEntryValue, IFormDataEntryValue } from './formdata';
+import { File } from './formdata/file';
+import { Response } from '../response';
 
 export async function createContext<A extends AppConfig>(
 	app: GamanBase<A>,
@@ -22,8 +25,7 @@ export async function createContext<A extends AppConfig>(
 
 	/** FormData state */
 	let form: FormData | null = null;
-
-	let body: Buffer<ArrayBufferLike> | null = null;
+	let body: Buffer;
 
 	const gamanRequest: Request = {
 		method,
@@ -43,26 +45,31 @@ export async function createContext<A extends AppConfig>(
 
 		body: async () => {
 			if (body == null) {
-				body = await getRequestBodyBuffer(req);
+				body = await getBody(req);
 			}
 			return body;
 		},
 		text: async () => {
 			if (body == null) {
-				body = await getRequestBodyBuffer(req);
+				body = await getBody(req);
 			}
 			return body.toString();
 		},
 		json: async <T>() => {
 			if (contentType.includes('application/json') && method !== 'HEAD') {
 				if (body == null) {
-					body = await getRequestBodyBuffer(req);
+					body = await getBody(req);
 				}
 				try {
 					return JSON.parse(body.toString()) as T;
 				} catch {
 					return {} as T;
 				}
+			} else if (contentType.includes('application/x-www-form-urlencoded') && method !== 'HEAD') {
+				if (body == null) {
+					body = await getBody(req);
+				}
+				return querystring.parse(body.toString()) as T;
 			} else {
 				return {} as T;
 			}
@@ -74,18 +81,26 @@ export async function createContext<A extends AppConfig>(
 
 			if (contentType.includes('application/x-www-form-urlencoded') && method !== 'HEAD') {
 				if (body == null) {
-					body = await getRequestBodyBuffer(req);
+					body = await getBody(req);
 				}
-				form = parseFormUrlEncoded(body?.toString() || '{}');
+				form = parseFormUrlEncoded(body.toString() || '{}');
 			} else if (contentType.includes('multipart/form-data') && method !== 'HEAD') {
-				const formData = await parseMultipartFormWithBusboy(req);
-				form = formData;
+				if (body == null) {
+					body = await getBody(req);
+				}
+				form = await parseMultipartForm(body, contentType);
 			} else {
 				form = new FormData();
 			}
 			return form;
 		},
-		input: async (name: string) => (await gamanRequest.formData()).get(name)?.asString(),
+		input: async (name) => (await gamanRequest.formData()).get(name)?.asString(),
+		inputs: async (name) =>
+			((await gamanRequest.formData()).getAll(name) || []).map((s) => s.asString()),
+		file: async (name) => (await gamanRequest.formData()).get(name)?.asFile(),
+		files: async (name) =>
+			((await gamanRequest.formData()).getAll(name) || []).map((s) => s.asFile()),
+
 		ip: getClientIP(req),
 	};
 	const cookies = new GamanCookies(gamanRequest);
@@ -96,6 +111,8 @@ export async function createContext<A extends AppConfig>(
 		cookies,
 		request: gamanRequest,
 		session: new GamanSession(app, cookies, gamanRequest),
+		response: Response,
+		res: Response,
 
 		// data dari request
 		headers: gamanRequest.headers,
@@ -107,6 +124,9 @@ export async function createContext<A extends AppConfig>(
 		json: gamanRequest.json,
 		formData: gamanRequest.formData,
 		input: gamanRequest.input,
+		inputs: gamanRequest.inputs,
+		file: gamanRequest.file,
+		files: gamanRequest.files,
 
 		// data tersembunyi
 		[HTTP_REQUEST_SYMBOL]: req,
@@ -135,7 +155,7 @@ function getClientIP(req: http.IncomingMessage): string {
 	return remoteIP;
 }
 
-async function getRequestBodyBuffer(req: http.IncomingMessage): Promise<Buffer> {
+async function getBody(req: http.IncomingMessage): Promise<Buffer> {
 	const chunks: Buffer[] = [];
 	return new Promise((resolve, reject) => {
 		req.on('data', (chunk) => chunks.push(chunk));
@@ -180,46 +200,28 @@ function parseFormUrlEncoded(body: string): FormData {
 	return result;
 }
 
-// --- Fungsi Baru untuk Busboy ---
-async function parseMultipartFormWithBusboy(req: http.IncomingMessage): Promise<FormData> {
+async function parseMultipartForm(body: Buffer, contentType: string): Promise<FormData> {
 	const formData = new FormData();
-
-	return new Promise((resolve, reject) => {
-		const busboy = Busboy({ headers: req.headers });
-
-		busboy.on('file', (name, fileStream, info) => {
-			const { filename, mimeType } = info;
-			const fileChunks: Buffer[] = [];
-			fileStream.on('data', (chunk) => {
-				fileChunks.push(chunk);
-			});
-			fileStream.on('end', () => {
-				const fileBuffer = Buffer.concat(fileChunks);
-				formData.set(name, {
-					name: name,
-					filename: filename,
-					mimetype: mimeType,
-					// Menggunakan Blob karena GamanFormData.value menerima Blob
-					value: new Blob([fileBuffer], { type: mimeType }),
-				});
-			});
-			fileStream.on('error', reject);
-		});
-
-		busboy.on('field', (name, val) => {
-			formData.set(name, {
-				name,
-				value: val,
-			});
-		});
-
-		busboy.on('finish', () => {
-			resolve(formData);
-		});
-
-		busboy.on('error', reject);
-
-		// Sangat penting: Alirkan request stream ke busboy
-		req.pipe(busboy);
-	});
+	const match = contentType.match(/boundary="?([^";]+)"?/);
+	const boundary = match?.[1];
+	if (boundary) {
+		for (let part of parseMultipart(body, { boundary })) {
+			if (part.name) {
+				if (part.isText) {
+					formData.set(part.name, new FormDataEntryValue(part.name, part.text));
+				} else if (part.filename) {
+					formData.set(
+						part.name,
+						new FormDataEntryValue(
+							part.name,
+							new File(part.filename, part.content, {
+								type: part.mediaType,
+							}),
+						),
+					);
+				}
+			}
+		}
+	}
+	return formData;
 }

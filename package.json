@@ -39,20 +39,20 @@
     "@gaman/cli": ">=0.0.14"
   },
   "dependencies": {
+    "@mjackson/multipart-parser": "^0.10.1",
     "@types/ws": "^8.18.1",
-    "busboy": "^1.6.0",
     "cookie": "^1.0.2",
     "dotenv": "^17.2.0",
     "ws": "^8.18.2"
   },
   "devDependencies": {
-    "@types/busboy": "^1.5.4",
     "@types/ejs": "^3.1.5",
     "@types/nunjucks": "^3.2.6",
     "arg": "^5.0.2",
     "axios": "^1.11.0",
     "ejs": "^3.1.10",
     "eslint": "^9.31.0",
+    "form-data": "^4.0.4",
     "glob": "^10.4.5",
     "globals": "^16.3.0",
     "k6": "^0.0.0",

@@ -18,6 +18,6 @@
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["src/**/*.ts", "src/response.test.ts", "src/context/index.test.ts"],
-	"exclude": ["node_modules", "dist"]
+	"include": ["src/**/*.ts", "src/global.d.ts"],
+	"exclude": ["node_modules", "dist", "src/**/*.test.*"]
 }
