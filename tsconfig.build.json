@@ -4,11 +4,11 @@
 		"module": "ES2020",
 		"moduleResolution": "node",
 		"rootDir": "./src/",
-		"outDir": "./dist/types",
+		"outDir": "./dist",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 
-		"typeRoots": ["src/types", "./node_modules/@types"]
+		"typeRoots": ["src", "./node_modules/@types"]
 	},
 	"include": ["src/**/*.ts"],
 	"exclude": ["src/**/*.test.*"],

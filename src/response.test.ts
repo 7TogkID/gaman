@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Response } from './response'; // sesuaikan path
+import { Response } from '../dist/response'; // sesuaikan path
 import { Readable } from 'stream';
 
 describe('Response', () => {

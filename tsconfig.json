@@ -1,23 +1,23 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "declaration": true,
-    "moduleResolution": "Bundler",
-    "outDir": "./dist",
-    "esModuleInterop": true,
-    "module": "es2020",
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "types": ["node"]
-  },
-  "jest": {},
-  "tsc-alias": {
-    "resolveFullPaths": true,
-    "verbose": false
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+	"compilerOptions": {
+		"target": "ES2022",
+		"declaration": true,
+		"moduleResolution": "Bundler",
+		"outDir": "./dist",
+		"esModuleInterop": true,
+		"module": "es2020",
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"skipLibCheck": false,
+		"noUnusedLocals": false,
+		"noUnusedParameters": false,
+		"types": ["node"]
+	},
+	"jest": {},
+	"tsc-alias": {
+		"resolveFullPaths": true,
+		"verbose": false
+	},
+	"include": ["src/**/*.ts", "src/response.test.ts", "src/context/index.test.ts"],
+	"exclude": ["node_modules", "dist"]
 }

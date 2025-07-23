@@ -4,7 +4,7 @@
   "type": "module",
   "main": "./dist/cjs/index.js",
   "module": "./dist/index.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -49,6 +49,7 @@
     "@types/ejs": "^3.1.5",
     "@types/nunjucks": "^3.2.6",
     "arg": "^5.0.2",
+    "axios": "^1.11.0",
     "ejs": "^3.1.10",
     "eslint": "^9.31.0",
     "glob": "^10.4.5",
@@ -64,41 +65,42 @@
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.36.0",
+    "undici": "^7.12.0",
     "vitest": "^3.2.4"
   },
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/cjs/index.js"
     },
     "./nunjucks": {
-      "types": "./dist/types/integration/nunjucks/index.d.ts",
+      "types": "./dist/integration/nunjucks/index.d.ts",
       "import": "./dist/integration/nunjucks/index.js",
       "require": "./dist/cjs/integration/nunjucks/index.js"
     },
     "./ejs": {
-      "types": "./dist/types/integration/ejs/index.d.ts",
+      "types": "./dist/integration/ejs/index.d.ts",
       "import": "./dist/integration/ejs/index.js",
       "require": "./dist/cjs/integration/ejs/index.js"
     },
     "./static": {
-      "types": "./dist/types/integration/static/index.d.ts",
+      "types": "./dist/integration/static/index.d.ts",
       "import": "./dist/integration/static/index.js",
       "require": "./dist/cjs/integration/static/index.js"
     },
     "./session": {
-      "types": "./dist/types/integration/session/index.d.ts",
+      "types": "./dist/integration/session/index.d.ts",
       "import": "./dist/integration/session/index.js",
       "require": "./dist/cjs/integration/session/index.js"
     },
     "./cors": {
-      "types": "./dist/types/middleware/cors/index.d.ts",
+      "types": "./dist/middleware/cors/index.d.ts",
       "import": "./dist/middleware/cors/index.js",
       "require": "./dist/cjs/middleware/cors/index.js"
     },
     "./basic-auth": {
-      "types": "./dist/types/middleware/basic-auth/index.d.ts",
+      "types": "./dist/middleware/basic-auth/index.d.ts",
       "import": "./dist/middleware/basic-auth/index.js",
       "require": "./dist/cjs/middleware/basic-auth/index.js"
     }
@@ -106,22 +108,22 @@
   "typesVersions": {
     "*": {
       "nunjucks": [
-        "./dist/types/integration/nunjucks/index"
+        "./dist/integration/nunjucks/index"
       ],
       "ejs": [
-        "./dist/types/integration/ejs/index"
+        "./dist/integration/ejs/index"
       ],
       "static": [
-        "./dist/types/integration/static/index"
+        "./dist/integration/static/index"
       ],
       "session": [
-        "./dist/types/integration/session/index"
+        "./dist/integration/session/index"
       ],
       "cors": [
-        "./dist/types/middleware/cors/index"
+        "./dist/middleware/cors/index"
       ],
       "basic-auth": [
-        "./dist/types/middleware/basic-auth/index"
+        "./dist/middleware/basic-auth/index"
       ]
     }
   }

@@ -9,9 +9,11 @@ const defaultOptions = {
 	},
 };
 
-export function serv<A extends AppConfig>(options: AppOptions<A> = defaultOptions): GamanBase<A> {
+export async function serv<A extends AppConfig>(
+	options: AppOptions<A> = defaultOptions,
+): Promise<GamanBase<A>> {
 	const app = new GamanBase<A>(options);
-	app.listen();
+	await app.listen();
 
 	if (!process.env.GAMAN_KEY) {
 		Log.error(
@@ -19,7 +21,8 @@ export function serv<A extends AppConfig>(options: AppOptions<A> = defaultOption
 				'Please generate one by running the following command:\n\n' +
 				'  npx gaman key:generate\n',
 		);
-		process.exit(1);
+		await app.close();
+		await process.exit(1);
 	}
 
 	return app;

@@ -28,6 +28,9 @@ jobs:
 
       - name: Clean install dependencies
         run: npm ci
+      
+      - name: Build gaman
+        run: npm run build
 
       - name: Run tests
         run: npm test
@@ -47,6 +50,9 @@ jobs:
 
       - name: Install dependencies
         run: bun install
+      
+      - name: Build gaman
+        run: bun run build
 
       - name: Run tests
         run: bun test
@@ -67,6 +73,9 @@ jobs:
 
       - name: Install dependencies
         run: bun install
+      
+      - name: Build gaman
+        run: bun run build
 
       - name: Run tests
         run: bun test

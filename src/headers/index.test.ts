@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GamanHeaders } from '.';
+import { GamanHeaders } from '../../dist/headers';
 
 describe('GamanHeaders', () => {
 	it('should get a header value correctly', () => {

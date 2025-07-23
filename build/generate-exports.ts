@@ -14,7 +14,7 @@ const exportsMap: Record<string, string> = {
 
 const exportsField: Record<string, any> = {
 	'.': {
-		types: './dist/types/index.d.ts',
+		types: './dist/index.d.ts',
 		import: './dist/index.js',
 		require: './dist/cjs/index.js',
 	},
@@ -25,9 +25,8 @@ const typesVersions: Record<string, Record<string, string[]>> = {
 };
 
 for (const [subpath, file] of Object.entries(exportsMap)) {
-	if (subpath === 'types') continue; // skip root types field
 
-	const typesPath = `./dist/types/${file}.d.ts`;
+	const typesPath = `./dist/${file}.d.ts`;
 	const importPath = `./dist/${file}.js`;
 	const requirePath = `./dist/cjs/${file}.js`;
 

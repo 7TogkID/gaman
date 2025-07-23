@@ -92,14 +92,27 @@ export type AppOptions<A extends AppConfig> = {
 		/**
 		 * The host address for the server.
 		 * Defaults to 'localhost' if not specified.
+		 *
+		 * @example '127.0.0.1'
 		 */
 		host?: string;
 
 		/**
 		 * The port number for the server.
+		 * If set to 0, a random available port will be used.
 		 * Defaults to 3431 if not specified.
+		 *
+		 * @example 3000
 		 */
 		port?: number;
+
+		/**
+		 * Disable all internal server logs such as startup messages.
+		 * Useful for test environments or CI pipelines.
+		 *
+		 * @default false
+		 */
+		silent?: boolean;
 	};
 };
 export type LocalsEmpty = object;

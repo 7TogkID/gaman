@@ -27,6 +27,7 @@ export class GamanBase<A extends AppConfig = any> {
 	#blocks: IBlock<A>[] = [];
 	#websocket: GamanWebSocket<A>;
 	#integrations: Array<IIntegration<A>> = [];
+	#server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse> | null = null;
 
 	private strict = false;
 
@@ -115,6 +116,10 @@ export class GamanBase<A extends AppConfig = any> {
 			...block,
 			path: _path,
 		});
+	}
+
+	getServer(): http.Server<typeof http.IncomingMessage, typeof http.ServerResponse> | null {
+		return this.#server;
 	}
 
 	private async requestHandle(req: http.IncomingMessage, res: http.ServerResponse) {
@@ -215,7 +220,7 @@ export class GamanBase<A extends AppConfig = any> {
 				}
 			}
 			Log.error(error.message);
-			console.error(error.details)
+			console.error(error.details);
 			return await this.handleResponse(new Response(undefined, { status: 500 }), ctx);
 		} finally {
 			const endTime = performance.now();
@@ -228,6 +233,7 @@ export class GamanBase<A extends AppConfig = any> {
 				Log.response.route &&
 				Log.response.status &&
 				Log.response.method &&
+				!this.options.server?.silent &&
 				!IGNORED_LOG_FOR_PATH_REGEX.test(Log.response.route)
 			) {
 				Log.log(`Request processed in §a(${(endTime - startTime).toFixed(1)}ms)§r`);
@@ -431,27 +437,54 @@ export class GamanBase<A extends AppConfig = any> {
 		return res.end(response.body);
 	}
 
-	listen() {
-		const server = http.createServer(this.requestHandle.bind(this));
+	listen(): Promise<void> {
+		return new Promise((resolve, reject) => {
+			this.#server = http.createServer(this.requestHandle.bind(this));
 
-		server.on('upgrade', (request, socket, head) => {
-			const urlString = request.url || '/';
-			const { pathname } = new URL(urlString, `http://${request.headers.host}`);
+			this.#server.on('upgrade', (request, socket, head) => {
+				const urlString = request.url || '/';
+				const { pathname } = new URL(urlString, `http://${request.headers.host}`);
 
-			const wss = this.#websocket.getWebSocketServer(pathname);
-			if (wss) {
-				wss.handleUpgrade(request, socket, head, function done(ws) {
-					wss.emit('connection', ws, request);
+				const wss = this.#websocket.getWebSocketServer(pathname);
+				if (wss) {
+					wss.handleUpgrade(request, socket, head, function done(ws) {
+						wss.emit('connection', ws, request);
+					});
+				} else {
+					socket.destroy();
+				}
+			});
+
+			const port = this.options?.server?.port ?? 3431;
+			const host = this.options?.server?.host || 'localhost';
+
+			this.#server.listen(port, host, () => {
+				if (!this.options.server?.silent) {
+					Log.log(
+						// @ts-expect-error
+						`Server is running at http://${host}:${this.#server?.address()?.port}`,
+					);
+				}
+
+				resolve(); // <-- selesai listen
+			});
+
+			this.#server.on('error', (err) => {
+				reject(err); // <-- error bind port, dll
+			});
+		});
+	}
+
+	close(): Promise<void> {
+		return new Promise((resolve, reject) => {
+			if (this.#server) {
+				this.#server.close((err) => {
+					if (err) reject(err);
+					else resolve();
 				});
 			} else {
-				socket.destroy();
+				resolve();
 			}
-		});
-
-		const port = this.options?.server?.port || 3431;
-		const host = this.options?.server?.host || 'localhost';
-		server.listen(port, host, () => {
-			Log.log(`Server is running at http://${host}:${port}`);
 		});
 	}
 

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest';
-import { createContext } from '.';
-import type http from 'node:http';
+import { createContext } from '../../dist/context';
+import * as http from 'node:http';
 import { Readable } from 'stream';
-import { GamanBase } from '../gaman-base';
+import { GamanBase } from '../../dist/gaman-base';
 
 function mockRequest({
 	method = 'GET',
