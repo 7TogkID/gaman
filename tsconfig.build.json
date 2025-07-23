@@ -2,11 +2,12 @@
 	"extends": "./tsconfig.json",
 	"compilerOptions": {
 		"module": "ES2020",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"rootDir": "./src/",
 		"outDir": "./dist",
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
+		"skipLibCheck": true,
 
 		"typeRoots": ["src", "./node_modules/@types"]
 	},

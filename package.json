@@ -1,6 +1,6 @@
 {
   "name": "gaman",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "main": "./dist/cjs/index.js",
   "module": "./dist/index.js",
@@ -11,9 +11,14 @@
   "engines": {
     "node": ">=18.20.8"
   },
+  "bin": {
+    "gaman": "./dist/cli/index.js"
+  },
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && tsx ./build/build.ts",
+    "build:types": "tsc --emitDeclarationOnly --declaration --project tsconfig.build.json",
+    "build:alias": "npx tsc-alias",
+    "build": "npm run clean && tsx ./build/build.ts && npm run build:types && npm run build:alias",
     "test": "vitest run",
     "test:push": "npm run gen:exports && npm run build && yalc push",
     "gen:exports": "tsx build/generate-exports.ts",
@@ -35,19 +40,22 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
-  "peerDependencies": {
-    "@gaman/cli": ">=0.0.14"
-  },
   "dependencies": {
     "@mjackson/multipart-parser": "^0.10.1",
     "@types/ws": "^8.18.1",
     "cookie": "^1.0.2",
     "dotenv": "^17.2.0",
-    "ws": "^8.18.2"
+    "esbuild": "^0.25.8",
+    "fast-glob": "^3.3.3",
+    "fs-extra": "^11.3.0",
+    "ws": "^8.18.2",
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "@types/ejs": "^3.1.5",
+    "@types/fs-extra": "^11.0.4",
     "@types/nunjucks": "^3.2.6",
+    "@types/yargs": "^17.0.33",
     "arg": "^5.0.2",
     "axios": "^1.11.0",
     "ejs": "^3.1.10",
@@ -94,6 +102,11 @@
       "import": "./dist/integration/session/index.js",
       "require": "./dist/cjs/integration/session/index.js"
     },
+    "./integration": {
+      "types": "./dist/integration/index.d.ts",
+      "import": "./dist/integration/index.js",
+      "require": "./dist/cjs/integration/index.js"
+    },
     "./cors": {
       "types": "./dist/middleware/cors/index.d.ts",
       "import": "./dist/middleware/cors/index.js",
@@ -103,6 +116,71 @@
       "types": "./dist/middleware/basic-auth/index.d.ts",
       "import": "./dist/middleware/basic-auth/index.js",
       "require": "./dist/cjs/middleware/basic-auth/index.js"
+    },
+    "./middleware": {
+      "types": "./dist/middleware/index.d.ts",
+      "import": "./dist/middleware/index.js",
+      "require": "./dist/cjs/middleware/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js",
+      "require": "./dist/cjs/utils/index.js"
+    },
+    "./file": {
+      "types": "./dist/context/formdata/file/index.d.ts",
+      "import": "./dist/context/formdata/file/index.js",
+      "require": "./dist/cjs/context/formdata/file/index.js"
+    },
+    "./formdata": {
+      "types": "./dist/context/formdata/index.d.ts",
+      "import": "./dist/context/formdata/index.js",
+      "require": "./dist/cjs/context/formdata/index.js"
+    },
+    "./cookies": {
+      "types": "./dist/context/cookies/index.d.ts",
+      "import": "./dist/context/cookies/index.js",
+      "require": "./dist/cjs/context/cookies/index.js"
+    },
+    "./exception": {
+      "types": "./dist/error/index.d.ts",
+      "import": "./dist/error/index.js",
+      "require": "./dist/cjs/error/index.js"
+    },
+    "./headers": {
+      "types": "./dist/headers/index.d.ts",
+      "import": "./dist/headers/index.js",
+      "require": "./dist/cjs/headers/index.js"
+    },
+    "./tree": {
+      "types": "./dist/tree/index.d.ts",
+      "import": "./dist/tree/index.js",
+      "require": "./dist/cjs/tree/index.js"
+    },
+    "./block": {
+      "types": "./dist/block/index.d.ts",
+      "import": "./dist/block/index.js",
+      "require": "./dist/cjs/block/index.js"
+    },
+    "./response": {
+      "types": "./dist/response.d.ts",
+      "import": "./dist/response.js",
+      "require": "./dist/cjs/response.js"
+    },
+    "./next": {
+      "types": "./dist/next.d.ts",
+      "import": "./dist/next.js",
+      "require": "./dist/cjs/next.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js",
+      "require": "./dist/cjs/types.js"
+    },
+    "./base": {
+      "types": "./dist/gaman-base.d.ts",
+      "import": "./dist/gaman-base.js",
+      "require": "./dist/cjs/gaman-base.js"
     }
   },
   "typesVersions": {
@@ -119,11 +197,53 @@
       "session": [
         "./dist/integration/session/index"
       ],
+      "integration": [
+        "./dist/integration/index"
+      ],
       "cors": [
         "./dist/middleware/cors/index"
       ],
       "basic-auth": [
         "./dist/middleware/basic-auth/index"
+      ],
+      "middleware": [
+        "./dist/middleware/index"
+      ],
+      "utils": [
+        "./dist/utils/index"
+      ],
+      "file": [
+        "./dist/context/formdata/file/index"
+      ],
+      "formdata": [
+        "./dist/context/formdata/index"
+      ],
+      "cookies": [
+        "./dist/context/cookies/index"
+      ],
+      "exception": [
+        "./dist/error/index"
+      ],
+      "headers": [
+        "./dist/headers/index"
+      ],
+      "tree": [
+        "./dist/tree/index"
+      ],
+      "block": [
+        "./dist/block/index"
+      ],
+      "response": [
+        "./dist/response"
+      ],
+      "next": [
+        "./dist/next"
+      ],
+      "types": [
+        "./dist/types"
+      ],
+      "base": [
+        "./dist/gaman-base"
       ]
     }
   }

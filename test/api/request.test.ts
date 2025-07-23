@@ -1,4 +1,5 @@
-import gaman, { defineBlock } from '../../dist';
+import gaman from 'gaman';
+import {defineBlock} from "gaman/block"
 import { beforeAll, describe, expect, it } from 'vitest';
 
 describe('Request Test', () => {
@@ -21,6 +22,7 @@ describe('Request Test', () => {
 			],
 			server: { port: 0, silent: true },
 		});
+		// @ts-ignore
 		const port = app.getServer()?.address()?.port;
 		base = `http://localhost:${port}`;
 	});

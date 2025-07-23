@@ -1,4 +1,5 @@
-import gaman, { defineBlock } from '../src';
+import gaman from 'gaman';
+import {defineBlock} from "gaman/block"
 
 gaman.serv({
 	blocks: [

@@ -1,34 +1,10 @@
-export * from "./types";
-
-export * from "./gaman-base";
-
-export * from "./context";
-export * from "./context/formdata";
-export * from "./context/cookies";
-export * from "./context/session";
-
-export * from "./next";
-export * from "./response";
-export * from "./web-socket";
-export * from "./tree";
-export * from "./middleware";
-export * from "./integration";
-export * from "./headers";
-export * from "./block";
-
-export * from "./error/http-exception";
-
-export * from "./utils/logger";
-export * from "./utils/textformat";
-export * from "./utils/mime"
-
-
 import { serv } from "./gaman";
 import dotenv from "dotenv";
+import "./global"
+
 dotenv.config({
   quiet: true
 });
-
 
 export default {
   serv,

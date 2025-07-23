@@ -18,6 +18,12 @@
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["src/**/*.ts", "src/global.d.ts"],
-	"exclude": ["node_modules", "dist", "src/**/*.test.*"]
+	"include": ["src/**/*.ts", "src/global.ts"],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"src/**/*.test.*",
+		"@mjackson/multipart-parser",
+		"@mjackson/multipart-parser/*"
+	]
 }

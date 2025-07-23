@@ -8,12 +8,16 @@
 
 import { defineIntegration } from '..';
 import { SESSION_OPTIONS_SYMBOL, SESSION_STORE_SYMBOL } from '../../symbol';
-import { Log } from '../../utils';
+import { Log } from '../../utils/logger';
 import { FileStore } from './store/file';
 import { MemoryStore } from './store/memory';
 import { MongoDBStore } from './store/mongo';
 import { RedisStore } from './store/redis';
 import { SQLStore } from './store/sql';
+
+
+/** Export all session context */
+export * from '../../context/session';
 
 /**
  * Configuration options for each session store type.

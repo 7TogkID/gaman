@@ -2,8 +2,6 @@ import { type Plugin, type PluginBuild, type BuildOptions, build } from 'esbuild
 import path from 'node:path';
 import fs from 'node:fs';
 import { glob } from 'glob';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 
 const entryPoints = glob.sync('./src/**/*.ts', {
 	ignore: ['./src/**/*.test.*'],
@@ -65,12 +63,3 @@ const esmBuild = () =>
 	});
 
 Promise.all([esmBuild(), cjsBuild()]);
-
-const execAsync = promisify(exec);
-
-try {
-	await execAsync('npx tsc --emitDeclarationOnly --declaration --project tsconfig.build.json');
-	await execAsync('npx tsc-alias');
-} catch (err) {
-	console.error('[build:error]', err);
-}

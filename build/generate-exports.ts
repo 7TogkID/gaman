@@ -6,10 +6,29 @@ const exportsMap: Record<string, string> = {
 	ejs: 'integration/ejs/index',
 	static: 'integration/static/index',
 	session: 'integration/session/index',
+	integration: 'integration/index',
 
 	// Middlewares
 	cors: 'middleware/cors/index',
 	'basic-auth': 'middleware/basic-auth/index',
+	middleware: 'middleware/index',
+
+	// utils
+	utils: 'utils/index',
+
+	file: 'context/formdata/file/index',
+	formdata: 'context/formdata/index',
+	cookies: 'context/cookies/index',
+
+	exception: 'error/index',
+	headers: 'headers/index',
+
+	tree: 'tree/index',
+	block: 'block/index',
+	response: 'response',
+	next: 'next',
+	types: 'types',
+	base: 'gaman-base'
 };
 
 const exportsField: Record<string, any> = {
@@ -25,7 +44,6 @@ const typesVersions: Record<string, Record<string, string[]>> = {
 };
 
 for (const [subpath, file] of Object.entries(exportsMap)) {
-
 	const typesPath = `./dist/${file}.d.ts`;
 	const importPath = `./dist/${file}.js`;
 	const requirePath = `./dist/cjs/${file}.js`;

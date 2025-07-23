@@ -1,6 +1,6 @@
 import { GamanBase } from './gaman-base';
 import type { AppConfig, AppOptions } from './types';
-import { Log } from './utils';
+import { Log } from './utils/logger';
 
 const defaultOptions = {
 	server: {
