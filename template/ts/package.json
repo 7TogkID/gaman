@@ -12,7 +12,5 @@
 	"author": "",
 	"license": "ISC",
 	"description": "",
-	"dependencies": {
-		"gaman": "^1.0.1"
-	}
+	"dependencies": {}
 }
