@@ -1,61 +1,69 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
-import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
-import dev from './commands/dev';
-import build from './commands/build';
-import start from './commands/start';
-import generateBlock from './commands/make/block';
-import generateKey from './commands/key/generate.js';
+import dev from "./command/dev";
+import build from "./command/build";
+import start from "./command/start";
+import generateKey from "./command/key/generate";
+import { parseArgs } from "./utils/parse";
+import { Command } from "./command/command";
+import { TextFormat } from "../utils";
+import block from "./command/make/block";
+import integration from "./command/make/integration";
+import middleware from "./command/make/middleware";
 
-yargs(hideBin(process.argv))
-	.scriptName('gaman')
-	.usage('$0 <cmd> [args]')
-	.command(
-		'dev',
-		'Run the application in development mode.',
-		() => {},
-		async () => {
-			dev()
-		},
-	)
-	.command(
-		'build',
-		'Build the application.',
-		() => {},
-		async () => {
-			await build()
-		},
-	)
-	.command(
-		'start',
-		'Start the application in production mode.',
-		() => {},
-		async () => {
-			start()
-		},
-	)
-	.command(
-		'make:block <name>',
-		'Generate a new Gaman block',
-		(yargs) => {
-			return yargs.positional('name', {
-				type: 'string',
-				describe: 'Name of the block to create',
-			});
-		},
-		async (argv) => {
-			await generateBlock(argv.name as string);
-		},
-	)
-	.command(
-		'key:generate',
-		'Generate a new GAMAN_KEY and update .env file',
-		() => {},
-		async () => {
-			await generateKey();
-		},
-	)
+// Daftar perintah yang tersedia
+const commands: Command[] = [
+  dev,
+  build,
+  start,
+  generateKey,
+  block,
+  integration,
+	middleware
+];
 
-	.demandCommand(1, 'You need at least one command before moving on')
-	.help().argv;
+// Parsing argumen CLI
+const { command, args } = parseArgs();
+
+// Fungsi menampilkan bantuan
+function showHelp() {
+  console.log(TextFormat.format(`§l§bGaman CLI§r\n`));
+
+  console.log(
+    TextFormat.format(`§eUsage:\n  §r§a$ gaman <command> [options]\n`)
+  );
+  console.log(TextFormat.format(`§eCommands:`));
+
+  for (const cmd of commands) {
+    const aliases =
+      cmd.alias.length > 0 ? ` (alias: ${cmd.alias.join(", ")})` : "";
+
+    console.log(
+      TextFormat.format(
+        ` §b gaman ${cmd.name.padEnd(16)}§r ${cmd.description}${
+          aliases ? ` §8${aliases}` : ""
+        }`
+      )
+    );
+  }
+
+  console.log();
+}
+
+(async () => {
+  if (!command || command === "help" || args.help || args.h) {
+    showHelp();
+    return;
+  }
+
+  const matched = commands.find((cmd) =>
+    [cmd.name, ...cmd.alias].includes(command)
+  );
+
+  if (matched) {
+    await matched.execute(args);
+  } else {
+    console.error(`Unknown command: ${command}`);
+    showHelp();
+  }
+})();
