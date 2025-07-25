@@ -1,534 +1,548 @@
 import type {
-	IBlock,
-	Context,
-	AppConfig,
-	NextResponse,
-	RoutesDefinition,
-	AppOptions,
-	IIntegration,
-} from './types';
-import http from 'node:http';
-import { Log } from './utils/logger';
-import { createContext } from './context';
-import { formatPath, isHtmlString, removeEndSlash } from './utils/utils';
-import { Response } from './response';
-import { sortArrayByPriority } from './utils/priority';
-import { performance } from 'perf_hooks';
-import { HttpException } from './error/http-exception';
-import { GamanWebSocket } from './web-socket';
-import { Readable } from 'node:stream';
-import path from 'node:path';
-import { HTTP_RESPONSE_SYMBOL } from './symbol';
-import { GamanCookies } from './context/cookies';
-import { IGNORED_LOG_FOR_PATH_REGEX } from './constant';
-import { next } from './next';
+  Context,
+  AppConfig,
+  NextResponse,
+  RoutesDefinition,
+  AppOptions,
+} from "./types";
+import http from "node:http";
+import { Log } from "./utils/logger";
+import { createContext } from "./context";
+import { formatPath, isHtmlString, removeEndSlash } from "./utils/utils";
+import { Response } from "./response";
+import { sortArrayByPriority } from "./utils/priority";
+import { performance } from "perf_hooks";
+import { HttpException } from "./error/http-exception";
+import { GamanWebSocket } from "./web-socket";
+import { Readable } from "node:stream";
+import path from "node:path";
+import { HTTP_RESPONSE_SYMBOL } from "./symbol";
+import { GamanCookies } from "./context/cookies";
+import { IGNORED_LOG_FOR_PATH_REGEX } from "./constant";
+import { next } from "./next";
+import { Block } from "./block";
+import { IntegrationFactory } from "./integration";
 
 export class GamanBase<A extends AppConfig = any> {
-	#blocks: IBlock<A>[] = [];
-	#websocket: GamanWebSocket<A>;
-	#integrations: Array<IIntegration<A>> = [];
-	#server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse> | null = null;
+  #blocks: Block<A>[] = [];
+  #websocket: GamanWebSocket<A>;
+  #integrations: Array<ReturnType<IntegrationFactory<A>>> = [];
+  #server: http.Server<
+    typeof http.IncomingMessage,
+    typeof http.ServerResponse
+  > | null = null;
 
-	private strict = false;
+  private strict = false;
 
-	constructor(private options: AppOptions<A>) {
-		if (options.strict) {
-			this.strict = options.strict;
-		}
-		this.#websocket = new GamanWebSocket(this);
+  constructor(private options: AppOptions<A>) {
+    if (options.strict) {
+      this.strict = options.strict;
+    }
+    this.#websocket = new GamanWebSocket(this);
 
-		// Initialize integrations
-		if (options.integrations) {
-			for (const integration of options.integrations) {
-				this.#integrations.push(integration);
-				integration.onLoad?.(this);
-			}
-		}
+    // Initialize integrations
+    if (options.integrations) {
+      for (const integrationFactory of options.integrations) {
+        const integration = integrationFactory(this);
+        this.#integrations.push(integration);
+        integration.onLoad?.();
+      }
+    }
 
-		/**
-		 * * EN: Initialize Blocks and childrens
-		 * * ID: inisialisasi blocks dan childrens nya
-		 */
-		if (options.blocks) {
-			for (const block of options.blocks) {
-				const blockPath = block.path || '/';
-				if (this.#blocks.some((b) => b.path === blockPath)) {
-					throw new Error(`Block '${blockPath}' already exists!`);
-				}
+    /**
+     * * EN: Initialize Blocks and childrens
+     * * ID: inisialisasi blocks dan childrens nya
+     */
+    if (options.block !== undefined) {
+      if (this.#blocks.some((b) => b.path === options.block?.path)) {
+        throw new Error(`Block '${options.block.path}' already exists!`);
+      }
 
-				if (block.websocket) {
-					this.#websocket.registerWebSocketServer(block);
-				}
+      if (options.block.websocket) {
+        this.#websocket.registerWebSocketServer(options.block);
+      }
 
-				this.registerBlock({
-					...block,
-					path: blockPath,
-				});
+      options.block.path;
+      this.registerBlock(options.block);
 
-				// Initialize block childrens
-				function initChilderns(basePath: string, childrens: Array<IBlock<A>>, app: GamanBase<A>) {
-					for (const blockChild of childrens) {
-						const childPath = path.join(basePath, blockChild.path || '/');
-						if (app.#blocks.some((b) => b.path === childPath)) {
-							throw new Error(`Block '${childPath}' already exists!`);
-						}
+      // Initialize block childrens
+      function initChilderns(
+        basePath: string,
+        childrens: Array<Block<A>>,
+        app: GamanBase<A>
+      ) {
+        for (const blockChild of childrens) {
+          const childPath = path.join(basePath, blockChild.path || "/");
+          if (app.#blocks.some((b) => b.path === childPath)) {
+            throw new Error(`Block '${childPath}' already exists!`);
+          }
 
-						if (blockChild.websocket) {
-							app.#websocket.registerWebSocketServer(blockChild);
-						}
+          if (blockChild.websocket) {
+            app.#websocket.registerWebSocketServer(blockChild);
+          }
 
-						app.registerBlock({
-							...blockChild,
-							path: childPath || '/',
-						});
+          blockChild.path = childPath;
+          app.registerBlock(blockChild);
 
-						/**
-						 * * EN: initialize childerns from children
-						 * * ID: inisialisasi childrens dari children
-						 */
-						if (blockChild.childrens) {
-							initChilderns(childPath, blockChild.childrens, app);
-						}
-					}
-				}
-				// * init childrens
-				initChilderns(blockPath, block.childrens || [], this);
-			}
-		}
-	}
+          /**
+           * * EN: initialize childerns from children
+           * * ID: inisialisasi childrens dari children
+           */
+          if (blockChild.blocks) {
+            initChilderns(childPath, blockChild.blocks, app);
+          }
+        }
+      }
+      // * init childrens
+      initChilderns(
+        options.block.path || "/",
+        options.block.blocks || [],
+        this
+      );
+    }
+  }
 
-	getOptions() {
-		return this.options;
-	}
+  getOptions() {
+    return this.options;
+  }
 
-	getBlock(blockPath: string): IBlock<A> | undefined {
-		const path = formatPath(blockPath, this.strict);
-		const block: IBlock<A> | undefined = this.#blocks.find(
-			(b) => formatPath(b.path || '/', this.strict) === path,
-		);
-		return block;
-	}
+  getBlock(blockPath: string): Block<A> | undefined {
+    const path = formatPath(blockPath, this.strict);
+    const block: Block<A> | undefined = this.#blocks.find(
+      (b) => formatPath(b.path || "/", this.strict) === path
+    );
+    return block;
+  }
 
-	registerBlock(block: IBlock<A>) {
-		// * tambahin "/" di belakang kalau strict
-		const _path = formatPath(block.path || '/', this.strict);
-		this.#blocks.push({
-			...block,
-			path: _path,
-		});
-	}
+  registerBlock(block: Block<A>) {
+    // * tambahin "/" di belakang kalau strict
+    block.path = formatPath(block.path || "/", this.strict);
+    this.#blocks.push(block);
+  }
 
-	getServer(): http.Server<typeof http.IncomingMessage, typeof http.ServerResponse> | null {
-		return this.#server;
-	}
+  getServer(): http.Server<
+    typeof http.IncomingMessage,
+    typeof http.ServerResponse
+  > | null {
+    return this.#server;
+  }
 
-	private async requestHandle(req: http.IncomingMessage, res: http.ServerResponse) {
-		const startTime = performance.now();
-		const ctx = await createContext<A>(this, req, res);
-		Log.setRoute(ctx.request.pathname || '/');
-		Log.setMethod(ctx.request.method.toUpperCase());
-		try {
-			const blocksAndIntegrations = sortArrayByPriority<IBlock<A> | IIntegration<A>>(
-				[...this.#blocks, ...this.#integrations],
-				'priority',
-				'asc', //  1, 2, 3, 4, 5 // kalau desc: 5, 4, 3, 2, 1
-			);
-			for await (const blockOrIntegration of blocksAndIntegrations) {
-				if ('routes' in blockOrIntegration) {
-					const block = blockOrIntegration as IBlock<A>;
-					try {
-						/**
-						 * * Jika path depannya aja udah gak sama berarti gausah di lanjutin :V
-						 */
+  private async requestHandle(
+    req: http.IncomingMessage,
+    res: http.ServerResponse
+  ) {
+    const startTime = performance.now();
+    const ctx = await createContext<A>(this, req, res);
+    Log.setRoute(ctx.request.pathname || "/");
+    Log.setMethod(ctx.request.method.toUpperCase());
+    try {
+      const blocksAndIntegrations = sortArrayByPriority<
+        Block<A> | ReturnType<IntegrationFactory<A>>
+      >(
+        [...this.#blocks, ...this.#integrations],
+        "priority",
+        "asc" //  1, 2, 3, 4, 5 // kalau desc: 5, 4, 3, 2, 1
+      );
+      for await (const blockOrIntegration of blocksAndIntegrations) {
+        if ("routes" in blockOrIntegration) {
+          const block = blockOrIntegration as Block<A>;
+          try {
+            /**
+             * * Jika path depannya aja udah gak sama berarti gausah di lanjutin :V
+             */
 
-						if (!(block.path && ctx.request.pathname.startsWith(block.path))) {
-							continue;
-						}
+            if (!(block.path && ctx.request.pathname.startsWith(block.path))) {
+              continue;
+            }
 
-						if (block.includes) {
-							for (const middleware of block.includes) {
-								const result = await middleware(ctx, next);
+            if (block.includes) {
+              for (const middleware of block.includes) {
+                const result = await middleware(ctx, next);
 
-								/**
-								 * ? Kenapa harus di kurung di if(result){...} ???
-								 * * Karena di bawahnya masih ada yang harus di proses seperti routes...
-								 * * Kalau tidak di kurung maka, dia bakal jalanin middleware doang routesnya ga ke proses
-								 */
-								if (result) {
-									return await this.handleResponse(result, ctx);
-								}
-							}
-						}
+                /**
+                 * ? Kenapa harus di kurung di if(result){...} ???
+                 * * Karena di bawahnya masih ada yang harus di proses seperti routes...
+                 * * Kalau tidak di kurung maka, dia bakal jalanin middleware doang routesnya ga ke proses
+                 */
+                if (result) {
+                  return await this.handleResponse(result, ctx);
+                }
+              }
+            }
 
-						// Global middleware handler
-						if (block.all) {
-							const result = await block.all(ctx, next);
+            // Process routes
+            const result = await this.handleRoutes(
+              block.routes_useable,
+              ctx,
+              block.path
+            );
 
-							/**
-							 * ? Kenapa harus di kurung di if(result){...} ???
-							 * * Karena di bawahnya masih ada yang harus di proses seperti routes...
-							 * * Kalau tidak di kurung maka, dia bakal jalanin middleware doang routesnya ga ke proses
-							 */
-							if (result) {
-								// * Set Status Log
-								return await this.handleResponse(result, ctx);
-							}
-						}
+            /**
+             * * Disini gausah di kurung seperti di block.all() tadi
+             * * Karna disini adalah respon akhir dari handle routes!
+             */
+            if (result) {
+              return await this.handleResponse(result, ctx);
+            }
+          } catch (error: any) {
+            if (block.error) {
+              // ! Block Error handler
+              const result = await block.error(
+                new HttpException(403, error.message, error),
+                ctx,
+                next
+              );
+              if (result) {
+                return await this.handleResponse(result, ctx);
+              }
+            }
+            throw new HttpException(403, error.message, error);
+          }
+        } else if ("onRequest" in blockOrIntegration) {
+          const integration = blockOrIntegration as ReturnType<
+            IntegrationFactory<A>
+          >;
+          const result = await integration.onRequest?.(ctx);
+          if (result) {
+            return await this.handleResponse(result, ctx);
+          }
+        }
+      }
 
-						// Process routes
-						const result = await this.handleRoutes(block.routes || {}, ctx, block.path);
+      // not found
+      return await this.handleResponse(
+        new Response(undefined, { status: 404 }),
+        ctx
+      );
+    } catch (error: any) {
+      Log.error(error.message);
+      console.error(error.details);
+      return await this.handleResponse(
+        new Response(undefined, { status: 500 }),
+        ctx
+      );
+    } finally {
+      const endTime = performance.now();
 
-						/**
-						 * * Disini gausah di kurung seperti di block.all() tadi
-						 * * Karna disini adalah respon akhir dari handle routes!
-						 */
-						if (result) {
-							return await this.handleResponse(result, ctx);
-						}
-					} catch (error: any) {
-						if (block.error) {
-							// ! Block Error handler
-							const result = await block.error(
-								new HttpException(403, error.message, error),
-								ctx,
-								next,
-							);
-							if (result) {
-								return await this.handleResponse(result, ctx);
-							}
-						}
-						throw new HttpException(403, error.message, error);
-					}
-				} else if ('onRequest' in blockOrIntegration) {
-					const integration = blockOrIntegration as IIntegration<A>;
-					const result = await integration.onRequest?.(this, ctx);
-					if (result) {
-						return await this.handleResponse(result, ctx);
-					}
-				}
-			}
+      /**
+       * * kalau route dan status = null di tengah jalan
+       * * berarti gausah di kasih log
+       */
+      if (
+        Log.response.route &&
+        Log.response.status &&
+        Log.response.method &&
+        !this.options.server?.silent &&
+        !IGNORED_LOG_FOR_PATH_REGEX.test(Log.response.route)
+      ) {
+        Log.log(
+          `Request processed in §a(${(endTime - startTime).toFixed(1)}ms)§r`
+        );
+      }
+      Log.setRoute("");
+      Log.setMethod("");
+      Log.setStatus(null);
+    }
+  }
 
-			// not found
-			return await this.handleResponse(new Response(undefined, { status: 404 }), ctx);
-		} catch (error: any) {
-			// ! Handler Error keseluruhan system
+  private async handleRoutes(
+    routes: RoutesDefinition<A>,
+    ctx: Context<A>,
+    basePath: string = "/"
+  ): Promise<NextResponse> {
+    for await (const [path, handler] of Object.entries(routes)) {
+      /**
+       * * format path biar bisa nested path
+       * *
+       * * dan di belakang nya kasih "/" kalau dia strict
+       */
+      const routeFullPath = formatPath(`${basePath}/${path}`, this.strict);
 
-			if (this.options.error) {
-				const result = await this.options.error(error, ctx, next);
-				if (result) {
-					return await this.handleResponse(result, ctx);
-				}
-			}
-			Log.error(error.message);
-			console.error(error.details);
-			return await this.handleResponse(new Response(undefined, { status: 500 }), ctx);
-		} finally {
-			const endTime = performance.now();
+      // * setiap request di createParamRegex nya dari path Server
+      const regexParam = this.createParamRegex(routeFullPath);
 
-			/**
-			 * * kalau route dan status = null di tengah jalan
-			 * * berarti gausah di kasih log
-			 */
-			if (
-				Log.response.route &&
-				Log.response.status &&
-				Log.response.method &&
-				!this.options.server?.silent &&
-				!IGNORED_LOG_FOR_PATH_REGEX.test(Log.response.route)
-			) {
-				Log.log(`Request processed in §a(${(endTime - startTime).toFixed(1)}ms)§r`);
-			}
-			Log.setRoute('');
-			Log.setMethod('');
-			Log.setStatus(null);
-		}
-	}
+      /**
+       * * kalau strict pakai pathname full
+       * * kalau non strict, hapus slash akhir biar bisa "/home" dan "/home/"
+       */
+      const requestPath = this.strict
+        ? ctx.request.pathname
+        : removeEndSlash(ctx.request.pathname);
+      // ? apakah path dari client dan path server itu valid?
+      const match = regexParam.regex.exec(requestPath);
 
-	private async handleRoutes(
-		routes: RoutesDefinition<A>,
-		ctx: Context<A>,
-		basePath: string = '/',
-	): Promise<NextResponse> {
-		for await (const [path, handler] of Object.entries(routes)) {
-			/**
-			 * * format path biar bisa nested path
-			 * *
-			 * * dan di belakang nya kasih "/" kalau dia strict
-			 */
-			const routeFullPath = formatPath(`${basePath}/${path}`, this.strict);
+      /**
+       * * Jika match param itu tidak null
+       * * berarti di ctx.params[key] add param yang ada
+       */
+      regexParam.keys.forEach((key, index) => {
+        ctx.params[key] = match?.[index + 1] || "";
+      });
 
-			// * setiap request di createParamRegex nya dari path Server
-			const regexParam = this.createParamRegex(routeFullPath);
+      // * Jika ada BINTANG (*) berarti middleware
+      const isMiddleware = routeFullPath.includes("*");
 
-			/**
-			 * * kalau strict pakai pathname full
-			 * * kalau non strict, hapus slash akhir biar bisa "/home" dan "/home/"
-			 */
-			const requestPath = this.strict ? ctx.request.pathname : removeEndSlash(ctx.request.pathname);
-			// ? apakah path dari client dan path server itu valid?
-			const match = regexParam.regex.exec(requestPath);
+      /**
+       * * Jika dia middleware maka pake fungsi check middleware
+       * * Jika dia bukan middleware maka pake match
+       */
+      const isValid = isMiddleware
+        ? this.checkMiddleware(routeFullPath, ctx.request.pathname)
+        : match !== null;
 
-			/**
-			 * * Jika match param itu tidak null
-			 * * berarti di ctx.params[key] add param yang ada
-			 */
-			regexParam.keys.forEach((key, index) => {
-				ctx.params[key] = match?.[index + 1] || '';
-			});
+      /**
+       * * validasi (match) itu dari params
+       */
+      if (Array.isArray(handler) && isValid) {
+        /**
+         * * jalanin handler jika ($handler) adalah type Array<Handler> dan pathMatch valid
+         */
+        for await (const handle of handler) {
+          const result = await handle(ctx, next);
+          if (result) return result; // Lanjut handler lain jika tidak ada respon
+        }
+      } else if (typeof handler === "function" && isValid) {
+        /**
+         * * jalanin handler jika ($handler) adalah type Handler dan pathMatch valid
+         */
+        const result = await handler(ctx, next);
+        if (result) return result; // Lanjut handler lain jika tidak ada respon
+      } else if (typeof handler === "object") {
+        for await (const [methodOrPathNested, nestedHandler] of Object.entries(
+          handler
+        )) {
+          /**
+           * * Jika dia bukan method berarti dia berupa nestedPath
+           * * Dan Method Routes sama Method Request harus sama
+           * @example
+           * routes: {
+           *   "/": {
+           * 			GET: () => "OK!", // kalau request get dia pakai handler ini
+           *      POST: () => "OK! POST" // kalau request post dia pakai handler ini
+           *   }
+           * }
+           */
+          if (
+            this.isHttpMethod(methodOrPathNested) &&
+            methodOrPathNested.toLowerCase() ===
+              ctx.request.method.toLowerCase()
+          ) {
+            /**
+             * * validasi (match) itu dari params
+             */
+            if (Array.isArray(nestedHandler) && isValid) {
+              for await (const handle of nestedHandler) {
+                const result = await handle(ctx, next);
+                if (result) return result;
+              }
+            } else if (typeof nestedHandler === "function" && isValid) {
+              const result = await nestedHandler(ctx, next);
+              if (result) return result;
+            }
+          } else {
+            if (nestedHandler) {
+              // * Lakukan Proses Nested jika ada pathNested
+              const result = await this.handleRoutes(
+                { [methodOrPathNested]: nestedHandler },
+                ctx,
+                routeFullPath
+              );
 
-			// * Jika ada BINTANG (*) berarti middleware
-			const isMiddleware = routeFullPath.includes('*');
+              /**
+               * * Kalau kalau dia ada result langsung response
+               * * Kalau gak ada lanjut ke route berikutnya...
+               */
+              if (result) return result;
+            }
+          }
+        }
+      }
+    }
+  }
 
-			/**
-			 * * Jika dia middleware maka pake fungsi check middleware
-			 * * Jika dia bukan middleware maka pake match
-			 */
-			const isValid = isMiddleware
-				? this.checkMiddleware(routeFullPath, ctx.request.pathname)
-				: match !== null;
+  private async handleResponse(
+    result: string | object | any[] | Response | undefined,
+    ctx: Context<A>
+  ) {
+    //@ts-ignore
+    const res: http.ServerResponse = ctx[HTTP_RESPONSE_SYMBOL];
+    if (res.writableEnded) return; // * ignore process if response finished
 
-			/**
-			 * * validasi (match) itu dari params
-			 */
-			if (Array.isArray(handler) && isValid) {
-				/**
-				 * * jalanin handler jika ($handler) adalah type Array<Handler> dan pathMatch valid
-				 */
-				for await (const handle of handler) {
-					const result = await handle(ctx, next);
-					if (result) return result; // Lanjut handler lain jika tidak ada respon
-				}
-			} else if (typeof handler === 'function' && isValid) {
-				/**
-				 * * jalanin handler jika ($handler) adalah type Handler dan pathMatch valid
-				 */
-				const result = await handler(ctx, next);
-				if (result) return result; // Lanjut handler lain jika tidak ada respon
-			} else if (typeof handler === 'object') {
-				for await (const [methodOrPathNested, nestedHandler] of Object.entries(handler)) {
-					/**
-					 * * Jika dia bukan method berarti dia berupa nestedPath
-					 * * Dan Method Routes sama Method Request harus sama
-					 * @example
-					 * routes: {
-					 *   "/": {
-					 * 			GET: () => "OK!", // kalau request get dia pakai handler ini
-					 *      POST: () => "OK! POST" // kalau request post dia pakai handler ini
-					 *   }
-					 * }
-					 */
-					if (
-						this.isHttpMethod(methodOrPathNested) &&
-						methodOrPathNested.toLowerCase() === ctx.request.method.toLowerCase()
-					) {
-						/**
-						 * * validasi (match) itu dari params
-						 */
-						if (Array.isArray(nestedHandler) && isValid) {
-							for await (const handle of nestedHandler) {
-								const result = await handle(ctx, next);
-								if (result) return result;
-							}
-						} else if (typeof nestedHandler === 'function' && isValid) {
-							const result = await nestedHandler(ctx, next);
-							if (result) return result;
-						}
-					} else {
-						if (nestedHandler) {
-							// * Lakukan Proses Nested jika ada pathNested
-							const result = await this.handleRoutes(
-								{ [methodOrPathNested]: nestedHandler },
-								ctx,
-								routeFullPath,
-							);
+    const isResponse = (value: unknown): value is Response => {
+      return value instanceof Response;
+    };
 
-							/**
-							 * * Kalau kalau dia ada result langsung response
-							 * * Kalau gak ada lanjut ke route berikutnya...
-							 */
-							if (result) return result;
-						}
-					}
-				}
-			}
-		}
-	}
+    /**
+     * * substitue result
+     * @default response 404
+     */
+    let response: Response = new Response(undefined, { status: 404 });
 
-	private async handleResponse(
-		result: string | object | any[] | Response | undefined,
-		ctx: Context<A>,
-	) {
-		//@ts-ignore
-		const res: http.ServerResponse = ctx[HTTP_RESPONSE_SYMBOL];
-		if (res.writableEnded) return; // * ignore process if response finished
+    if (isResponse(result)) {
+      response = result;
+    } else {
+      /**
+       * * intialize response without class Response
+       * @example return {message: "OK"}; or return "OK!";
+       */
+      if (typeof result === "string") {
+        if (isHtmlString(result)) {
+          response = Response.html(result, {
+            status: 200,
+          });
+        } else {
+          response = Response.text(result, {
+            status: 200,
+          });
+        }
+      } else if (result) {
+        response = Response.json(result, {
+          status: 200,
+        });
+      }
+    }
 
-		const isResponse = (value: unknown): value is Response => {
-			return value instanceof Response;
-		};
+    /**
+     * * proccess integrations first
+     */
+    if (this.#integrations) {
+      const integrations = sortArrayByPriority<
+        ReturnType<IntegrationFactory<A>>
+      >(this.#integrations, "priority", "asc");
 
-		/**
-		 * * substitue result
-		 * @default response 404
-		 */
-		let response: Response = new Response(undefined, { status: 404 });
+      for (const integration of integrations) {
+        if (integration.onResponse) {
+          const integrationResponse = await integration.onResponse(
+            ctx,
+            response
+          );
+          if (integrationResponse) {
+            response = integrationResponse;
+            break;
+          }
+        }
+      }
+    }
 
-		if (isResponse(result)) {
-			response = result;
-		} else {
-			/**
-			 * * intialize response without class Response
-			 * @example return {message: "OK"}; or return "OK!";
-			 */
-			if (typeof result === 'string') {
-				if (isHtmlString(result)) {
-					response = Response.html(result, {
-						status: 200,
-					});
-				} else {
-					response = Response.text(result, {
-						status: 200,
-					});
-				}
-			} else if (result) {
-				response = Response.json(result, {
-					status: 200,
-				});
-			}
-		}
+    /**
+     * set cookies
+     */
+    const cookieHeaders = Array.from(GamanCookies.consume(ctx.cookies));
+    if (cookieHeaders.length > 0) {
+      response.headers.set("Set-Cookie", cookieHeaders);
+    }
 
-		/**
-		 * * proccess integrations first
-		 */
-		if (this.#integrations) {
-			const integrations = sortArrayByPriority<IIntegration<A>>(
-				this.#integrations,
-				'priority',
-				'asc',
-			);
+    // * initialize http response
+    res.statusCode = response.status;
+    res.statusMessage = response.statusText;
+    res.setHeaders(response.headers.toMap());
+    Log.setStatus(response.status);
 
-			for (const integration of integrations) {
-				if (integration.onResponse) {
-					const integrationResponse = await integration.onResponse(this, ctx, response);
-					if (integrationResponse) {
-						response = integrationResponse;
-						break;
-					}
-				}
-			}
-		}
+    if (response.body instanceof Readable) {
+      return response.body.pipe(res);
+    }
+    return res.end(response.body);
+  }
 
-		/**
-		 * set cookies
-		 */
-		const cookieHeaders = Array.from(GamanCookies.consume(ctx.cookies));
-		if (cookieHeaders.length > 0) {
-			response.headers.set('Set-Cookie', cookieHeaders);
-		}
+  listen(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.#server = http.createServer(this.requestHandle.bind(this));
 
-		// * initialize http response
-		res.statusCode = response.status;
-		res.statusMessage = response.statusText;
-		res.setHeaders(response.headers.toMap());
-		Log.setStatus(response.status);
+      this.#server.on("upgrade", (request, socket, head) => {
+        const urlString = request.url || "/";
+        const { pathname } = new URL(
+          urlString,
+          `http://${request.headers.host}`
+        );
 
-		if (response.body instanceof Readable) {
-			return response.body.pipe(res);
-		}
-		return res.end(response.body);
-	}
+        const wss = this.#websocket.getWebSocketServer(pathname);
+        if (wss) {
+          wss.handleUpgrade(request, socket, head, function done(ws) {
+            wss.emit("connection", ws, request);
+          });
+        } else {
+          socket.destroy();
+        }
+      });
 
-	listen(): Promise<void> {
-		return new Promise((resolve, reject) => {
-			this.#server = http.createServer(this.requestHandle.bind(this));
+      const port = this.options?.server?.port ?? 3431;
+      const host = this.options?.server?.host || "localhost";
 
-			this.#server.on('upgrade', (request, socket, head) => {
-				const urlString = request.url || '/';
-				const { pathname } = new URL(urlString, `http://${request.headers.host}`);
+      this.#server.listen(port, host, () => {
+        if (!this.options.server?.silent) {
+          Log.log(
+            `Server is running at http://${host}:${
+              // @ts-expect-error
+              this.#server?.address()?.port
+            }`
+          );
+        }
 
-				const wss = this.#websocket.getWebSocketServer(pathname);
-				if (wss) {
-					wss.handleUpgrade(request, socket, head, function done(ws) {
-						wss.emit('connection', ws, request);
-					});
-				} else {
-					socket.destroy();
-				}
-			});
+        resolve(); // <-- selesai listen
+      });
 
-			const port = this.options?.server?.port ?? 3431;
-			const host = this.options?.server?.host || 'localhost';
+      this.#server.on("error", (err) => {
+        reject(err); // <-- error bind port, dll
+      });
+    });
+  }
 
-			this.#server.listen(port, host, () => {
-				if (!this.options.server?.silent) {
-					Log.log(
-						// @ts-expect-error
-						`Server is running at http://${host}:${this.#server?.address()?.port}`,
-					);
-				}
+  close(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.#server) {
+        this.#server.close((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
+  }
 
-				resolve(); // <-- selesai listen
-			});
+  /**
+   * Checks if a string is a valid HTTP method
+   * @param method - String to check
+   * @returns True if the string is a valid HTTP method
+   */
+  private isHttpMethod(method: string): boolean {
+    return ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"].includes(
+      method.toUpperCase()
+    );
+  }
 
-			this.#server.on('error', (err) => {
-				reject(err); // <-- error bind port, dll
-			});
-		});
-	}
+  private createParamRegex(path: string): {
+    path: string;
+    regex: RegExp;
+    keys: string[];
+  } {
+    const paramKeys: string[] = [];
+    const regexString = path
+      .replace(/:([^/]+)/g, (_, key) => {
+        paramKeys.push(key); // Simpan parameter dinamis
+        return "([^/]+)"; // Konversi ke regex
+      })
+      .replace(/\//g, "\\/");
 
-	close(): Promise<void> {
-		return new Promise((resolve, reject) => {
-			if (this.#server) {
-				this.#server.close((err) => {
-					if (err) reject(err);
-					else resolve();
-				});
-			} else {
-				resolve();
-			}
-		});
-	}
+    const regexPath = new RegExp(`^${regexString}$`);
+    return {
+      path,
+      regex: regexPath,
+      keys: paramKeys,
+    };
+  }
 
-	/**
-	 * Checks if a string is a valid HTTP method
-	 * @param method - String to check
-	 * @returns True if the string is a valid HTTP method
-	 */
-	private isHttpMethod(method: string): boolean {
-		return ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'].includes(method.toUpperCase());
-	}
+  checkMiddleware(pathMiddleware: string, pathRequestClient: string): boolean {
+    // Escape special regex characters except '*'
+    const escapedPath = pathMiddleware.replace(/[-/\\^$+?.()|[\]{}]/g, "\\$&");
 
-	private createParamRegex(path: string): {
-		path: string;
-		regex: RegExp;
-		keys: string[];
-	} {
-		const paramKeys: string[] = [];
-		const regexString = path
-			.replace(/:([^/]+)/g, (_, key) => {
-				paramKeys.push(key); // Simpan parameter dinamis
-				return '([^/]+)'; // Konversi ke regex
-			})
-			.replace(/\//g, '\\/');
+    // Replace '*' with regex wildcard
+    const pattern = `^${escapedPath.replace(/\*/g, ".*")}$`;
 
-		const regexPath = new RegExp(`^${regexString}$`);
-		return {
-			path,
-			regex: regexPath,
-			keys: paramKeys,
-		};
-	}
+    // Create a regex from the pattern
+    const regex = new RegExp(pattern);
 
-	checkMiddleware(pathMiddleware: string, pathRequestClient: string): boolean {
-		// Escape special regex characters except '*'
-		const escapedPath = pathMiddleware.replace(/[-/\\^$+?.()|[\]{}]/g, '\\$&');
-
-		// Replace '*' with regex wildcard
-		const pattern = `^${escapedPath.replace(/\*/g, '.*')}$`;
-
-		// Create a regex from the pattern
-		const regex = new RegExp(pattern);
-
-		// Test the client request path against the regex
-		return regex.test(pathRequestClient);
-	}
+    // Test the client request path against the regex
+    return regex.test(pathRequestClient);
+  }
 }
