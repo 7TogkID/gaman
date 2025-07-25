@@ -1,29 +1,29 @@
-import { createReadStream, promises as fsPromises, statSync } from 'fs';
-import { join } from 'path';
-import { defineIntegration } from '..';
-import { Response } from '../../response';
-import { Log } from '../../utils/logger';
-import crypto from 'crypto';
-import { detectMime } from '../../utils/mime';
-import { Priority } from '../../types';
+import { createReadStream, promises as fsPromises, statSync } from "fs";
+import { join } from "path";
+import { defineIntegration } from "..";
+import { Response } from "../../response";
+import { Log } from "../../utils/logger";
+import crypto from "crypto";
+import { detectMime } from "../../utils/mime";
+import { Priority } from "../../types";
 
 // Tipe opsi konfigurasi middleware
 export interface StaticFileOptions {
-	path?: string; 
-	mimes?: Record<string, string>
-	priority?: Priority;
-	defaultDocument?: string; // File default jika direktori diakses (default: index.html)
-	rewriteRequestPath?: (path: string) => string; // Rewriter path (misal: hapus /static/)
-	onFound?: (path: string, ctx: any) => void | Promise<void>; // Callback saat file ditemukan
-	onNotFound?: (path: string, ctx: any) => void | Promise<void>; // Callback saat file tidak ditemukan
-	cacheControl?: string; // Header Cache-Control (default: 1 jam)
-	fallbackToIndexHTML?: boolean; // Jika true, fallback ke index.html untuk SPA
+  path?: string;
+  mimes?: Record<string, string>;
+  priority?: Priority;
+  defaultDocument?: string; // File default jika direktori diakses (default: index.html)
+  rewriteRequestPath?: (path: string) => string; // Rewriter path (misal: hapus /static/)
+  onFound?: (path: string, ctx: any) => void | Promise<void>; // Callback saat file ditemukan
+  onNotFound?: (path: string, ctx: any) => void | Promise<void>; // Callback saat file tidak ditemukan
+  cacheControl?: string; // Header Cache-Control (default: 1 jam)
+  fallbackToIndexHTML?: boolean; // Jika true, fallback ke index.html untuk SPA
 }
-                      
+
 // Buat ETag dari ukuran dan waktu modifikasi file
 function generateETag(stat: { size: number; mtime: Date }) {
-	const tag = `${stat.size}-${stat.mtime.getTime()}`;
-	return `"${crypto.createHash('sha1').update(tag).digest('hex')}"`;
+  const tag = `${stat.size}-${stat.mtime.getTime()}`;
+  return `"${crypto.createHash("sha1").update(tag).digest("hex")}"`;
 }
 
 /**
@@ -61,98 +61,99 @@ function generateETag(stat: { size: number; mtime: Date }) {
  * ```
  */
 export function gamanStatic(options: StaticFileOptions = {}) {
-	const staticPath = options.path || 'public';
-	const defaultDocument = options.defaultDocument ?? 'index.html';
-	const cacheControl = options.cacheControl ?? 'public, max-age=3600';
+  const staticPath = options.path || "public";
+  const defaultDocument = options.defaultDocument ?? "index.html";
+  const cacheControl = options.cacheControl ?? "public, max-age=3600";
 
-	return defineIntegration({
-		name: 'static',
-		priority: options.priority || 'very-high',
+  return defineIntegration(() => ({
+    name: "static",
+    priority: options.priority || "very-high",
 
-		async onRequest(_app, ctx) {
-			let reqPath = ctx.request.pathname;
+    async onRequest(ctx) {
+      let reqPath = ctx.request.pathname;
 
-			// Rewriting path jika disediakan
-			if (options.rewriteRequestPath) {
-				reqPath = options.rewriteRequestPath(reqPath);
-			}
+      // Rewriting path jika disediakan
+      if (options.rewriteRequestPath) {
+        reqPath = options.rewriteRequestPath(reqPath);
+      }
 
-			let filePath = join(process.cwd(), staticPath, reqPath);
-			let stats;
+      let filePath = join(process.cwd(), staticPath, reqPath);
+      let stats;
 
-			// Cari file (jika direktori, cari defaultDocument)
-			try {
-				stats = await fsPromises.stat(filePath);
+      // Cari file (jika direktori, cari defaultDocument)
+      try {
+        stats = await fsPromises.stat(filePath);
 
-				if (stats.isDirectory()) {
-					filePath = join(filePath, defaultDocument);
-					stats = await fsPromises.stat(filePath);
-				}
-			} catch {
-				// Fallback ke index.html untuk SPA
-				if (options.fallbackToIndexHTML) {
-					try {
-						filePath = join(process.cwd(), staticPath, 'index.html');
-						stats = await fsPromises.stat(filePath);
-					} catch {
-						await options.onNotFound?.(filePath, ctx);
-						return;
-					}
-				} else {
-					await options.onNotFound?.(filePath, ctx);
-					return;
-				}
-			}
+        if (stats.isDirectory()) {
+          filePath = join(filePath, defaultDocument);
+          stats = await fsPromises.stat(filePath);
+        }
+      } catch {
+        // Fallback ke index.html untuk SPA
+        if (options.fallbackToIndexHTML) {
+          try {
+            filePath = join(process.cwd(), staticPath, "index.html");
+            stats = await fsPromises.stat(filePath);
+          } catch {
+            await options.onNotFound?.(filePath, ctx);
+            return;
+          }
+        } else {
+          await options.onNotFound?.(filePath, ctx);
+          return;
+        }
+      }
 
-			if (!stats.isFile()) return;
+      if (!stats.isFile()) return;
 
-			// Gzip/Brotli: cek Accept-Encoding dan cari file terkompresi
-			const acceptEncoding = ctx.request.headers.get('accept-encoding') || '';
-			let encoding: 'br' | 'gzip' | null = null;
-			let encodedFilePath = filePath;
+      // Gzip/Brotli: cek Accept-Encoding dan cari file terkompresi
+      const acceptEncoding = ctx.request.headers.get("accept-encoding") || "";
+      let encoding: "br" | "gzip" | null = null;
+      let encodedFilePath = filePath;
 
-			if (acceptEncoding.includes('br')) {
-				try {
-					await fsPromises.access(`${filePath}.br`);
-					encoding = 'br';
-					encodedFilePath = `${filePath}.br`;
-				} catch {}
-			} else if (acceptEncoding.includes('gzip')) {
-				try {
-					await fsPromises.access(`${filePath}.gz`);
-					encoding = 'gzip';
-					encodedFilePath = `${filePath}.gz`;
-				} catch {}
-			}
+      if (acceptEncoding.includes("br")) {
+        try {
+          await fsPromises.access(`${filePath}.br`);
+          encoding = "br";
+          encodedFilePath = `${filePath}.br`;
+        } catch {}
+      } else if (acceptEncoding.includes("gzip")) {
+        try {
+          await fsPromises.access(`${filePath}.gz`);
+          encoding = "gzip";
+          encodedFilePath = `${filePath}.gz`;
+        } catch {}
+      }
 
-			// Buat ETag dan handle conditional GET
-			const etag = generateETag(statSync(encodedFilePath));
-			if (ctx.request.headers.get('if-none-match') === etag) {
-				return Response.text('', { status: 304 });
-			}
+      // Buat ETag dan handle conditional GET
+      const etag = generateETag(statSync(encodedFilePath));
+      if (ctx.request.headers.get("if-none-match") === etag) {
+        return Response.text("", { status: 304 });
+      }
 
-			// Cari MIME type dari ekstensi
-			const contentType = detectMime(filePath, options.mimes) || 'application/octet-stream';
+      // Cari MIME type dari ekstensi
+      const contentType =
+        detectMime(filePath, options.mimes) || "application/octet-stream";
 
-			// Matikan log route bawaan GamanJS (supaya tidak log 2x)
-			Log.setRoute('');
-			Log.setMethod('');
-			Log.setStatus(null);
+      // Matikan log route bawaan GamanJS (supaya tidak log 2x)
+      Log.setRoute("");
+      Log.setMethod("");
+      Log.setStatus(null);
 
-			// Callback saat ditemukan
-			await options.onFound?.(encodedFilePath, ctx);
+      // Callback saat ditemukan
+      await options.onFound?.(encodedFilePath, ctx);
 
-			// Kirim file
-			return Response.stream(createReadStream(encodedFilePath), {
-				status: 200,
-				headers: {
-					'Content-Type': contentType,
-					...(encoding ? { 'Content-Encoding': encoding } : {}),
-					Vary: 'Accept-Encoding',
-					ETag: etag,
-					'Cache-Control': cacheControl,
-				},
-			});
-		},
-	});
+      // Kirim file
+      return Response.stream(createReadStream(encodedFilePath), {
+        status: 200,
+        headers: {
+          "Content-Type": contentType,
+          ...(encoding ? { "Content-Encoding": encoding } : {}),
+          Vary: "Accept-Encoding",
+          ETag: etag,
+          "Cache-Control": cacheControl,
+        },
+      });
+    },
+  }));
 }
