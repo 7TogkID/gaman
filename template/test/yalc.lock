@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "gaman": {
+      "signature": "f222b111874fa60809689c74a8d965ec",
+      "file": true
+    }
+  }
+}

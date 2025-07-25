@@ -7,6 +7,8 @@ const exportsMap: Record<string, string> = {
 	static: 'integration/static/index',
 	session: 'integration/session/index',
 	integration: 'integration/index',
+	service: 'service/index',
+	routes: 'routes/index',
 
 	// Middlewares
 	cors: 'middleware/cors/index',
