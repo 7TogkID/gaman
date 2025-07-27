@@ -40,7 +40,7 @@ async function main() {
 			type: 'input',
 			name: 'projectName',
 			message: 'What is your project name?',
-			default: './gaman-project',
+			default: './gaman-app',
 		},
 		{
 			type: 'list',
