@@ -3,7 +3,7 @@ import { existsSync } from 'fs';
 import { Logger } from '@gaman/core/utils/logger';
 import { Command } from './command';
 
-const entryFile = './dist/entry.mjs';
+const entryFile = './dist/index.js';
 
 // Versi sebagai Command
 export class StartCommand extends Command {
@@ -19,14 +19,12 @@ export class StartCommand extends Command {
 	async execute(): Promise<void> {
 		if (!existsSync(entryFile)) {
 			Logger.error(
-				'File dist/entry.mjs not found. Please run the build process first.',
+				'File dist/index.js not found. Please run the build process first.',
 			);
 			process.exit(1);
 		}
 
-		Logger.log('Starting the application...');
-
-		const child = spawn('node', [entryFile], {
+		const child = spawn('npx', ['tsx', entryFile], {
 			stdio: 'inherit',
 			env: process.env,
 		});

@@ -1,6 +1,8 @@
 {
 	"compilerOptions": {
-		"module": "es2022",
+		"module": "ES2022",
+		"target": "ES2021",
+		"moduleResolution": "bundler",
 		"noImplicitAny": false,
 		"noUnusedLocals": false,
 		"removeComments": true,
@@ -12,8 +14,6 @@
 		"experimentalDecorators": true,
 		"useUnknownInCatchVariables": false,
 		"allowSyntheticDefaultImports": true,
-		"moduleResolution": "bundler",
-		"target": "ES2021",
 		"sourceMap": true,
 		"allowJs": false,
 		"outDir": "dist",
@@ -28,6 +28,6 @@
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["packages/**/*", "integration/**/*", "template/**/*"],
+	"include": ["packages/**/*", "integration/**/*"],
 	"exclude": ["node_modules", "dist", "**/*.test.*"]
 }

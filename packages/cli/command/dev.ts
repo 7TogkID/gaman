@@ -3,8 +3,8 @@ import { spawn } from "child_process";
 import { Command } from "./command";
 
 function getEntryFile(): string {
-  const candidates = ["src/main.ts", "src/main.js", "src/main.mjs"];
-  return candidates.find((file) => existsSync(file)) || "src/main.ts";
+  const candidates = ["src/index.ts", "src/index.js", "src/index.mjs"];
+  return candidates.find((file) => existsSync(file)) || "src/index.ts";
 }
 
 export class DevCommand extends Command {

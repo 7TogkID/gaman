@@ -1,8 +1,8 @@
 import { AppConfig, RoutesDefinition } from "../types";
 
 export type RoutesFactory<
-  TDeps extends object = object,
-  A extends AppConfig = AppConfig
+  TDeps extends object,
+  A extends AppConfig
 > = (deps: TDeps) => RoutesDefinition<A>;
 
 /**

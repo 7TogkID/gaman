@@ -8,6 +8,10 @@ out
 dist
 *.tgz
 
+# bundle
+packages/**/*.d.ts
+packages/**/*.js
+
 # code coverage
 coverage
 *.lcov
