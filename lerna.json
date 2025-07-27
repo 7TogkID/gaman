@@ -1,6 +1,4 @@
 {
-  "version": "1.0.8-aplha-1",
-  "packages": [
-    "packages/*"
-  ]
+  "version": "independent",
+  "packages": ["packages/*"]
 }

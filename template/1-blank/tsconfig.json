@@ -1,14 +1,11 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
-    "allowArbitraryExtensions": true,
-    "module": "nodenext",
-    "baseUrl": ".",
-    "paths": {
-      "*": ["./src/*"] 
-    }
-  }
+	"compilerOptions": {
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"module": "commonjs",
+		"baseUrl": ".",
+		"paths": {
+			"*": ["./src/*"]
+		}
+	}
 }

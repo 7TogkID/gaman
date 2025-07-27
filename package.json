@@ -1,18 +1,8 @@
 {
-	"name": "gaman",
-	"version": "1.0.3",
+	"name": "@Gaman/core",
 	"type": "module",
-	"main": "./dist/cjs/index.js",
-	"module": "./dist/index.js",
-	"types": "dist/index.d.ts",
-	"files": [
-		"dist"
-	],
 	"engines": {
 		"node": ">=18.20.8"
-	},
-	"bin": {
-		"gaman": "./dist/cli/index.js"
 	},
 	"scripts": {
 		"build": "tsc -b -v packages",
@@ -28,26 +18,25 @@
 		"release:beta": "npm run gen:exports && npm run build && npm publish --tag beta",
 		"lint:src": "eslint src/ --ext .ts",
 		"lint:fix": "eslint src/ --ext .ts --fix",
-    "publish:next": "npm run build && lerna publish --dist-tag=next --no-private --no-push --yes -m \"chore(@gaman) publish %s release\""
+		"publish:next": "npm run build && lerna publish --dist-tag=next --no-private --no-push --yes -m \"chore(@gaman) publish %s release\"",
+		"publish:beta": "npm run build && lerna publish --dist-tag=beta --no-private -m \"chore(@gaman) publish %s release\"",
+		"publish:test": "npm run build && lerna publish --force-publish --dist-tag=test --no-private --no-push -m \"chore(@gaman) publish %s release\""
 	},
 	"author": "angga7togk",
 	"license": "MIT",
 	"repository": {
 		"url": "git+https://github.com/7TogkID/gaman.git"
 	},
+	"private": true,
 	"bugs": {
 		"url": "https://github.com/7TogkID/gaman/issues"
 	},
 	"homepage": "https://gaman.7togk.id",
-	"publishConfig": {
-		"registry": "https://registry.npmjs.org"
-	},
 	"dependencies": {
 		"@types/ws": "^8.18.1",
 		"cookie": "^1.0.2",
 		"esbuild": "^0.25.8",
 		"fast-glob": "^3.3.3",
-		"lerna": "^8.2.3",
 		"ws": "^8.18.2"
 	},
 	"devDependencies": {
@@ -55,6 +44,7 @@
 		"@types/fs-extra": "^11.0.4",
 		"@types/nunjucks": "^3.2.6",
 		"@types/yargs": "^17.0.33",
+		"lerna": "^8.2.3",
 		"arg": "^5.0.2",
 		"axios": "^1.11.0",
 		"ejs": "^3.1.10",

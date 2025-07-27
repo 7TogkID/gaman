@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "es2022",
 		"noImplicitAny": false,
 		"noUnusedLocals": false,
 		"removeComments": true,
@@ -11,6 +11,8 @@
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"useUnknownInCatchVariables": false,
+		"allowSyntheticDefaultImports": true,
+		"moduleResolution": "bundler",
 		"target": "ES2021",
 		"sourceMap": true,
 		"allowJs": false,

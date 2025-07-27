@@ -6,8 +6,8 @@ import { GamanCookies } from "./context/cookies";
 import { Response } from "./response";
 import { GamanSession } from "./context/session";
 import { File } from "./context/formdata/file";
-import { Block } from "./src/block";
 import { IntegrationFactory } from "./integration";
+import { Block } from "./block";
 
 export type AppOptions<A extends AppConfig> = {
   /**

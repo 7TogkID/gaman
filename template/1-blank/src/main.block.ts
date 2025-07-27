@@ -1,5 +1,6 @@
-import { defineBlock } from "gaman/block";
-import mainRoutes from "./main.routes.ts";
+
+import { defineBlock } from "@gaman/core/block";
+import mainRoutes from "./main.routes";
 
 export default defineBlock({
   path: "/",
