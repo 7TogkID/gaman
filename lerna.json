@@ -1,6 +1,9 @@
 {
-	"$schema": "node_modules/lerna/schemas/lerna-schema.json",
-	"version": "1.0.8-alpha-1.14",
-	"npmClient": "npm",
-	"packages": ["packages/*", "!packages/create-gaman"]
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "version": "1.0.8",
+  "npmClient": "npm",
+  "packages": [
+    "packages/*",
+    "!packages/create-gaman"
+  ]
 }
