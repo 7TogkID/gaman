@@ -1,5 +1,4 @@
 {
-	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"composite": true,
 		"module": "commonjs",
@@ -22,6 +21,4 @@
 		"strictPropertyInitialization": false,
 		"types": ["node"]
 	},
-	"include": [],
-	"exclude": []
 }

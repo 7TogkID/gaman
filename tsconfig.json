@@ -1,29 +1,31 @@
 {
 	"compilerOptions": {
-		"target": "ES2022",
-		"declaration": true,
-		"moduleResolution": "Bundler",
-		"outDir": "./dist",
-		"esModuleInterop": true,
-		"module": "es2020",
-		"forceConsistentCasingInFileNames": true,
-		"strict": true,
-		"skipLibCheck": false,
+		"module": "commonjs",
+		"noImplicitAny": false,
 		"noUnusedLocals": false,
-		"noUnusedParameters": false,
-		"types": ["node"]
+		"removeComments": true,
+		"strictNullChecks": true,
+		"strictPropertyInitialization": false,
+		"forceConsistentCasingInFileNames": true,
+		"noLib": false,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"useUnknownInCatchVariables": false,
+		"target": "ES2021",
+		"sourceMap": true,
+		"allowJs": false,
+		"outDir": "dist",
+		"baseUrl": ".",
+		"paths": {
+			"@gaman/core/*": ["./packages/core/*"],
+			"@gaman/cli": ["./packages/cli"]
+		}
 	},
 	"jest": {},
 	"tsc-alias": {
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["src/**/*.ts", "src/global.ts"],
-	"exclude": [
-		"node_modules",
-		"dist",
-		"src/**/*.test.*",
-		"@mjackson/multipart-parser",
-		"@mjackson/multipart-parser/*"
-	]
+	"include": ["packages/**/*", "integration/**/*", "template/**/*"],
+	"exclude": ["node_modules", "dist", "**/*.test.*"]
 }

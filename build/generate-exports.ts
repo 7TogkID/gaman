@@ -25,12 +25,11 @@ const exportsMap: Record<string, string> = {
 	exception: 'error/index',
 	headers: 'headers/index',
 
-	tree: 'tree/index',
 	block: 'block/index',
 	response: 'response',
 	next: 'next',
 	types: 'types',
-	base: 'gaman-base'
+	app: 'gaman-app'
 };
 
 const exportsField: Record<string, any> = {

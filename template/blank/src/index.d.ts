@@ -3,7 +3,5 @@ declare namespace Gaman {
     example: string;
   }
 
-  interface Env {
-    
-  }
+  interface Env {}
 }

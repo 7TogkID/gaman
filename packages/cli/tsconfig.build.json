@@ -1,0 +1,17 @@
+{
+	"extends": "../tsconfig.build.json",
+	"compilerOptions": {
+		"outDir": ".",
+		"rootDir": ".",
+		"paths": {
+			"@gaman/core": ["../core"],
+			"@gaman/core/*": ["../core/*"]
+		}
+	},
+	"exclude": ["node_modules", "dist", "test/**/*", "**/*.test.*"],
+	"references": [
+		{
+			"path": "../core/tsconfig.build.json"
+		}
+	]
+}
