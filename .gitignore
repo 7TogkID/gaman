@@ -1,6 +1,8 @@
 # dependencies (bun install)
 node_modules
 
+lerna-debug.log
+
 # output
 out
 dist
