@@ -1,6 +1,6 @@
 {
   "name": "create-gaman",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "./index.js",
   "type": "module",
   "scripts": {
@@ -24,5 +24,6 @@
     "fs-extra": "^11.3.0",
     "inquirer": "^12.6.3",
     "yargs": "^17.7.2"
-  }
+  },
+  "gitHead": "8d1bf3bbac4b72847e9157e2c95d75b5e90c89cf"
 }
