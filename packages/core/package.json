@@ -1,6 +1,6 @@
 {
 	"name": "@gaman/core",
-	"version": "1.0.8-alpha-1.13",
+	"version": "1.0.8-alpha-1.14",
 	"type": "module",
 	"main": "index.js",
 	"engines": {
