@@ -10,7 +10,7 @@ import block from './command/make/block';
 import integration from './command/make/integration';
 import middleware from './command/make/middleware';
 import { TextFormat } from '@gaman/core/utils/textformat';
-
+ 
 // Daftar perintah yang tersedia
 const commands: Command[] = [
 	dev,
