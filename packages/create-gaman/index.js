@@ -99,7 +99,8 @@ async function main() {
 
 		const latestGaman = (await getPackageLatest()).version;
 		if (packageJson.dependencies) {
-			packageJson.dependencies.gaman = `^${latestGaman}`;
+			packageJson.dependencies["@gaman/core"] = `^${latestGaman}`;
+			packageJson.dependencies["@gaman/cli"] = `^${latestGaman}`;
 		}
 
 		await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
