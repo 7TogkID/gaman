@@ -1,6 +1,6 @@
 {
 	"name": "@gaman/cli",
-	"version": "1.0.8-alpha-1.8",
+	"version": "1.0.8-alpha-1.9",
 	"type": "module",
 	"main": "./index.js",
 	"module": "./index.js",
@@ -20,6 +20,10 @@
 	"homepage": "https://gaman.7togk.id",
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
+	},
+	"peerDependencies": {
+		"esbuild": "^>=0.25.8",
+		"fast-glob": "^>=3.3.3"
 	},
 	"gitHead": "8d1bf3bbac4b72847e9157e2c95d75b5e90c89cf"
 }
