@@ -3,7 +3,7 @@ import { GamanApp } from "./gaman-app";
 import type { AppConfig } from "./types";
 import { loadEnv } from "./utils/load-env";
 import { Log } from "./utils/logger";
-
+ 
 export async function defineBootstrap<A extends AppConfig>(
   mainBlock: Block<A>,
   cb: (app: GamanApp<A>) => any
