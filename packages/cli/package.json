@@ -1,6 +1,6 @@
 {
 	"name": "@gaman/cli",
-	"version": "1.0.8-aplha-1.0",
+	"version": "1.0.8-aplha-1.1",
 	"type": "module",
 	"main": "./index.js",
 	"module": "./index.js",
