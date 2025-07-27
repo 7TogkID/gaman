@@ -1,6 +1,6 @@
 {
 	"name": "@gaman/core",
-	"version": "1.0.8-alpha.0",
+	"version": "1.0.8-aplha-0",
 	"type": "module",
 	"engines": {
 		"node": ">=18.20.8"
