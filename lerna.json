@@ -1,4 +1,6 @@
 {
-  "version": "independent",
-  "packages": ["packages/*"]
+  "version": "1.0.8-alpha-1.3",
+  "packages": [
+    "packages/*"
+  ]
 }

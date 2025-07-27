@@ -1,6 +1,6 @@
 {
   "name": "create-gaman",
-  "version": "1.0.8-aplha-1.2",
+  "version": "1.0.8-alpha-1.3",
   "main": "./index.js",
   "type": "module",
   "scripts": {
