@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"module": "ES2022",
+		"outDir": "./dist",
+		"target": "ES2021",
+		"moduleResolution": "bundler",
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"types": ["./src/index.d.ts"],
+		"baseUrl": ".",
+		"paths": {
+			"*": ["./src/*"]
+		}
+	},
+	"include": ["./src/**/*.ts"],
+	"exclude": ["node_modules", "dist", "**/*test.ts"]
+}

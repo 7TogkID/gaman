@@ -1,5 +1,5 @@
 {
 	"Blank": "1-blank",
 	"Simple CRUD": "2-crud-prisma",
-	"CRUD + Prisma": "3-form-data"
+	"Form Data": "3-form-data"
 }
