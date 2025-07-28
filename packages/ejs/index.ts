@@ -13,7 +13,7 @@ let _ejs: typeof import('ejs');
 
 async function loadEJS() {
 	try {
-		const njkModule = await import('ejs');
+		const { default: njkModule } = await import('ejs');
 		_ejs = njkModule;
 	} catch (err: any) {
 		Log.error('ejs is not installed.');
