@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import { existsSync } from 'fs';
-import { Logger } from '@gaman/core/utils/logger';
+import { Logger } from '@gaman/common/utils/logger';
 import { Command } from './command';
 
 const entryFile = './dist/index.js';

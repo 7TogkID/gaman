@@ -4,14 +4,14 @@
 		"outDir": ".",
 		"rootDir": ".",
 		"paths": {
-			"@gaman/core": ["../core"],
-			"@gaman/core/*": ["../core/*"]
+			"@gaman/common": ["../common"],
+			"@gaman/common/*": ["../common/*"],
 		}
 	},
 	"exclude": ["node_modules", "dist", "test/**/*", "**/*.test.*"],
 	"references": [
 		{
-			"path": "../core/tsconfig.build.json"
+			"path": "../common/tsconfig.build.json"
 		}
 	]
 }

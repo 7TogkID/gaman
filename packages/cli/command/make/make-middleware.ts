@@ -2,12 +2,11 @@ import * as _path from "path";
 import { Command } from "../command";
 import { parsePath } from "../../utils/parse";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
-import { placeModuleToMainFile } from "../../utils/place";
-import { Log } from "@gaman/core/utils/logger";
+import { Log } from "@gaman/common/utils/logger";
 
 class MakeBlock extends Command {
   constructor() {
-    super("make:block", "Generate a block template", "gaman make:block <name>");
+    super("make:middleware", "Generate a middleware template", "gaman make:middleware <name>", ['make:m']);
   }
 
   async execute(args: Record<string, any>): Promise<void> {
@@ -20,12 +19,11 @@ class MakeBlock extends Command {
     const { path, name } = parsePath(filePath);
     filePath = _path.join(
       process.cwd(),
-      `src/module/${path}`,
-      `${name}.block.ts`
+      `src/middleware/${path}.middleware.ts`
     );
 
     if (existsSync(filePath)) {
-      Log.error(`Block "${name}" already exists.`);
+      Log.error(`Middleware "${name}" already exists.`);
       return;
     }
 
@@ -35,23 +33,16 @@ class MakeBlock extends Command {
       mkdirSync(dir, { recursive: true });
     }
 
-    const template = `import { defineBlock } from "gaman/block";
+    const template = `import { defineMiddleware } from "@gaman/core/middleware";
 
-export default defineBlock({
-  path: "/${name}",
-  routes: {
-    "/": {
-      GET: () => r.text("${name} block works!"),
-    },
-  },
+export default defineMiddleware((ctx) => {
+  return next();
 });
 `;
 
     writeFileSync(filePath, template, { encoding: "utf-8" });
 
-    placeModuleToMainFile(path, "Block");
-
-    Log.info(`Created block: ${filePath}`);
+    Log.info(`Created middleware: ${filePath}`);
   }
 }
 

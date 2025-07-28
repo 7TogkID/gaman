@@ -2,8 +2,8 @@ import { randomBytes } from 'crypto';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { Command } from '../command';
-import { Log } from '@gaman/core/utils/logger';
-import { TextFormat } from '@gaman/core/utils/textformat';
+import { Log } from '@gaman/common/utils/logger';
+import { TextFormat } from '@gaman/common/utils/textformat';
 import { existsSync } from 'fs';
 
 export class GenerateKeyCommand extends Command {

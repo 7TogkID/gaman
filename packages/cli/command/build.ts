@@ -1,7 +1,7 @@
 import esbuild from 'esbuild';
 import fg from 'fast-glob';
 import { existsSync, rmSync } from 'fs';
-import { Logger } from '@gaman/core/utils/logger';
+import { Logger } from '@gaman/common/utils/logger';
 import { Command } from './command';
 
 export async function runBuild() {

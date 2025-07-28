@@ -6,20 +6,24 @@ import start from './command/start';
 import generateKey from './command/key/generate';
 import { parseArgs } from './utils/parse';
 import { Command } from './command/command';
-import block from './command/make/block';
-import integration from './command/make/integration';
-import middleware from './command/make/middleware';
-import { TextFormat } from '@gaman/core/utils/textformat';
- 
+import makeBlock from './command/make/make-block';
+import makeIntegration from './command/make/make-integration';
+import makeMiddleware from './command/make/make-middleware';
+import makeRoutes from './command/make/make-routes';
+import { TextFormat } from '@gaman/common/utils/textformat';
+import makeService from './command/make/make-service';
+
 // Daftar perintah yang tersedia
 const commands: Command[] = [
 	dev,
 	build,
 	start,
 	generateKey,
-	block,
-	integration,
-	middleware,
+	makeBlock,
+	makeRoutes,
+	makeService,
+	makeIntegration,
+	makeMiddleware,
 ];
 
 // Parsing argumen CLI
