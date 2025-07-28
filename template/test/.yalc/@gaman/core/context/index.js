@@ -1,18 +1,17 @@
-import * as querystring from "node:querystring";
-import { GamanHeaders } from "../headers";
-import { GamanCookies } from "./cookies";
-import { HTTP_REQUEST_SYMBOL, HTTP_RESPONSE_SYMBOL } from "../symbol";
-import { GamanSession } from "./session";
-import { Buffer } from "node:buffer";
-import { FormData, FormDataEntryValue } from "./formdata";
-import { File } from "./formdata/file";
-import { Response } from "../response";
-import { parseMultipart } from "@gaman/common/utils/multipart-parser";
-export async function createContext(app, req, res) {
-    const urlString = req.url || "/";
-    const method = req.method || "GET";
+import * as querystring from 'node:querystring';
+import { GamanHeaders } from '../headers';
+import { GamanCookies } from './cookies';
+import { HTTP_REQUEST_SYMBOL, HTTP_RESPONSE_SYMBOL } from '../symbol';
+import { Buffer } from 'node:buffer';
+import { FormData, FormDataEntryValue } from './formdata';
+import { File } from './formdata/file';
+import { Response } from '../response';
+import { parseMultipart } from '@gaman/common/utils/multipart-parser';
+export async function createContext(_app, req, res) {
+    const urlString = req.url || '/';
+    const method = req.method || 'GET';
     const url = new URL(urlString, `http://${req.headers.host}`);
-    const contentType = req.headers["content-type"] || "";
+    const contentType = req.headers['content-type'] || '';
     const headers = new GamanHeaders(req.headers);
     /** FormData state */
     let form = null;
@@ -42,7 +41,7 @@ export async function createContext(app, req, res) {
             return body.toString();
         },
         json: async () => {
-            if (contentType.includes("application/json") && method !== "HEAD") {
+            if (contentType.includes('application/json') && method !== 'HEAD') {
                 if (body == null) {
                     body = await getBody(req);
                 }
@@ -53,8 +52,8 @@ export async function createContext(app, req, res) {
                     return {};
                 }
             }
-            else if (contentType.includes("application/x-www-form-urlencoded") &&
-                method !== "HEAD") {
+            else if (contentType.includes('application/x-www-form-urlencoded') &&
+                method !== 'HEAD') {
                 if (body == null) {
                     body = await getBody(req);
                 }
@@ -68,15 +67,15 @@ export async function createContext(app, req, res) {
             if (form !== null) {
                 return form;
             }
-            if (contentType.includes("application/x-www-form-urlencoded") &&
-                method !== "HEAD") {
+            if (contentType.includes('application/x-www-form-urlencoded') &&
+                method !== 'HEAD') {
                 if (body == null) {
                     body = await getBody(req);
                 }
-                form = parseFormUrlEncoded(body.toString() || "{}");
+                form = parseFormUrlEncoded(body.toString() || '{}');
             }
-            else if (contentType.includes("multipart/form-data") &&
-                method !== "HEAD") {
+            else if (contentType.includes('multipart/form-data') &&
+                method !== 'HEAD') {
                 if (body == null) {
                     body = await getBody(req);
                 }
@@ -96,11 +95,12 @@ export async function createContext(app, req, res) {
     const cookies = new GamanCookies(gamanRequest);
     const ctx = {
         locals: {},
-        env: {},
+        env: {
+            ...process.env,
+        },
         url,
         cookies,
         request: gamanRequest,
-        session: new GamanSession(app, cookies, gamanRequest),
         response: Response,
         res: Response,
         // data dari request
@@ -123,15 +123,15 @@ export async function createContext(app, req, res) {
     return ctx;
 }
 // * sementara gini dulu ntar saya tambahin @gaman/trust-proxy
-const TRUST_PROXY_IPS = ["127.0.0.1", "::1"]; // atau IP proxy kamu
+const TRUST_PROXY_IPS = ['127.0.0.1', '::1']; // atau IP proxy kamu
 function getClientIP(req) {
-    const remoteIP = req.socket.remoteAddress || "";
+    const remoteIP = req.socket.remoteAddress || '';
     // Cek apakah request datang dari proxy yang kita percaya
     const isTrustedProxy = TRUST_PROXY_IPS.includes(remoteIP);
     if (isTrustedProxy) {
-        const xff = req.headers["x-forwarded-for"];
-        if (typeof xff === "string") {
-            const ips = xff.split(",").map((ip) => ip.trim());
+        const xff = req.headers['x-forwarded-for'];
+        if (typeof xff === 'string') {
+            const ips = xff.split(',').map((ip) => ip.trim());
             return ips[0]; // Ambil IP paling awal (IP client asli)
         }
     }
@@ -140,15 +140,15 @@ function getClientIP(req) {
 async function getBody(req) {
     const chunks = [];
     return new Promise((resolve, reject) => {
-        req.on("data", (chunk) => chunks.push(chunk));
-        req.on("end", () => resolve(Buffer.concat(chunks)));
-        req.on("error", reject);
+        req.on('data', (chunk) => chunks.push(chunk));
+        req.on('end', () => resolve(Buffer.concat(chunks)));
+        req.on('error', reject);
     });
 }
 function createQuery(searchParams) {
     const queryFn = ((name) => {
         const all = searchParams.getAll(name);
-        return all.length > 1 ? all : all[0] ?? "";
+        return all.length > 1 ? all : all[0] ?? '';
     });
     // Copy semua entries ke dalam fungsi agar bisa diakses sebagai object
     for (const [key, value] of searchParams.entries()) {
@@ -172,7 +172,7 @@ function parseFormUrlEncoded(body) {
         else {
             result.set(key, {
                 name: key,
-                value: value || "",
+                value: value || '',
             });
         }
     }

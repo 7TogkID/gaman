@@ -2,15 +2,15 @@
   "version": "v1",
   "packages": {
     "@gaman/core": {
-      "signature": "9e027e38c491bfa252a448a271c7b9b0",
+      "signature": "f74fa0bb66bd741e195d37404acb5c85",
       "file": true
     },
     "@gaman/common": {
-      "signature": "778aa1ec04d46f1781349fac0fe564f4",
+      "signature": "1530cb54e5b7a42eee1bedd238766560",
       "file": true
     },
     "@gaman/cli": {
-      "signature": "d96770ef8fb951e976ea3515a57f8c16",
+      "signature": "9ee93d2653f7a3ba8b517331bb6f24db",
       "file": true
     }
   }

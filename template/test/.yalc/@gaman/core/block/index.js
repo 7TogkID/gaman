@@ -6,9 +6,14 @@ export function defineBlock(block) {
         block.depedencies = {};
     if (!block.services)
         block.services = {};
-    const serviceCache = {};
+    const serviceCache = {}; // * service cache biar ga berat karna pakai proxy
+    /**
+     * * Proxy ini adalah Wrapper dinamis jadi bisa ngambil object dinamis mirip lamda lah
+     */
     const context = new Proxy({}, {
+        // * fungsi get ini seperti saat orang pakai context['service'] nah 'service' ini itu prop
         get(_, prop) {
+            // ? kalau udah ada di cache pakai cache aja!
             if (prop in serviceCache)
                 return serviceCache[prop];
             if (prop in block.services) {
@@ -22,13 +27,14 @@ export function defineBlock(block) {
             return undefined;
         },
     });
+    // * register services_useable artinya services yang bakal di pakai
     const services_useable = {};
     if (block.services) {
         for (const [key, factory] of Object.entries(block.services)) {
             services_useable[key] = factory(context);
         }
     }
-    // Build routes
+    // * register routes_useable artinya routes yang bakal di pakai
     let routes_useable = {};
     if (block.routes) {
         for (const factory of block.routes) {

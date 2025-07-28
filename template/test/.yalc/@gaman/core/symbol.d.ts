@@ -1,1 +1,1 @@
-export declare const RESPONSE_RENDER_SYMBOL: unique symbol, HTTP_REQUEST_SYMBOL: unique symbol, HTTP_RESPONSE_SYMBOL: unique symbol, SESSION_OPTIONS_SYMBOL: unique symbol, SESSION_STORE_SYMBOL: unique symbol;
+export declare const RESPONSE_RENDER_SYMBOL: unique symbol, HTTP_REQUEST_SYMBOL: unique symbol, HTTP_RESPONSE_SYMBOL: unique symbol;

@@ -46,5 +46,5 @@ export declare class GamanApp<A extends AppConfig = any> {
      */
     private isHttpMethod;
     private createParamRegex;
-    checkMiddleware(pathMiddleware: string, pathRequestClient: string): boolean;
+    private checkMiddleware;
 }

@@ -16,6 +16,8 @@ declare global {
             PORT?: string;
             GAMAN_KEY?: string;
         }
+        interface Context {
+        }
     }
 }
 export {};

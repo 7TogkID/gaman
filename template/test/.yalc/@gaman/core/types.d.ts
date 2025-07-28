@@ -1,13 +1,12 @@
-import type { WebSocket, WebSocketServer } from "ws";
-import { ClientRequest } from "http";
-import { GamanHeaders } from "./headers";
-import { FormData } from "./context/formdata";
-import { GamanCookies } from "./context/cookies";
-import { Response } from "./response";
-import { GamanSession } from "./context/session";
-import { File } from "./context/formdata/file";
-import { IntegrationFactory } from "./integration";
-import { Block } from "./block";
+import type { WebSocket, WebSocketServer } from 'ws';
+import { ClientRequest } from 'http';
+import { GamanHeaders } from './headers';
+import { FormData } from './context/formdata';
+import { GamanCookies } from './context/cookies';
+import { Response } from './response';
+import { File } from './context/formdata/file';
+import { IntegrationFactory } from './integration';
+import { Block } from './block';
 export type AppOptions<A extends AppConfig> = {
     /**
      * main block module
@@ -141,7 +140,7 @@ export interface Request {
      *
      * @returns A typed JSON object.
      */
-    json: <T>() => Promise<T>;
+    json: <T = any>() => Promise<T>;
     /**
      * Parses the request body as FormData.
      *
@@ -182,13 +181,12 @@ export interface Request {
      */
     ip: string;
 }
-export interface Context<A extends AppConfig = AppConfig> extends Pick<Request, "header" | "headers" | "param" | "params" | "query" | "text" | "json" | "formData" | "input" | "file" | "files"> {
-    locals: A["Locals"];
-    env: A["Env"];
+export interface Context<A extends AppConfig = AppConfig> extends Pick<Request, 'header' | 'headers' | 'param' | 'params' | 'query' | 'text' | 'json' | 'formData' | 'input' | 'file' | 'files'>, Gaman.Context {
+    locals: A['Locals'];
+    env: A['Env'];
     url: URL;
     cookies: GamanCookies;
     request: Request;
-    session: GamanSession;
     response: typeof Response;
     res: typeof Response;
 }

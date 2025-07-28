@@ -531,7 +531,7 @@ export class GamanApp<A extends AppConfig = any> {
 		};
 	}
 
-	checkMiddleware(pathMiddleware: string, pathRequestClient: string): boolean {
+	private checkMiddleware(pathMiddleware: string, pathRequestClient: string): boolean {
 		// Escape special regex characters except '*'
 		const escapedPath = pathMiddleware.replace(/[-/\\^$+?.()|[\]{}]/g, '\\$&');
 

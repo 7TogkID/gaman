@@ -5,7 +5,7 @@
 		"rootDir": ".",
 		"paths": {
 			"@gaman/common": ["../common"],
-			"@gaman/common/*": ["../common/*"],
+			"@gaman/common/*": ["../common/*"]
 		}
 	},
 	"exclude": ["node_modules", "dist", "test/**/*", "**/*.test.*"],
@@ -13,5 +13,9 @@
 		{
 			"path": "../common/tsconfig.build.json"
 		}
-	]
+	],
+	"tsc-alias": {
+		"resolveFullPaths": true,
+		"verbose": false
+	}
 }

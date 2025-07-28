@@ -1,6 +1,6 @@
 {
 	"name": "@gaman/core",
-	"version": "1.0.10",
+	"version": "1.0.12",
 	"type": "module",
 	"main": "index.js",
 	"engines": {
@@ -20,6 +20,13 @@
 		"access": "public",
 		"registry": "https://registry.npmjs.org"
 	},
+	"dependencies": {
+		"@types/node": "24.1.0"
+	},
+	"peerDependencies": {
+		"cookie": ">=1.0.2",
+		"tslib": ">=2.8.1"
+	},
 	"gitHead": "8d1bf3bbac4b72847e9157e2c95d75b5e90c89cf",
-	"yalcSig": "9e027e38c491bfa252a448a271c7b9b0"
+	"yalcSig": "f74fa0bb66bd741e195d37404acb5c85"
 }

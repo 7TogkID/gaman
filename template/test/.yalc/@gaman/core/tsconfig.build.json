@@ -5,7 +5,9 @@
 		"rootDir": ".",
 		"paths": {
 			"@gaman/common": ["../common"],
-			"@gaman/common/*": ["../common/*"]
+			"@gaman/common/*": ["../common/*"],
+			"@gaman/session": ["../session"],
+			"@gaman/session/*": ["../session/*"]
 		}
 	},
 	"exclude": ["node_modules", "dist", "test/**/*", "**/*.test.*"],

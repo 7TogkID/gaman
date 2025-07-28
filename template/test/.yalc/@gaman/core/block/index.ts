@@ -75,12 +75,18 @@ export function defineBlock<A extends AppConfig>(
 ): Block<A> {
 	if (!block.depedencies) block.depedencies = {};
 	if (!block.services) block.services = {};
+  
+	const serviceCache: Record<string, any> = {}; // * service cache biar ga berat karna pakai proxy
 
-	const serviceCache: Record<string, any> = {};
+  /**
+   * * Proxy ini adalah Wrapper dinamis jadi bisa ngambil object dinamis mirip lamda lah
+   */
 	const context = new Proxy(
 		{},
 		{
+      // * fungsi get ini seperti saat orang pakai context['service'] nah 'service' ini itu prop
 			get(_, prop: string) {
+        // ? kalau udah ada di cache pakai cache aja!
 				if (prop in serviceCache) return serviceCache[prop];
 
 				if (prop in block.services!) {
@@ -89,6 +95,7 @@ export function defineBlock<A extends AppConfig>(
 					serviceCache[prop] = instance;
 					return instance;
 				}
+        
 				if (prop in block.depedencies!) return block.depedencies![prop];
 
 				return undefined;
@@ -96,6 +103,7 @@ export function defineBlock<A extends AppConfig>(
 		},
 	);
 
+  // * register services_useable artinya services yang bakal di pakai
 	const services_useable: Record<string, any> = {};
 	if (block.services) {
 		for (const [key, factory] of Object.entries(block.services)) {
@@ -103,7 +111,7 @@ export function defineBlock<A extends AppConfig>(
 		}
 	}
 
-	// Build routes
+	// * register routes_useable artinya routes yang bakal di pakai
 	let routes_useable: RoutesDefinition<A> = {};
 	if (block.routes) {
 		for (const factory of block.routes) {
