@@ -1,5 +1,5 @@
 import { defineService } from '@gaman/core/service';
 
 export default defineService(() => ({
-	getMessage: () => '❤️ Welcome to GamanJS',
+	getMessage: () => '❤️ Welcome to GamanJS x PrismaJS',
 }));
