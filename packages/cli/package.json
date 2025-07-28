@@ -1,6 +1,6 @@
 {
 	"name": "@gaman/cli",
-	"version": "1.0.10",
+	"version": "1.0.11",
 	"type": "module",
 	"main": "./index.js",
 	"module": "./index.js",
