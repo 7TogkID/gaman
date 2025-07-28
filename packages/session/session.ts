@@ -1,10 +1,15 @@
-import { GamanApp } from '../../gaman-app';
-import { IGamanSessionOptions } from '@gaman/session';
-import { IGamanSessionStore } from '@gaman/session/store';
-import { SESSION_OPTIONS_SYMBOL, SESSION_STORE_SYMBOL } from '../../symbol';
-import { Request } from '../../types';
+import { GamanApp } from '@gaman/core/gaman-app';
+import { Request } from '@gaman/core/types';
 import { sign, verify } from '@gaman/common/utils/signature';
-import { GamanCookies, GamanCookieSetOptions } from '../cookies';
+import {
+	GamanCookies,
+	GamanCookieSetOptions,
+} from '@gaman/core/context/cookies';
+import { IGamanSessionOptions } from '.';
+import { IGamanSessionStore } from './store';
+
+const SESSION_OPTIONS_SYMBOL = Symbol.for('gaman.sessionOptions');
+const SESSION_STORE_SYMBOL = Symbol.for('gaman.sessionStore');
 
 export interface IGamanSession {
 	set(name: string, payload: string | object | Buffer): Promise<void>;
@@ -52,7 +57,8 @@ export class GamanSession implements IGamanSession {
 			const token = sign(payload, this.#secret);
 			this.#cookies.set(name, token, cookieOpts);
 		} else {
-			const data = typeof payload === 'string' ? payload : JSON.stringify(payload);
+			const data =
+				typeof payload === 'string' ? payload : JSON.stringify(payload);
 			await this.#store?.set(sessionId, data, this.#options.maxAge);
 			this.#cookies.set(name, sessionId, cookieOpts);
 		}

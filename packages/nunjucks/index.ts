@@ -4,8 +4,8 @@
  */
 
 import { join } from "path";
-import { defineIntegration } from "../core/integration";
-import { Response } from "../core/response";
+import { defineIntegration } from "@gaman/core/integration";
+import { Response } from "@gaman/core/response";
 import { Log } from "@gaman/common/utils/logger";
 import type { ConfigureOptions, Environment } from "nunjucks";
 import { Priority } from "@gaman/common/utils/priority";

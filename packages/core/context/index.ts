@@ -4,7 +4,6 @@ import type { Context, AppConfig, Request } from "../types";
 import { GamanHeaders } from "../headers";
 import { GamanCookies } from "./cookies";
 import { HTTP_REQUEST_SYMBOL, HTTP_RESPONSE_SYMBOL } from "../symbol";
-import { GamanSession } from "./session";
 import { GamanApp } from "../gaman-app";
 import { Buffer } from "node:buffer";
 import { FormData, FormDataEntryValue, IFormDataEntryValue } from "./formdata";
@@ -124,7 +123,6 @@ export async function createContext<A extends AppConfig>(
     url,
     cookies,
     request: gamanRequest,
-    session: new GamanSession(app, cookies, gamanRequest),
     response: Response,
     res: Response,
 

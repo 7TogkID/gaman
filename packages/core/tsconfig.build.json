@@ -14,9 +14,6 @@
 	"references": [
 		{
 			"path": "../common/tsconfig.build.json"
-		},
-		{
-			"path": "../session/tsconfig.build.json"
 		}
 	]
 }
