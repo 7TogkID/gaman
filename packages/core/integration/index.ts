@@ -1,6 +1,7 @@
+import { Priority } from "@gaman/common/utils/priority";
 import { GamanApp } from "../gaman-app";
 import { Response } from "../response";
-import { AppConfig, Context, NextResponse, Priority } from "../types";
+import { AppConfig, Context, NextResponse } from "../types";
 
 export type IntegrationFactory<A extends AppConfig = AppConfig> = (
   app: GamanApp<A>
