@@ -1,10 +1,22 @@
 {
-  "extends": "../tsconfig.build.json",
-  "compilerOptions": {
-    "outDir": ".",
-    "rootDir": ".",
-    "paths": {}
-  },
-  "exclude": ["node_modules", "dist", "test/**/*", "**/*.test.*"],
-  "references": []
+	"extends": "../tsconfig.build.json",
+	"compilerOptions": {
+		"outDir": ".",
+		"rootDir": ".",
+		"paths": {
+			"@gaman/common": ["../common"],
+			"@gaman/common/*": ["../common/*"],
+			"@gaman/session": ["../session"],
+			"@gaman/session/*": ["../session/*"]
+		}
+	},
+	"exclude": ["node_modules", "dist", "test/**/*", "**/*.test.*"],
+	"references": [
+		{
+			"path": "../common/tsconfig.build.json"
+		},
+		{
+			"path": "../session/tsconfig.build.json"
+		}
+	]
 }

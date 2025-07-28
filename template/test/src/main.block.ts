@@ -1,15 +1,16 @@
-import { defineBlock } from "gaman/block";
-import mainService from "./main.service";
-import mainRoutes from "./main.routes";
+import tesService from 'tes.service.ts';
+import mainRoutes from './main.routes.ts';
+import mainService from './main.service.ts';
+import { defineBlock } from '@gaman/core/block';
 
 export default defineBlock({
-  path: "/",
-  routes: [mainRoutes],
-  services: {
-    appService: mainService,
-  },
-  depedencies: {
-    db: "ANgga",
-  },
-
+	routes: [mainRoutes],
+	services: {
+		tesService: tesService,
+    mainService: mainService,
+	},
+	depedencies: {
+		text: 'Hello, World!',
+	},
+	path: '/',
 });

@@ -1,11 +1,15 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./core/tsconfig.build.json"
-    },
-    {
-      "path": "./cli/tsconfig.build.json"
-    },
-  ]
+	"files": [],
+	"references": [
+		{
+			"path": "../tsconfig.json"
+		},
+		{ "path": "./common/tsconfig.build.json" },
+		{
+			"path": "./core/tsconfig.build.json"
+		},
+		{
+			"path": "./cli/tsconfig.build.json"
+		}
+	]
 }

@@ -1,9 +1,9 @@
 import { GamanApp } from '../../gaman-app';
-import { IGamanSessionOptions } from '../../integration/session';
-import { IGamanSessionStore } from '../../integration/session/store';
+import { IGamanSessionOptions } from '@gaman/session';
+import { IGamanSessionStore } from '@gaman/session/store';
 import { SESSION_OPTIONS_SYMBOL, SESSION_STORE_SYMBOL } from '../../symbol';
 import { Request } from '../../types';
-import { sign, verify } from '../../utils/signature';
+import { sign, verify } from '@gaman/common/utils/signature';
 import { GamanCookies, GamanCookieSetOptions } from '../cookies';
 
 export interface IGamanSession {

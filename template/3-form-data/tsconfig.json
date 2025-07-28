@@ -6,6 +6,8 @@
 		"moduleResolution": "bundler",
 		"allowSyntheticDefaultImports": true,
 		"forceConsistentCasingInFileNames": true,
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
 		"types": ["./src/index.d.ts"],
 		"baseUrl": ".",
 		"paths": {

@@ -10,7 +10,7 @@
 	"license": "MIT",
 	"repository": {
 		"url": "git+https://github.com/7TogkID/gaman.git",
-		"directory": "packages/gaman"
+		"directory": "packages/core"
 	},
 	"bugs": {
 		"url": "https://github.com/7TogkID/gaman/issues"

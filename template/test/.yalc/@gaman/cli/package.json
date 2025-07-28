@@ -1,0 +1,30 @@
+{
+	"name": "@gaman/cli",
+	"version": "1.0.10",
+	"type": "module",
+	"main": "./index.js",
+	"module": "./index.js",
+	"types": "./index.d.ts",
+	"bin": {
+		"gaman": "./index.js"
+	},
+	"author": "angga7togk",
+	"license": "MIT",
+	"repository": {
+		"url": "git+https://github.com/7TogkID/gaman.git",
+		"directory": "packages/cli"
+	},
+	"bugs": {
+		"url": "https://github.com/7TogkID/gaman/issues"
+	},
+	"homepage": "https://gaman.7togk.id",
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org"
+	},
+	"peerDependencies": {
+		"esbuild": ">=0.25.8",
+		"fast-glob": ">=3.3.3"
+	},
+	"gitHead": "8d1bf3bbac4b72847e9157e2c95d75b5e90c89cf",
+	"yalcSig": "d96770ef8fb951e976ea3515a57f8c16"
+}

@@ -4,6 +4,6 @@ declare namespace Gaman {
   }
 
   interface Env {
-    
+    ANU: string
   }
 }

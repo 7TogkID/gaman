@@ -20,6 +20,7 @@
 		"baseUrl": ".",
 		"paths": {
 			"@gaman/core/*": ["./packages/core/*"],
+			"@gaman/common/*": ["./packages/common/*"],
 			"@gaman/cli": ["./packages/cli"]
 		}
 	},

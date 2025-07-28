@@ -1,14 +1,14 @@
-import { defineRoutes } from "gaman/routes";
-import mainService from "./main.service.ts";
+import { defineRoutes } from '@gaman/core/routes';
+import mainService from 'main.service';
+import tesService from 'tes.service';
 
 interface Deps {
-  db: string,
-  appService: ReturnType<typeof mainService>;
+	mainService: ReturnType<typeof mainService>;
+  tesService: ReturnType<typeof tesService>;
 }
 
-export default defineRoutes(({ db, appService }: Deps) => ({
-  "/": async (ctx) => {
-    return r.text(await appService.getDatabase())
-  },
+export default defineRoutes(({ mainService, tesService }: Deps) => ({
+	'/': () => {
+		return mainService.getMessage();
+	},
 }));
-  

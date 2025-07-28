@@ -1,9 +1,10 @@
-import { defineService } from "gaman/service";
+import { defineService } from '@gaman/core/service';
+import tesService from 'tes.service';
 
 interface Deps {
-  db: string;
+	tesService: ReturnType<typeof tesService>;
 }
 
-export default defineService(({ db }: Deps) => ({
-  getDatabase: async () => db,
+export default defineService(({ tesService }: Deps) => ({
+	getMessage: () => tesService.getMessage(),
 }));

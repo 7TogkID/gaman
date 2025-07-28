@@ -1,0 +1,17 @@
+{
+  "version": "v1",
+  "packages": {
+    "@gaman/core": {
+      "signature": "9e027e38c491bfa252a448a271c7b9b0",
+      "file": true
+    },
+    "@gaman/common": {
+      "signature": "778aa1ec04d46f1781349fac0fe564f4",
+      "file": true
+    },
+    "@gaman/cli": {
+      "signature": "d96770ef8fb951e976ea3515a57f8c16",
+      "file": true
+    }
+  }
+}

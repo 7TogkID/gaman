@@ -1,27 +1,19 @@
 {
-	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"composite": true,
-		"module": "commonjs",
-		"declaration": true,
-		"noImplicitAny": false,
-		"skipLibCheck": true,
-		"noUnusedLocals": false,
-		"importHelpers": true,
-		"removeComments": false,
-		"noLib": false,
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
-		"useUnknownInCatchVariables": false,
+		"module": "ES2022",
+		"outDir": "./dist",
 		"target": "ES2021",
-		"sourceMap": false,
-		"allowJs": false,
-		"strict": true,
-		"strictNullChecks": true,
+		"moduleResolution": "bundler",
+		"allowSyntheticDefaultImports": true,
 		"forceConsistentCasingInFileNames": true,
-		"strictPropertyInitialization": false,
-		"types": ["node"]
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
+		"types": ["./src/index.d.ts"],
+		"baseUrl": ".",
+		"paths": {
+			"*": ["./src/*"]
+		}
 	},
-	"include": [],
-	"exclude": []
+	"include": ["./src/**/*.ts"],
+	"exclude": ["node_modules", "dist", "**/*test.ts"]
 }

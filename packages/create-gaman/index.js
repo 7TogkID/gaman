@@ -11,8 +11,10 @@ import { randomBytes } from 'crypto';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function getPackageLatest() {
-	return await fetch('https://registry.npmjs.org/@gaman/core/latest').then(
+const dependencies = ['common', 'core', 'cli'];
+
+async function getPackageLatest(dep) {
+	return await fetch(`https://registry.npmjs.org/@gaman/${dep}/latest`).then(
 		(r) => r.json(),
 	);
 }
@@ -97,10 +99,11 @@ async function main() {
 		const packageJson = await fs.readJson(packageJsonPath);
 		packageJson.name = path.basename(answers.projectName);
 
-		const latestGaman = (await getPackageLatest()).version;
 		if (packageJson.dependencies) {
-			packageJson.dependencies["@gaman/core"] = `^${latestGaman}`;
-			packageJson.dependencies["@gaman/cli"] = `^${latestGaman}`;
+			for (const dep of dependencies) {
+				const latestGaman = (await getPackageLatest(dep)).version;
+				packageJson.dependencies[`@gaman/${dep}`] = `^${latestGaman}`;
+			}
 		}
 
 		await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
