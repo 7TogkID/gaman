@@ -20,5 +20,9 @@
 		"access": "public",
 		"registry": "https://registry.npmjs.org"
 	},
+	"peerDependencies": {
+		"cookie": ">=1.0.2",
+		"tslib": ">=2.8.1"
+	},
 	"gitHead": "8d1bf3bbac4b72847e9157e2c95d75b5e90c89cf"
 }

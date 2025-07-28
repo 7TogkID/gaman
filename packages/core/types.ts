@@ -176,7 +176,7 @@ export interface Request {
 	 *
 	 * @returns A typed JSON object.
 	 */
-	json: <T>() => Promise<T>;
+	json: <T = any>() => Promise<T>;
 
 	/**
 	 * Parses the request body as FormData.
