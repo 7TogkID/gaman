@@ -14,10 +14,10 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/npm/v/gaman" alt="npm version">
-  <img src="https://img.shields.io/npm/dm/gaman" alt="npm download">
-  <img src="https://img.shields.io/npm/l/gaman" alt="npm license">
-  <img src="https://img.shields.io/github/stars/7togkid/gaman" alt="github stars">
+  <img src="https://img.shields.io/npm/v/@gaman/core" alt="npm version">
+  <img src="https://img.shields.io/npm/dm/@gaman/core" alt="npm download">
+  <img src="https://img.shields.io/npm/l/@gaman/core" alt="npm license">
+  <img src="https://img.shields.io/github/stars/7togkid/@gaman/core" alt="github stars">
 </p>
 
 ---
@@ -32,11 +32,11 @@ npm create gaman@latest
 
 ## Documentation
 
-visit our [official documentation](https://gaman.7togk.id/docs)
+visit our [official documentation](https://gaman.7togk.id)
 
 ## Contributing
 
-**New Contributing welcome!** Check out our [Contributing Guide]() for help getting started.
+**New Contributing welcome!** Check out our [Contributing Guide](CONTRIBUTING.md) for help getting started.
 
 ## Links
 - [License (MIT)](https://github.com/7togkid/gaman/blob/main/LICENSE)

@@ -7,9 +7,9 @@ export default defineBlock({
 	path: '/blog',
 	routes: [blogRoutes],
 	dependencies: {
-		prisma: new PrismaClient(),
+		prisma: new PrismaClient()
 	},
 	services: {
-		blogService: blogService,
-	},
+		blogService: blogService
+	}
 });
