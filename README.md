@@ -17,7 +17,7 @@
   <img src="https://img.shields.io/npm/v/@gaman/core" alt="npm version">
   <img src="https://img.shields.io/npm/dm/@gaman/core" alt="npm download">
   <img src="https://img.shields.io/npm/l/@gaman/core" alt="npm license">
-  <img src="https://img.shields.io/github/stars/7togkid/@gaman/core" alt="github stars">
+  <img src="https://img.shields.io/github/stars/7togkid/gaman" alt="github stars">
 </p>
 
 ---

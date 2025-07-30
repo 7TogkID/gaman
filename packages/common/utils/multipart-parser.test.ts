@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { Buffer } from "node:buffer";
-import { parseMultipart } from "../../core/utils/multipart-parser";
 import { MultipartForm } from "./fake-multipart";
 import * as fs from "fs";
+import { parseMultipart } from "./multipart-parser";
 
 const form = new MultipartForm("WebKitFormBoundaryABC123");
 form.append("avatar", {
@@ -16,33 +16,33 @@ describe("Multipart Parser", () => {
     const input = Buffer.from(form.toString());
     const boundary = form.getBoundary();
 
-    const start = performance.now();
+    // const start = performance.now();
     const result = parseMultipart(input, boundary);
-    const end = performance.now();
+    // const end = performance.now();
 
-    console.log(`⏱️ Multipart parsed in ${(end - start).toFixed(3)} ms`);
+    // console.log(`⏱️ Multipart parsed in ${(end - start).toFixed(3)} ms`);
     expect(result).toBeDefined();
   });
   it("benchmark parser", () => {
     const input = Buffer.from(form.toString());
     const boundary = form.getBoundary();
 
-    const start = performance.now();
+    // const start = performance.now();
     const result = parseMultipart(input, boundary);
-    const end = performance.now();
+    // const end = performance.now();
 
-    console.log(`⏱️ Multipart parsed in ${(end - start).toFixed(3)} ms`);
+    // console.log(`⏱️ Multipart parsed in ${(end - start).toFixed(3)} ms`);
     expect(result).toBeDefined();
   });
   it("benchmark parser", () => {
     const input = Buffer.from(form.toString());
     const boundary = form.getBoundary();
 
-    const start = performance.now();
+    // const start = performance.now();
     const result = parseMultipart(input, boundary);
-    const end = performance.now();
+    // const end = performance.now();
 
-    console.log(`⏱️ Multipart parsed in ${(end - start).toFixed(3)} ms`);
+    // console.log(`⏱️ Multipart parsed in ${(end - start).toFixed(3)} ms`);
     expect(result).toBeDefined();  
   }); 
 });

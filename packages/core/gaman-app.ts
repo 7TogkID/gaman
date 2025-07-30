@@ -27,27 +27,15 @@ import { Block } from './block';
 import { IntegrationFactory } from './integration';
 
 export class GamanApp<A extends AppConfig = any> {
-	#blocks: Block<A>[] = [];
-	#websocket: GamanWebSocket<A>;
-	#integrations: Array<ReturnType<IntegrationFactory<A>>> = [];
-	#server: http.Server<
+	blocks: Block<A>[] = [];
+	websocket: GamanWebSocket<A>;
+	integrations: Array<ReturnType<IntegrationFactory<A>>> = [];
+	server: http.Server<
 		typeof http.IncomingMessage,
 		typeof http.ServerResponse
 	> | null = null;
-	#strict = false;
-
-	get blocks() {
-		return this.#blocks;
-	}
-	get integrations() {
-		return this.#integrations;
-	}
-	get server() {
-		return this.#server;
-	}
-	get strict() {
-		return this.#strict;
-	}
+	strict = false;
+	silent = false;
 
 	/**
 	 * must use slash '/' at the end of the path
@@ -55,7 +43,11 @@ export class GamanApp<A extends AppConfig = any> {
 	 * @default true
 	 */
 	setStrict(v: boolean = true) {
-		this.#strict = v;
+		this.strict = v;
+	}
+
+	setSilent(v: boolean = true) {
+		this.silent = v;
 	}
 
 	/**
@@ -68,19 +60,19 @@ export class GamanApp<A extends AppConfig = any> {
 	registerIntegration(...integrationFactories: IntegrationFactory<A>[]) {
 		for (const factory of integrationFactories) {
 			const integration = factory(this);
-			this.#integrations.push(integration);
+			this.integrations.push(integration);
 			integration.onLoad?.();
 		}
 	}
 
 	constructor(private mainBlock: Block<A>) {
-		this.#websocket = new GamanWebSocket(this);
+		this.websocket = new GamanWebSocket(this);
 	}
 
 	getBlock(blockPath: string): Block<A> | undefined {
-		const path = formatPath(blockPath, this.#strict);
-		const block: Block<A> | undefined = this.#blocks.find(
-			(b) => formatPath(b.path || '/', this.#strict) === path,
+		const path = formatPath(blockPath, this.strict);
+		const block: Block<A> | undefined = this.blocks.find(
+			(b) => formatPath(b.path || '/', this.strict) === path,
 		);
 		return block;
 	}
@@ -90,7 +82,7 @@ export class GamanApp<A extends AppConfig = any> {
 		 * * EN: Initialize Blocks and childrens
 		 * * ID: inisialisasi blocks dan childrens nya
 		 */
-		if (this.#blocks.some((b) => b.path === this.mainBlock?.path || '/')) {
+		if (this.blocks.some((b) => b.path === this.mainBlock?.path || '/')) {
 			throw new Error(`Block '${this.mainBlock.path}' already exists!`);
 		}
 
@@ -108,7 +100,7 @@ export class GamanApp<A extends AppConfig = any> {
 		) {
 			for (const blockChild of childrens) {
 				const childPath = path.join(basePath, blockChild.path || '/');
-				if (app.#blocks.some((b) => b.path === childPath)) {
+				if (app.blocks.some((b) => b.path === childPath)) {
 					throw new Error(`Block '${childPath}' already exists!`);
 				}
 
@@ -135,16 +127,18 @@ export class GamanApp<A extends AppConfig = any> {
 			this,
 		);
 		const endTime = performance.now();
-		Log.info(
-			`${this.#blocks.length} Blocks have been registered §a(${(
-				endTime - startTime
-			).toFixed(1)}ms)§r`,
-		);
+		if (!this.silent) {
+			Log.info(
+				`${this.blocks.length} Blocks have been registered §a(${(
+					endTime - startTime
+				).toFixed(1)}ms)§r`,
+			);
+		}
 
 		// * tambahin "/" di belakang kalau strict
 		function register(block: Block<A>, app: GamanApp<A>) {
-			block.path = formatPath(block.path || '/', app.#strict);
-			app.#blocks.push(block);
+			block.path = formatPath(block.path || '/', app.strict);
+			app.blocks.push(block);
 		}
 	}
 
@@ -160,7 +154,7 @@ export class GamanApp<A extends AppConfig = any> {
 			const blocksAndIntegrations = sortArrayByPriority<
 				Block<A> | ReturnType<IntegrationFactory<A>>
 			>(
-				[...this.#blocks, ...this.#integrations],
+				[...this.blocks, ...this.integrations],
 				'priority',
 				'asc', //  1, 2, 3, 4, 5 // kalau desc: 5, 4, 3, 2, 1
 			);
@@ -253,6 +247,7 @@ export class GamanApp<A extends AppConfig = any> {
 				Log.response.route &&
 				Log.response.status &&
 				Log.response.method &&
+				!this.silent &&
 				!IGNORED_LOG_FOR_PATH_REGEX.test(Log.response.route)
 			) {
 				Log.log(
@@ -276,7 +271,7 @@ export class GamanApp<A extends AppConfig = any> {
 			 * *
 			 * * dan di belakang nya kasih "/" kalau dia strict
 			 */
-			const routeFullPath = formatPath(`${basePath}/${path}`, this.#strict);
+			const routeFullPath = formatPath(`${basePath}/${path}`, this.strict);
 
 			// * setiap request di createParamRegex nya dari path Server
 			const regexParam = this.createParamRegex(routeFullPath);
@@ -285,7 +280,7 @@ export class GamanApp<A extends AppConfig = any> {
 			 * * kalau strict pakai pathname full
 			 * * kalau non strict, hapus slash akhir biar bisa "/home" dan "/home/"
 			 */
-			const requestPath = this.#strict
+			const requestPath = this.strict
 				? ctx.request.pathname
 				: removeEndSlash(ctx.request.pathname);
 			// ? apakah path dari client dan path server itu valid?
@@ -425,10 +420,10 @@ export class GamanApp<A extends AppConfig = any> {
 		/**
 		 * * proccess integrations first
 		 */
-		if (this.#integrations) {
+		if (this.integrations) {
 			const integrations = sortArrayByPriority<
 				ReturnType<IntegrationFactory<A>>
-			>(this.#integrations, 'priority', 'asc');
+			>(this.integrations, 'priority', 'asc');
 
 			for (const integration of integrations) {
 				if (integration.onResponse) {
@@ -467,13 +462,13 @@ export class GamanApp<A extends AppConfig = any> {
 	listen(port: number = 3431, host: string = 'localhost', cb: () => any) {
 		this.registerBlocks(); // register all Block
 
-		this.#server = http.createServer(this.requestHandle.bind(this));
+		this.server = http.createServer(this.requestHandle.bind(this));
 
-		this.#server.on('upgrade', (request, socket, head) => {
+		this.server.on('upgrade', (request, socket, head) => {
 			const urlString = request.url || '/';
 			const { pathname } = new URL(urlString, `http://${request.headers.host}`);
 
-			const wss = this.#websocket.getWebSocketServer(pathname);
+			const wss = this.websocket.getWebSocketServer(pathname);
 			if (wss) {
 				wss.handleUpgrade(request, socket, head, function done(ws) {
 					wss.emit('connection', ws, request);
@@ -483,13 +478,13 @@ export class GamanApp<A extends AppConfig = any> {
 			}
 		});
 
-		this.#server.listen(port, host, cb);
+		this.server.listen(port, host, cb);
 	}
 
 	close(): Promise<void> {
 		return new Promise((resolve, reject) => {
-			if (this.#server) {
-				this.#server.close((err) => {
+			if (this.server) {
+				this.server.close((err) => {
 					if (err) reject(err);
 					else resolve();
 				});
@@ -531,7 +526,10 @@ export class GamanApp<A extends AppConfig = any> {
 		};
 	}
 
-	private checkMiddleware(pathMiddleware: string, pathRequestClient: string): boolean {
+	private checkMiddleware(
+		pathMiddleware: string,
+		pathRequestClient: string,
+	): boolean {
 		// Escape special regex characters except '*'
 		const escapedPath = pathMiddleware.replace(/[-/\\^$+?.()|[\]{}]/g, '\\$&');
 

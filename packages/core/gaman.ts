@@ -8,7 +8,6 @@ export async function defineBootstrap<A extends AppConfig>(
   mainBlock: Block<A>,
   cb: (app: GamanApp<A>) => any
 ) {
-  Log.log(`Starting Gaman application...`);
   loadEnv();
 
   if (!process.env.GAMAN_KEY) {

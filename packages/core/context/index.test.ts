@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest';
-import { createContext } from '../../dist/context';
+import { createContext } from '.';
 import * as http from 'node:http';
 import { Readable } from 'stream';
-import { GamanBase } from '../../dist/gaman-base';
+import { GamanApp } from '../gaman-app';
 
 function mockRequest({
 	method = 'GET',
@@ -48,9 +48,9 @@ function mockResponse(): http.ServerResponse {
 }
 
 describe('createContext(app, )', () => {
-	var app: GamanBase<any>;
+	var app: GamanApp<any>;
 	beforeAll(() => {
-		app = new GamanBase<any>({});
+		app = new GamanApp<any>(null as any);
 	});
 
 	it('parses query and headers', async () => {

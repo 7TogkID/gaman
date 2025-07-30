@@ -1,14 +1,15 @@
-import gaman from 'gaman';
-import {defineBlock} from "gaman/block"
 import { beforeAll, describe, expect, it } from 'vitest';
+import { defineBlock } from '../../packages/core/block';
+import { defineRoutes } from '../../packages/core/routes';
+import { defineBootstrap } from '../../packages/core/index';
 
 describe('Request Test', () => {
-	let base: string;
+	let base: string = `http://localhost:3434`;
 	beforeAll(async () => {
-		const app = await gaman.serv({
-			blocks: [
-				defineBlock({
-					routes: {
+		defineBootstrap(
+			defineBlock({
+				routes: [
+					defineRoutes(() => ({
 						'/json': async (ctx) => {
 							const data = await ctx.json();
 							return data;
@@ -17,14 +18,14 @@ describe('Request Test', () => {
 							const data = await ctx.text();
 							return data;
 						},
-					},
-				}),
-			],
-			server: { port: 0, silent: true },
-		});
-		// @ts-ignore
-		const port = app.getServer()?.address()?.port;
-		base = `http://localhost:${port}`;
+					})),
+				],
+			}),
+			(app) => {
+				app.setSilent();
+				app.listen(3434, 'localhost', () => {});
+			},
+		);
 	});
 
 	it('POST json', async () => {
@@ -33,7 +34,7 @@ describe('Request Test', () => {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				method: "POST",
+				method: 'POST',
 				body: JSON.stringify({
 					name: 'angga7togk',
 				}),
@@ -50,10 +51,10 @@ describe('Request Test', () => {
 				headers: {
 					'Content-Type': 'application/plain',
 				},
-				method: "POST",
-				body: "angga7togk",
+				method: 'POST',
+				body: 'angga7togk',
 			})
 		).text();
-		expect(data).toBe("angga7togk")
+		expect(data).toBe('angga7togk');
 	});
 });
