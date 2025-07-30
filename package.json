@@ -26,7 +26,6 @@
 	"repository": {
 		"url": "git+https://github.com/7TogkID/gaman.git"
 	},
-	"private": true,
 	"bugs": {
 		"url": "https://github.com/7TogkID/gaman/issues"
 	},
