@@ -7,6 +7,13 @@ interface Deps {
 
 export default defineRoutes(({ blogService }: Deps) => ({
 	'/': {
+		// get all blogs
+		GET: async () => {
+			return Res.json({
+				message: 'OK!',
+				data: await blogService.getAll(),
+			});
+		},
 
 		// Create new blog
 		POST: async ({ json }) => {
@@ -34,7 +41,7 @@ export default defineRoutes(({ blogService }: Deps) => ({
 				data: await blogService.getById(Number(param('id'))),
 			});
 		},
-		
+
 		// Update Blog with id
 		PUT: async ({ param, json }) => {
 			const id = Number(param('id'));

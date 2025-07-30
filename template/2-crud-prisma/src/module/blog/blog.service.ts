@@ -6,6 +6,9 @@ interface Deps {
 }
 
 export default defineService(({ prisma }: Deps) => ({
+	getAll: async () => {
+		return await prisma.blog.findMany();
+	},
 
 	getById: async (id: number) => {
 		return await prisma.blog.findUnique({

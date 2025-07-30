@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 
 export default defineBlock({
 	services: { userService: userService },
-	depedencies: { prisma: new PrismaClient() },
+	dependencies: { prisma: new PrismaClient() },
 	path: '/user',
 	routes: [userRoutes],
 	error: () => {
