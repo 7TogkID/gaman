@@ -6,8 +6,7 @@ interface Deps {
 }
 
 export default defineRoutes(({ mainService }: Deps) => ({
-	'/': (ctx) => {
-		ctx.locals.example
+	'/': () => {
 		return r.json({ message: mainService.getMessage() });
 	},
 }));

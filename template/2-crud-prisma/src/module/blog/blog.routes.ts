@@ -7,13 +7,6 @@ interface Deps {
 
 export default defineRoutes(({ blogService }: Deps) => ({
 	'/': {
-		// Get all blogs
-		GET: async () => {
-			return Res.json({
-				message: 'OK!',
-				data: await blogService.getAll(),
-			});
-		},
 
 		// Create new blog
 		POST: async ({ json }) => {

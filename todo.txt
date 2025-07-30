@@ -4,17 +4,19 @@
 @gaman/crud
 @gaman/apikey
 @gaman/cron
+@gaman/rate-limit
+@gaman/orm
+@gaman/validation
 
 
-cookie with secret
+adapter support: Bun, Node, Deno, Cloudflare Worker, Lambda.
+
+
+-- Template
+starter kit blog app
+starter kit api app
 
 
 
-1. const {title} = ctx.body 
-
-2. ga itu , name packge.json nya ganti jadi gaman-app aja
-
-3. jika port udah di pake 3431 jadi di plus jadi 3432 seterusnya...
-
-
+Compatibility layer dengan Express, Hono, ElisyaJS
 

@@ -53,7 +53,7 @@ export interface BlockFactory<A extends AppConfig> {
 
 	services?: Record<string, ServiceFactory<any, any>>;
 
-	depedencies?: Record<string, any>;
+	dependencies?: Record<string, any>;
 
 	/**
 	 * Defines a set of routes for this block.
@@ -73,7 +73,7 @@ export interface Block<A extends AppConfig> extends BlockFactory<A> {
 export function defineBlock<A extends AppConfig>(
 	block: BlockFactory<A>,
 ): Block<A> {
-	if (!block.depedencies) block.depedencies = {};
+	if (!block.dependencies) block.dependencies = {};
 	if (!block.services) block.services = {};
   
 	const serviceCache: Record<string, any> = {}; // * service cache biar ga berat karna pakai proxy
@@ -96,7 +96,7 @@ export function defineBlock<A extends AppConfig>(
 					return instance;
 				}
         
-				if (prop in block.depedencies!) return block.depedencies![prop];
+				if (prop in block.dependencies!) return block.dependencies![prop];
 
 				return undefined;
 			},
