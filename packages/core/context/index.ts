@@ -119,9 +119,6 @@ export async function createContext<A extends AppConfig>(
 	const cookies = new GamanCookies(gamanRequest);
 	const ctx = {
 		locals: <A['Locals']>{},
-		env: <A['Env']>{
-			...process.env,
-		},
 		url,
 		cookies,
 		request: gamanRequest,

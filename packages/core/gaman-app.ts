@@ -31,6 +31,7 @@ import { IGNORED_LOG_FOR_PATH_REGEX } from './constant';
 import { next } from './next';
 import { Block } from './block';
 import { IntegrationFactory } from './integration';
+import { loadEnv } from '@gaman/common/utils/load-env';
 
 export class GamanApp<A extends AppConfig = any> {
 	blocks: Block<A>[] = [];
@@ -73,6 +74,13 @@ export class GamanApp<A extends AppConfig = any> {
 
 	constructor(private mainBlock: Block<A>) {
 		this.websocket = new GamanWebSocket(this);
+	}
+
+	/**
+	 * load and parse env data to `process.env`
+	 */
+	loadEnv(envPath = '.env') {
+		loadEnv(envPath);
 	}
 
 	getBlock(blockPath: string): Block<A> | undefined {
@@ -485,7 +493,10 @@ export class GamanApp<A extends AppConfig = any> {
 		return res.end(response.body);
 	}
 
-	listen(port: number = 3431, host: string = 'localhost', cb: () => any) {
+	async listen(
+		port?: number,
+		host?: string,
+	): Promise<void> {
 		this.registerBlocks(); // register all Block
 
 		this.server = http.createServer(this.requestHandle.bind(this));
@@ -504,7 +515,10 @@ export class GamanApp<A extends AppConfig = any> {
 			}
 		});
 
-		this.server.listen(port, host, cb);
+		this.server.listen(
+			process.env.PORT || port || 3431,
+			process.env.HOST || host || 'localhost',
+		);
 	}
 
 	close(): Promise<void> {

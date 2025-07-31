@@ -241,7 +241,6 @@ export interface Context<A extends AppConfig = AppConfig>
 		>,
 		Gaman.Context {
 	locals: A['Locals'];
-	env: A['Env'];
 	url: URL;
 	cookies: GamanCookies;
 	request: Request;

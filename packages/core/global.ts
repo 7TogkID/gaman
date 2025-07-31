@@ -23,8 +23,8 @@ declare global {
 		interface Locals {}
 		interface Env {
 			NODE_ENV?: 'development' | 'production';
-			PORT?: string;
-			GAMAN_KEY?: string;
+			PORT?: number;
+			HOST?: string;
 		}
 		interface Context {
 			
