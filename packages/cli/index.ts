@@ -12,6 +12,7 @@ import makeMiddleware from './command/make/make-middleware';
 import makeRoutes from './command/make/make-routes';
 import { TextFormat } from '@gaman/common/utils/textformat';
 import makeService from './command/make/make-service';
+import makeModule from './command/make/make-module';
 
 // Daftar perintah yang tersedia
 const commands: Command[] = [
@@ -19,6 +20,7 @@ const commands: Command[] = [
 	build,
 	start,
 	generateKey,
+	makeModule,
 	makeBlock,
 	makeRoutes,
 	makeService,

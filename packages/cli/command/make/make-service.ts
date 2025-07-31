@@ -82,7 +82,7 @@ function placeToDataServiceBlock(pathName: string) {
       const fullMatch = match[0];
       const innerContent = match[1];
 
-      const servicesRegex = /services:\s*\{([\s\S]*?)\}/m;
+      const servicesRegex = /bindings:\s*\{([\s\S]*?)\}/m;
       let updatedInner = innerContent;
 
       if (servicesRegex.test(innerContent)) {
@@ -91,14 +91,14 @@ function placeToDataServiceBlock(pathName: string) {
           const newItems = trimmed
             ? `${trimmed}, ${name}Service: ${name}Service`
             : `${name}Service: ${name}Service`;
-          return `services: { ${newItems} }`;
+          return `bindings: { ${newItems} }`;
         });
 
         Log.info(`Added "${name}Service" to existing services object`);
       } else {
         // Inject properti baru
-        updatedInner = `services: { ${name}Service: ${name}Service },\n  ${innerContent.trim()}\n`;
-        Log.info(`Injected new services object with "${name}Service"`);
+        updatedInner = `bindings: { ${name}Service: ${name}Service },\n  ${innerContent.trim()}\n`;
+        Log.info(`Injected new bindings object with "${name}Service"`);
       }
 
       const updatedFull = fullMatch.replace(innerContent, updatedInner);

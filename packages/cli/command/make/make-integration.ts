@@ -52,10 +52,6 @@ export default defineIntegration((app) => ({
 `;
 
 		writeFileSync(filePath, template, { encoding: 'utf-8' });
-
-    placeIntegrationToMainFile(path)
-
-
 		Log.info(`Created integration: ${filePath}`);
 	}
 }
