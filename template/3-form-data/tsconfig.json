@@ -8,7 +8,7 @@
 		"forceConsistentCasingInFileNames": true,
 		"noEmit": true,
 		"allowImportingTsExtensions": true,
-		"types": ["./src/index.d.ts"],
+		"types": ["node", "./src/index.d.ts"],
 		"baseUrl": ".",
 		"paths": {
 			"*": ["./src/*"]
