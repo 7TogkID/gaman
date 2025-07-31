@@ -6,10 +6,8 @@ import blogService from './blog.service.ts';
 export default defineBlock({
 	path: '/blog',
 	routes: [blogRoutes],
-	dependencies: {
-		prisma: new PrismaClient()
-	},
-	services: {
+	bindings: {
+		prisma: new PrismaClient(),
 		blogService: blogService
-	}
+	},
 });

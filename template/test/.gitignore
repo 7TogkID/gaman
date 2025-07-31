@@ -3,6 +3,7 @@ dist/
 
 # dependencies
 node_modules/
+.yalc
 
 # file session
 session.db

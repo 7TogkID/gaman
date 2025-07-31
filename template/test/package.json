@@ -1,7 +1,7 @@
 {
   "name": "test",
   "version": "1.0.0",
-  "description": "<p align=\"right\">   <img src=\"https://github.com/7TogkID/gaman/blob/main/.github/images/indonesia.png?raw=true\" width=\"23px\"> </p>",
+  "description": "asda",
   "main": "index.js",
   "scripts": {
     "dev": "gaman dev",
@@ -14,6 +14,7 @@
   "dependencies": {
     "@gaman/cli": "file:.yalc/@gaman/cli",
     "@gaman/common": "file:.yalc/@gaman/common",
-    "@gaman/core": "file:.yalc/@gaman/core"
+    "@gaman/core": "file:.yalc/@gaman/core",
+    "@gaman/cors": "^1.0.1"
   }
 }

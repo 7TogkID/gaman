@@ -4,8 +4,7 @@ import { defineBlock } from '@gaman/core/block';
 import { PrismaClient } from '@prisma/client';
 
 export default defineBlock({
-	services: { userService: userService },
-	dependencies: { prisma: new PrismaClient() },
+	bindings: { prisma: new PrismaClient(), userService: userService },
 	path: '/user',
 	routes: [userRoutes],
 	error: () => {

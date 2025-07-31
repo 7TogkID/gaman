@@ -8,7 +8,7 @@ export default defineBlock({
 	blocks: [blogBlock, userBlock],
 	path: '/',
 	routes: [mainRoutes],
-	services: {
+	bindings: {
 		mainService: mainService,
 	},
 	error: () => {
