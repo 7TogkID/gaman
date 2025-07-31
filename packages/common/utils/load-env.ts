@@ -1,29 +1,38 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Loads environment variables from a .env file into process.env
  */
-export function loadEnv(envPath = ".env") {
-  const fullPath = path.resolve(envPath);
-  if (!fs.existsSync(fullPath)) return;
+let env_custom_data = {};
 
-  const content = fs.readFileSync(fullPath, "utf-8");
+export function loadEnv(envPath = '.env') {
+	const fullPath = path.resolve(envPath);
+	if (!fs.existsSync(fullPath)) return;
 
-  content.split(/\r?\n/).forEach((line) => {
-    const trimmed = line.trim();
+	const content = fs.readFileSync(fullPath, 'utf-8');
 
-    // Ignore empty lines and comments
-    if (!trimmed || trimmed.startsWith("#")) return;
+	content.split(/\r?\n/).forEach((line) => {
+		const trimmed = line.trim();
 
-    const [key, ...rest] = trimmed.split("=");
-    const value = rest
-      .join("=")
-      .trim()
-      .replace(/^["']|["']$/g, ""); // remove quotes if present
+		// Ignore empty lines and comments
+		if (!trimmed || trimmed.startsWith('#')) return;
 
-    if (key && !(key in process.env)) {
-      process.env[key] = value;
-    }
-  });
+		const [key, ...rest] = trimmed.split('=');
+		const value = rest
+			.join('=')
+			.trim()
+			.replace(/^["']|["']$/g, ''); // remove quotes if present
+
+    // ! delete all env custom
+    // ! its function is so that when you call loadEnv again it doesn't duplicate
+		if (key && key in env_custom_data) {
+			delete env_custom_data[key];
+		}
+
+		if (key && !(key in process.env)) {
+			process.env[key] = value;
+			env_custom_data[key] = value;
+		}
+	});
 }
