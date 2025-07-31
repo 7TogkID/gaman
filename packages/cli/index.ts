@@ -3,7 +3,6 @@
 import dev from './command/dev';
 import build from './command/build';
 import start from './command/start';
-import generateKey from './command/key/generate';
 import { parseArgs } from './utils/parse';
 import { Command } from './command/command';
 import makeBlock from './command/make/make-block';
@@ -19,7 +18,6 @@ const commands: Command[] = [
 	dev,
 	build,
 	start,
-	generateKey,
 	makeModule,
 	makeBlock,
 	makeRoutes,
