@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/7TogkID/gaman">
+  <a href="https://gaman.7togk.id">
     <img src="https://github.com/7TogkID/gaman/blob/main/.github/images/gaman.png?raw=true" width="25%">
   </a>
 </p>
@@ -13,120 +13,31 @@
   <strong>GamanJS is a modern backend framework built for resilience, scalability, and simplicity.</strong>
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/npm/v/@gaman/core" alt="npm version">
+  <img src="https://img.shields.io/npm/dm/@gaman/core" alt="npm download">
+  <img src="https://img.shields.io/npm/l/@gaman/core" alt="npm license">
+  <img src="https://img.shields.io/github/stars/7togkid/gaman" alt="github stars">
+</p>
+
 ---
 
-## 🧠 Philosophy
-
-"Gaman" (我慢) — patience, perseverance, and resilience. These principles are at the heart of GamanJS, empowering developers to build robust and modular web applications effortlessly.
-
-## ✨ Packages
-
-| Package                                        | Release Notes |
-| ---------------------------------------------- | ------------- |
-| [gaman](https://github.com/7TogkID/gaman)      | v0.0.28       |
-| [create-gaman](packages/create-gaman)          | v0.0.1        |
-| [@gaman/ejs](packages/gaman-ejs)               | v0.0.11       |
-| [@gaman/static](packages/gaman-static)         | v0.0.3        |
-| [@gaman/cors](packages/gaman-cors)             | v0.0.2        |
-| [@gaman/basic-auth](packages/gaman-basic-auth) | v0.0.2        |
-| [@gaman/cli](packages/gaman-cli)               | v0.0.8        |
-
-## 🚀 Get Started
-
-For complete documentation, examples, and best practices, visit the **GamanWiki**:  
-[https://github.com/7TogkID/gaman/wiki](https://github.com/7TogkID/gaman/wiki)
-
-### Create a New Project
-
-There are two ways to scaffold a new GamanJS project:
+## How To running?
 
 ```bash
-npx create-gaman@latest
-```
-
-This will scaffold a new GamanJS project with the necessary structure.
-
-### Run Your Project
-
-Start your server with:
-
-```bash
+npm install
 npm run dev
 ```
 
-## 📂 Project Structure
+## Documentation
 
-After creating a new project, your file structure will look like this:
+visit our [official documentation](https://gaman.7togk.id)
 
-```css
-src/
-├── main.ts
-├── main.block.ts
-```
+## Contributing
 
-## ✏️ Example Code
+**New Contributing welcome!** Check out our [Contributing Guide](CONTRIBUTING.md) for help getting started.
 
-Here’s a quick example to get you started: <br>
-`src/main.ts`
+## Links
 
-```ts
-import mainBlock from "main.block";
-import gaman from "gaman";
-
-gaman.serv({
-  blocks: [mainBlock], // your blocks
-  server: {
-    port: 3431, // optional
-    host: "0.0.0.0", // optional
-  },
-});
-```
-
-`src/main.block.ts`
-
-```ts
-import { defineBlock, Response } from "gaman";
-
-export default defineBlock({
-  path: "/",
-  all: (ctx) => {
-    console.log("middleware ALL");
-  },
-  routes: {
-    "/": (ctx) => {
-      return Response.json({ message: "❤️ Welcome to GamanJS" });
-    },
-    "/article/*": (ctx) => {
-      ctx.locals.userName = "Angga7Togk"; // set data locals
-    },
-    "/article": {
-      POST: [
-        async (ctx) => {
-          const json = await ctx.json();
-          return Response.json(json /**return JSON */, { status: 200 });
-        },
-      ],
-      "/json": {
-        GET: (ctx) => {
-          const userName = ctx.locals.userName;
-
-          // return like Response.json()
-          return {
-            user_name_from_local: userName,
-          };
-        },
-      },
-      "/text": {
-        GET: (ctx) => {
-          const userName = ctx.locals.userName;
-
-          // return like Response.text()
-          return userName;
-        },
-      },
-    },
-  },
-});
-```
-
-Happy coding! ❤️ GamanJS Team
+- [License (MIT)](https://github.com/7togkid/gaman/blob/main/LICENSE)
+- [Official Website](https://gaman.7togk.id)

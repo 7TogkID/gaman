@@ -5,9 +5,9 @@ import mainRoutes from './main.routes';
 import mainService from './main.service';
 
 export default defineBlock({
-	blocks: [blogBlock, userBlock],
 	path: '/',
 	routes: [mainRoutes],
+	includes: [blogBlock, userBlock],
 	bindings: {
 		mainService: mainService,
 	},

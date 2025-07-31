@@ -5,9 +5,8 @@ import { TextFormat } from '@gaman/common/utils/textformat';
 defineBootstrap(mainBlock, async (app) => {
 	app.setStrict(false);
 
-	app.listen(3431, 'localhost', () => {
-		Log.log(
-			`Server is running at ${TextFormat.UNDERLINE}http://localhost:3431${TextFormat.RESET}`,
-		);
-	});
+	await app.listen(3431);
+	Log.log(
+		`Server is running at ${TextFormat.UNDERLINE}http://localhost:3431${TextFormat.RESET}`,
+	);
 });

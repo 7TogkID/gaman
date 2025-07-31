@@ -12,9 +12,9 @@
 	"author": "",
 	"description": "",
 	"dependencies": {
-		"@gaman/cli": "^1.0.11",
-		"@gaman/common": "^1.0.1",
-		"@gaman/core": "^1.0.14",
+		"@gaman/cli": "^1.0.15",
+		"@gaman/common": "^1.0.2",
+		"@gaman/core": "^1.0.16",
 		"@prisma/client": "^6.12.0",
 		"prisma": "^6.12.0"
 	}
