@@ -2,6 +2,7 @@ import { Priority } from "@gaman/common/utils/priority";
 import { GamanApp } from "../gaman-app";
 import { Response } from "../response";
 import { AppConfig, Context, NextResponse } from "../types";
+import { IS_INTEGRATION_FACTORY_SYMBOL } from "../symbol";
 
 export type IntegrationFactory<A extends AppConfig = AppConfig> = (
   app: GamanApp<A>
@@ -44,7 +45,8 @@ export type IntegrationFactory<A extends AppConfig = AppConfig> = (
 };
 
 export function defineIntegration<A extends AppConfig>(
-  integration: IntegrationFactory<A>
+  factory: IntegrationFactory<A>
 ): IntegrationFactory<A> {
-  return integration;
+  factory[IS_INTEGRATION_FACTORY_SYMBOL] = true;
+  return factory;
 }

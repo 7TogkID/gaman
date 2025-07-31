@@ -3,6 +3,7 @@ import type {
 	AppConfig,
 	NextResponse,
 	RoutesDefinition,
+	Handler,
 } from './types';
 import * as http from 'node:http';
 import { Log } from '@gaman/common/utils/logger';
@@ -19,7 +20,12 @@ import { HttpException } from '@gaman/common/error/http-exception';
 import { GamanWebSocket } from './web-socket';
 import { Readable } from 'node:stream';
 import * as path from 'node:path';
-import { HTTP_RESPONSE_SYMBOL } from './symbol';
+import {
+	HTTP_RESPONSE_SYMBOL,
+	IS_BLOCK_SYMBOL,
+	IS_INTEGRATION_FACTORY_SYMBOL,
+	IS_MIDDLEWARE_SYMBOL,
+} from './symbol';
 import { GamanCookies } from './context/cookies';
 import { IGNORED_LOG_FOR_PATH_REGEX } from './constant';
 import { next } from './next';
@@ -92,8 +98,14 @@ export class GamanApp<A extends AppConfig = any> {
 		const startTime = performance.now();
 		register(this.mainBlock, this);
 
+		// ** register integrations
+		const integrationFactories = (this.mainBlock.includes || []).filter(
+			(d) => d[IS_INTEGRATION_FACTORY_SYMBOL] == true,
+		) as IntegrationFactory<A>[];
+		this.registerIntegration(...integrationFactories);
+
 		// Initialize block childrens
-		function initChilderns(
+		function registerChilderns(
 			basePath: string,
 			childrens: Array<Block<A>>,
 			app: GamanApp<A>,
@@ -111,19 +123,30 @@ export class GamanApp<A extends AppConfig = any> {
 				blockChild.path = childPath;
 				register(blockChild, app);
 
+				// ** register integrations
+				const integrationFactories = (blockChild.includes || []).filter(
+					(d) => d[IS_INTEGRATION_FACTORY_SYMBOL] == true,
+				) as IntegrationFactory<A>[];
+				app.registerIntegration(...integrationFactories);
+
 				/**
 				 * * EN: initialize childerns from children
 				 * * ID: inisialisasi childrens dari children
 				 */
-				if (blockChild.blocks) {
-					initChilderns(childPath, blockChild.blocks, app);
+				const _blocks = blockChild.includes?.filter(
+					(d) => d[IS_BLOCK_SYMBOL] == true,
+				) as Array<Block<A>>;
+				if (_blocks) {
+					registerChilderns(childPath, _blocks, app);
 				}
 			}
 		}
 		// * init childrens
-		initChilderns(
+		registerChilderns(
 			this.mainBlock.path || '/',
-			this.mainBlock.blocks || [],
+			(this.mainBlock.includes?.filter(
+				(d) => d[IS_BLOCK_SYMBOL] == true,
+			) as Array<Block<A>>) || [],
 			this,
 		);
 		const endTime = performance.now();
@@ -171,7 +194,10 @@ export class GamanApp<A extends AppConfig = any> {
 						}
 
 						if (block.includes) {
-							for (const middleware of block.includes) {
+							const middlewares = block.includes.filter(
+								(d) => d[IS_MIDDLEWARE_SYMBOL],
+							) as Array<Handler<A>>;
+							for (const middleware of middlewares) {
 								const result = await middleware(ctx, next);
 
 								/**

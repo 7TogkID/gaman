@@ -1,9 +1,9 @@
-import { AppConfig, RoutesDefinition } from "../types";
+import { IS_ROUTES_FACTORY_SYMBOL } from '../symbol';
+import { AppConfig, RoutesDefinition } from '../types';
 
-export type RoutesFactory<
-  TDeps extends object,
-  A extends AppConfig
-> = (deps: TDeps) => RoutesDefinition<A>;
+export type RoutesFactory<TDeps extends object, A extends AppConfig> = (
+	deps: TDeps,
+) => RoutesDefinition<A>;
 
 /**
  * Defines a routes structure that can be either a RoutesDefinition,
@@ -17,9 +17,9 @@ export type RoutesFactory<
  * @param obj - The routing configuration to define.
  * @returns The same routing structure with proper typing.
  */
-export function defineRoutes<
-  TDeps extends object,
-  A extends AppConfig
->(factory: RoutesFactory<TDeps, A>): RoutesFactory<TDeps, A> {
-  return factory;
+export function defineRoutes<TDeps extends object, A extends AppConfig>(
+	factory: RoutesFactory<TDeps, A>,
+): RoutesFactory<TDeps, A> {
+	factory[IS_ROUTES_FACTORY_SYMBOL] = true;
+	return factory;
 }

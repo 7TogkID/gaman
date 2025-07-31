@@ -1,7 +1,9 @@
-import type { AppConfig, Handler } from "../types";
+import { IS_MIDDLEWARE_SYMBOL } from '../symbol';
+import type { AppConfig, Handler } from '../types';
 
 export function defineMiddleware<A extends AppConfig>(
-  handler: Handler<A>
+	handler: Handler<A>,
 ): Handler<A> {
-  return handler;
+	handler[IS_MIDDLEWARE_SYMBOL] = true;
+	return handler;
 }
