@@ -1,6 +1,8 @@
 {
 	"name": "gaman",
 	"type": "module",
+	"main": "index.js",
+	"version": "0.0.1",
 	"scripts": {
 		"build": "tsc -b -v packages",
 		"clean": "tsc -b --clean packages",
