@@ -134,12 +134,6 @@ async function main() {
 		}
 	}
 
-	// Write .env
-	const envPath = path.join(targetDir, '.env');
-	const gamanKey = randomBytes(32).toString('hex');
-	await fs.writeFile(envPath, `GAMAN_KEY=${gamanKey}\n`);
-	console.log('🔐 Generated GAMAN_KEY and saved to .env');
-
 	// Done!
 	console.log('\n🎉 Project created successfully!');
 	console.log('\n🚀 Next steps:');
