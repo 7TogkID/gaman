@@ -21,7 +21,7 @@ async function getPackageLatest(dep) {
 
 async function getTemplateMap() {
 	return await fetch(
-		'https://raw.githubusercontent.com/7TogkID/gaman/refs/heads/1.x/template/map.json',
+		'https://raw.githubusercontent.com/7TogkID/gaman/refs/heads/master/template/map.json',
 	).then((r) => r.json());
 }
 
