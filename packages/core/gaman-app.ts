@@ -474,6 +474,16 @@ export class GamanApp<A extends AppConfig = any> {
 		}
 
 		/**
+		 * set headers setter
+		 */
+		for (const [key, value] of ctx.headers.entries()) {
+			// if setter == true
+			if (value[1] == true) {
+				response.headers.set(key, value[0]);
+			}
+		}
+
+		/**
 		 * set cookies
 		 */
 		const cookieHeaders = Array.from(GamanCookies.consume(ctx.cookies));
@@ -493,10 +503,7 @@ export class GamanApp<A extends AppConfig = any> {
 		return res.end(response.body);
 	}
 
-	async listen(
-		port?: number,
-		host?: string,
-	): Promise<void> {
+	async listen(port?: number, host?: string): Promise<void> {
 		this.registerBlocks(); // register all Block
 
 		this.server = http.createServer(this.requestHandle.bind(this));

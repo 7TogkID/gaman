@@ -1,10 +1,11 @@
 export class GamanHeaders {
-	#data: Map<string, string | string[]> = new Map();
+	// [value, setted?]
+	#data: Map<string, [string | string[], boolean]> = new Map();
 
 	constructor(headers: Record<string, string | string[] | undefined> = {}) {
 		for (const [key, value] of Object.entries(headers)) {
 			if (value) {
-				this.#data.set(key.toLowerCase(), value);
+				this.#data.set(key.toLowerCase(), [value, false]);
 			}
 		}
 	}
@@ -20,11 +21,13 @@ export class GamanHeaders {
 	get(key: string): string | undefined {
 		const k = key.toLowerCase();
 		const r = this.#data.get(k);
-		return Array.isArray(r) ? r.join(', ') : r;
+		if (!r) return undefined;
+		const [value] = r;
+		return Array.isArray(value) ? value.join(', ') : value;
 	}
 
 	set(key: string, value: string | string[]): this {
-		this.#data.set(key.toLowerCase(), value);
+		this.#data.set(key.toLowerCase(), [value, true]);
 		return this;
 	}
 
@@ -35,28 +38,30 @@ export class GamanHeaders {
 
 	delete(key: string): boolean {
 		const k = key.toLowerCase();
-		if (!this.#data.has(k)) return false;
-		this.#data.delete(k);
-		return true;
+		return this.#data.delete(k);
 	}
 
-	keys(): MapIterator<string> {
+	keys(): IterableIterator<string> {
 		return this.#data.keys();
 	}
 
-	entries(): MapIterator<[string, string | string[]]> {
+	entries(): IterableIterator<[string, [string | string[], boolean]]> {
 		return this.#data.entries();
 	}
 
 	toRecord(): Record<string, string> {
 		const result: Record<string, string> = {};
-		for (const [key, value] of this.entries()) {
+		for (const [key, [value]] of this.#data.entries()) {
 			result[key] = Array.isArray(value) ? value.join(', ') : value;
 		}
 		return result;
 	}
 
 	toMap(): Map<string, string | string[]> {
-		return this.#data;
+		const result = new Map<string, string | string[]>();
+		for (const [key, [value]] of this.#data.entries()) {
+			result.set(key, value);
+		}
+		return result;
 	}
 }
