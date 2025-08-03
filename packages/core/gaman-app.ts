@@ -1,9 +1,4 @@
-import type {
-	Context,
-	AppConfig,
-	NextResponse,
-	Handler,
-} from './types';
+import type { Context, AppConfig, NextResponse, Handler } from './types';
 import * as http from 'node:http';
 import { Log } from '@gaman/common/utils/logger';
 import { createContext } from './context';
@@ -16,7 +11,6 @@ import { Response } from './response';
 import { sortArrayByPriority } from '@gaman/common/utils/priority';
 import { performance } from 'perf_hooks';
 import { HttpException } from '@gaman/common/error/http-exception';
-import { GamanWebSocket } from './web-socket';
 import { Readable } from 'node:stream';
 import * as path from 'node:path';
 import {
@@ -35,7 +29,6 @@ import { RoutesDefinition } from './routes';
 
 export class GamanApp<A extends AppConfig = any> {
 	blocks: Block<A>[] = [];
-	websocket: GamanWebSocket<A>;
 	integrations: Array<ReturnType<IntegrationFactory<A>>> = [];
 	server: http.Server<
 		typeof http.IncomingMessage,
@@ -72,9 +65,7 @@ export class GamanApp<A extends AppConfig = any> {
 		}
 	}
 
-	constructor(private mainBlock: Block<A>) {
-		this.websocket = new GamanWebSocket(this);
-	}
+	constructor(private mainBlock: Block<A>) {}
 
 	/**
 	 * load and parse env data to `process.env`
@@ -91,7 +82,7 @@ export class GamanApp<A extends AppConfig = any> {
 		return block;
 	}
 
-	private registerBlocks() {
+	private async registerBlocks() {
 		/**
 		 * * EN: Initialize Blocks and childrens
 		 * * ID: inisialisasi blocks dan childrens nya
@@ -104,7 +95,7 @@ export class GamanApp<A extends AppConfig = any> {
 		//   this.#websocket.registerWebSocketServer(this.mainBlock);
 		// }
 		const startTime = performance.now();
-		register(this.mainBlock, this);
+		await register(this.mainBlock, this);
 
 		// ** register integrations
 		const integrationFactories = (this.mainBlock.includes || []).filter(
@@ -113,7 +104,7 @@ export class GamanApp<A extends AppConfig = any> {
 		this.registerIntegration(...integrationFactories);
 
 		// Initialize block childrens
-		function registerChilderns(
+		async function registerChilderns(
 			basePath: string,
 			childrens: Array<Block<A>>,
 			app: GamanApp<A>,
@@ -129,7 +120,7 @@ export class GamanApp<A extends AppConfig = any> {
 				// }
 
 				blockChild.path = childPath;
-				register(blockChild, app);
+				await register(blockChild, app);
 
 				// ** register integrations
 				const integrationFactories = (blockChild.includes || []).filter(
@@ -150,7 +141,7 @@ export class GamanApp<A extends AppConfig = any> {
 			}
 		}
 		// * init childrens
-		registerChilderns(
+		await registerChilderns(
 			this.mainBlock.path || '/',
 			(this.mainBlock.includes?.filter(
 				(d) => d[IS_BLOCK_SYMBOL] == true,
@@ -167,8 +158,14 @@ export class GamanApp<A extends AppConfig = any> {
 		}
 
 		// * tambahin "/" di belakang kalau strict
-		function register(block: Block<A>, app: GamanApp<A>) {
+		async function register(block: Block<A>, app: GamanApp<A>) {
 			block.path = formatPath(block.path || '/', app.strict);
+
+			// call onBlockRegister integration
+			for (const intr of app.integrations) {
+				await intr.onBlockRegister?.(block);
+			}
+
 			app.blocks.push(block);
 		}
 	}
@@ -504,27 +501,32 @@ export class GamanApp<A extends AppConfig = any> {
 	}
 
 	async listen(port?: number, host?: string): Promise<void> {
-		this.registerBlocks(); // register all Block
+		await this.registerBlocks(); // register all Block
 
 		this.server = http.createServer(this.requestHandle.bind(this));
 
-		this.server.on('upgrade', (request, socket, head) => {
-			const urlString = request.url || '/';
-			const { pathname } = new URL(urlString, `http://${request.headers.host}`);
+		// this.server.on('upgrade', (request, socket, head) => {
+		// 	const urlString = request.url || '/';
+		// 	const { pathname } = new URL(urlString, `http://${request.headers.host}`);
 
-			const wss = this.websocket.getWebSocketServer(pathname);
-			if (wss) {
-				wss.handleUpgrade(request, socket, head, function done(ws) {
-					wss.emit('connection', ws, request);
-				});
-			} else {
-				socket.destroy();
-			}
-		});
+		// 	const wss = this.websocket.getWebSocketServer(pathname);
+		// 	if (wss) {
+		// 		wss.handleUpgrade(request, socket, head, function done(ws) {
+		// 			wss.emit('connection', ws, request);
+		// 		});
+		// 	} else {
+		// 		socket.destroy();
+		// 	}
+		// });
 
 		this.server.listen(
 			process.env.PORT || port || 3431,
 			process.env.HOST || host || 'localhost',
+			async () => {
+				for await (const intr of this.integrations) {
+					await intr.onListen?.(this.server);
+				}
+			},
 		);
 	}
 
@@ -547,7 +549,7 @@ export class GamanApp<A extends AppConfig = any> {
 	 * @returns True if the string is a valid HTTP method
 	 */
 	private isHttpMethod(method: string): boolean {
-		return ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'].includes(
+		return ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'].includes(
 			method.toUpperCase(),
 		);
 	}

@@ -8,7 +8,6 @@ import { GamanApp } from '../gaman-app';
 import { Buffer } from 'node:buffer';
 import { FormData, FormDataEntryValue, IFormDataEntryValue } from './formdata';
 import { File } from './formdata/file';
-import { Response } from '../response';
 import { parseMultipart } from '@gaman/common/utils/multipart-parser';
 
 export async function createContext<A extends AppConfig>(
@@ -122,8 +121,6 @@ export async function createContext<A extends AppConfig>(
 		url,
 		cookies,
 		request: gamanRequest,
-		response: Response,
-		res: Response,
 
 		// data dari request
 		headers: gamanRequest.headers,

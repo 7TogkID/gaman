@@ -89,7 +89,6 @@ export class File extends Blob {
 		const { join } = await import('node:path');
 		const name = `${prefix}${Date.now()}_${this.filename}`;
 		const fullPath = join(tmpdir(), name);
-		console.log(fullPath);
 		await writeFile(fullPath, Buffer.from(await this.arrayBuffer()));
 		return fullPath;
 	}

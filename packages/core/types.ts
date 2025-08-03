@@ -5,57 +5,7 @@ import { FormData } from './context/formdata';
 import { GamanCookies } from './context/cookies';
 import { Response } from './response';
 import { File } from './context/formdata/file';
-import { IntegrationFactory } from './integration';
-import { Block } from './block';
 
-export type AppOptions<A extends AppConfig> = {
-	/**
-	 * main block module
-	 */
-	block?: Block<A>;
-
-	/**
-	 * must use slash '/' at the end of the path
-	 * @example '/user/detail/'
-	 */
-	strict?: boolean;
-
-	/**
-	 * List of integrations to be used in the application.
-	 * Integrations can modify app behavior or add features.
-	 */
-	integrations?: Array<IntegrationFactory<A>>;
-
-	/**
-	 * Server configuration options, including host and port.
-	 */
-	server?: {
-		/**
-		 * The host address for the server.
-		 * Defaults to 'localhost' if not specified.
-		 *
-		 * @example '127.0.0.1'
-		 */
-		host?: string;
-
-		/**
-		 * The port number for the server.
-		 * If set to 0, a random available port will be used.
-		 * Defaults to 3431 if not specified.
-		 *
-		 * @example 3000
-		 */
-		port?: number;
-
-		/**
-		 * Disable all internal server logs such as startup messages.
-		 * Useful for test environments or CI pipelines.
-		 *
-		 * @default false
-		 */
-		silent?: boolean;
-	};
-};
 export type LocalsEmpty = object;
 export type EnvEmpty = object;
 
@@ -244,8 +194,6 @@ export interface Context<A extends AppConfig = AppConfig>
 	url: URL;
 	cookies: GamanCookies;
 	request: Request;
-	response: typeof Response;
-	res: typeof Response;
 }
 
 export type NextResponse =
@@ -256,17 +204,4 @@ export type NextResponse =
 	| string
 	| undefined;
 
-export interface Router<A extends AppConfig> {
-	GET?: Handler<A> | Handler<A>[];
-	HEAD?: Handler<A> | Handler<A>[];
-	PUT?: Handler<A> | Handler<A>[];
-	PATCH?: Handler<A> | Handler<A>[];
-	POST?: Handler<A> | Handler<A>[];
-	DELETE?: Handler<A> | Handler<A>[];
 
-	[nestedPath: string]: Router<A> | Handler<A> | Handler<A>[] | undefined;
-}
-
-export interface RoutesDefinition<A extends AppConfig> {
-	[path: string]: Router<A> | Handler<A> | Handler<A>[];
-}
