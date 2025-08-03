@@ -2,7 +2,6 @@ import type {
 	Context,
 	AppConfig,
 	NextResponse,
-	RoutesDefinition,
 	Handler,
 } from './types';
 import * as http from 'node:http';
@@ -32,6 +31,7 @@ import { next } from './next';
 import { Block } from './block';
 import { IntegrationFactory } from './integration';
 import { loadEnv } from '@gaman/common/utils/load-env';
+import { RoutesDefinition } from './routes';
 
 export class GamanApp<A extends AppConfig = any> {
 	blocks: Block<A>[] = [];

@@ -1,5 +1,21 @@
 import { IS_ROUTES_FACTORY_SYMBOL } from '../symbol';
-import { AppConfig, RoutesDefinition } from '../types';
+import { AppConfig, Handler } from '../types';
+
+export interface Router<A extends AppConfig> {
+	GET?: Handler<A> | Handler<A>[];
+	HEAD?: Handler<A> | Handler<A>[];
+	PUT?: Handler<A> | Handler<A>[];
+	PATCH?: Handler<A> | Handler<A>[];
+	POST?: Handler<A> | Handler<A>[];
+	DELETE?: Handler<A> | Handler<A>[];
+	OPTIONS?: Handler<A> | Handler<A>[];
+
+	[nestedPath: string]: Router<A> | Handler<A> | Handler<A>[] | undefined;
+}
+
+export interface RoutesDefinition<A extends AppConfig> {
+	[path: string]: Router<A> | Handler<A> | Handler<A>[];
+}
 
 export type RoutesFactory<TDeps extends object, A extends AppConfig> = (
 	deps: TDeps,
