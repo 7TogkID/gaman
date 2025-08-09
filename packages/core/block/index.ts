@@ -1,12 +1,11 @@
 import { Priority } from '@gaman/common/utils/priority';
-import { RoutesFactory } from '../routes';
+import { RoutesDefinition, RoutesFactory } from '../routes';
 import { ServiceFactory } from '../service';
 import type {
 	AppConfig,
 	Context,
 	Handler,
 	NextResponse,
-	RoutesDefinition,
 } from '../types';
 import { HttpException } from '@gaman/common/error/http-exception';
 import { IntegrationFactory } from '../integration';
