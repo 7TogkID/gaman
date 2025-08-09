@@ -32,9 +32,6 @@ jobs:
       - name: Build gaman
         run: npm run build
 
-      - name: Generate GAMAN_KEY
-        run: npm run gen:key
-
       - name: Run tests
         run: npm test
 
@@ -56,9 +53,6 @@ jobs:
       
       - name: Build gaman
         run: bun run build
-      
-      - name: Generate GAMAN_KEY
-        run: bun run gen:key
 
       - name: Run tests
         run: bun run test
@@ -82,9 +76,6 @@ jobs:
       
       - name: Build gaman
         run: bun run build
-      
-      - name: Generate GAMAN_KEY
-        run: bun run gen:key
 
       - name: Run tests
         run: bun run test
