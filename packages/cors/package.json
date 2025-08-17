@@ -1,6 +1,6 @@
 {
 	"name": "@gaman/cors",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"type": "module",
 	"main": "index.js",
 	"author": "angga7togk",
