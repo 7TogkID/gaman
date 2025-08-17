@@ -7,6 +7,7 @@
 import { next } from '@gaman/core/next';
 import { Context } from '@gaman/core/types';
 import { defineMiddleware } from '@gaman/core';
+import { Response } from '@gaman/core/response';
 
 /**
  * CORS middleware options.
@@ -58,16 +59,6 @@ export const cors = (options: CorsOptions) => {
 		// Set CORS headers
 		const headers: Record<string, string> = {};
 
-		// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
-		if (allowedOrigin !== '*') {
-			const existingVary = ctx.header('Vary');
-			if (existingVary) {
-				ctx.headers.set('Vary', existingVary);
-			} else {
-				ctx.headers.set('Vary', 'Origin');
-			}
-		}
-
 		if (allowedOrigin) {
 			headers['Access-Control-Allow-Origin'] = allowedOrigin;
 		}
@@ -89,17 +80,29 @@ export const cors = (options: CorsOptions) => {
 			headers['Access-Control-Expose-Headers'] = exposeHeaders.join(', ');
 		}
 
-		// Handle preflight request
-		if (ctx.request.method === 'OPTIONS' && requestOrigin) {
+		if (ctx.request.method === 'OPTIONS') {
 			return new Response(null, { status: 204, headers });
 		}
 
-		// Add headers to the response and proceed to the next middleware
-		Object.entries(headers).forEach(([key, value]) => {
+		// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+		if (allowedOrigin && allowedOrigin !== '*') {
+			const existingVary = ctx.headers.get('Vary');
+			ctx.headers.set(
+				'Vary',
+				existingVary ? `${existingVary}, Origin` : 'Origin',
+			);
+		}
+
+		// Handle preflight request
+		if (ctx.request.method === 'OPTIONS') {
+			return new Response(undefined, { status: 204, headers });
+		}
+
+		for (const [key, value] of Object.entries(headers)) {
 			if (!ctx.headers.has(key)) {
 				ctx.headers.set(key, value);
 			}
-		});
+		}
 
 		return await next();
 	});
