@@ -1,34 +1,43 @@
 {
 	"compilerOptions": {
-		"module": "ES2022",
-		"target": "ES2021",
+		"composite": true,
+		"module": "es2020",
+		"target": "ES2020",
 		"moduleResolution": "bundler",
+		"declaration": true,
 		"noImplicitAny": false,
+		"skipLibCheck": true,
 		"noUnusedLocals": false,
-		"removeComments": true,
-		"strictNullChecks": true,
-		"strictPropertyInitialization": false,
-		"forceConsistentCasingInFileNames": true,
+		"importHelpers": true,
+		"removeComments": false,
 		"noLib": false,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"useUnknownInCatchVariables": false,
-		"allowSyntheticDefaultImports": true,
-		"sourceMap": true,
+		"esModuleInterop": true,
+		"sourceMap": false,
 		"allowJs": false,
-		"outDir": "dist",
-		"baseUrl": ".",
-		"paths": {
-			"@gaman/core/*": ["./packages/core/*"],
-			"@gaman/common/*": ["./packages/common/*"],
-			"@gaman/cli": ["./packages/cli"]
-		}
+		"strict": true,
+		"strictNullChecks": true,
+		"forceConsistentCasingInFileNames": true,
+		"strictPropertyInitialization": false,
+		"types": ["node"],
+		"baseUrl": "."
 	},
 	"jest": {},
 	"tsc-alias": {
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["packages/**/*", "integration/**/*"],
-	"exclude": ["node_modules", "dist", "**/*.test.*"]
+	"include": ["apps/**/*"],
+	"exclude": ["node_modules", "dist", "**/*.test.*"],
+	"files": [],
+	"references": [
+		{
+			"path": "./apps/core"
+		},
+		{
+			"path": "./apps/common"
+		}
+	]
 }

@@ -1,248 +1,64 @@
 {
-  "name": "gaman",
-  "type": "module",
-  "main": "index.js",
-  "version": "0.0.1",
-  "scripts": {
-    "build": "tsc -b -v packages",
-    "clean": "tsc -b --clean packages",
-    "build:types": "tsc --emitDeclarationOnly --declaration --project tsconfig.build.json",
-    "build:alias": "npx tsc-alias",
-    "build:old": "npm run clean && tsx ./build/build.ts && npm run build:types && npm run build:alias",
-    "test": "vitest run",
-    "test:push": "npm run gen:exports && npm run build && yalc push",
-    "gen:exports": "tsx build/generate-exports.ts",
-    "gen:key": "tsx build/generate-key.ts",
-    "release": "npm run gen:exports && npm run build && npm publish",
-    "release:beta": "npm run gen:exports && npm run build && npm publish --tag beta",
-    "lint:src": "eslint src/ --ext .ts",
-    "lint:fix": "eslint src/ --ext .ts --fix",
-    "publish": "npm run build && ./node_modules/.bin/lerna publish --dist-tag=latest --no-private --no-push --yes -m \"chore(gaman) publish packages\"",
-    "publish:next": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --dist-tag=next --no-private --no-push --yes -m \"chore(gaman) publish packages\"",
-    "publish:beta": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --dist-tag=beta --no-private -m \"chore(gaman) publish packages\"",
-    "publish:test": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --force-publish --dist-tag=test --no-private --no-push -m \"chore(gaman) publish packages\"",
-    "yalc:push": "npm run build && cd ./packages/core && yalc push && cd ../common && yalc push && cd ../cli && yalc push"
-  },
-  "author": "angga7togk",
-  "license": "MIT",
-  "repository": {
-    "url": "git+https://github.com/7TogkID/gaman.git"
-  },
-  "bugs": {
-    "url": "https://github.com/7TogkID/gaman/issues"
-  },
-  "homepage": "https://gaman.7togk.id",
-  "dependencies": {
-    "@types/ws": "^8.18.1",
-    "cookie": "^1.0.2",
-    "esbuild": "^0.25.8",
-    "fast-glob": "^3.3.3",
-    "ws": "^8.18.2"
-  },
-  "devDependencies": {
-    "@types/ejs": "^3.1.5",
-    "@types/fs-extra": "^11.0.4",
-    "@types/nunjucks": "^3.2.6",
-    "@types/yargs": "^17.0.33",
-    "arg": "^5.0.2",
-    "axios": "^1.11.0",
-    "ejs": "^3.1.10",
-    "eslint": "^9.31.0",
-    "form-data": "^4.0.4",
-    "glob": "^10.4.5",
-    "globals": "^16.3.0",
-    "k6": "^0.0.0",
-    "lerna": "^8.2.3",
-    "mongodb": "^6.17.0",
-    "nunjucks": "^3.2.4",
-    "redis": "^5.6.1",
-    "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7",
-    "ts-jest": "^29.4.0",
-    "tsc-alias": "^1.8.16",
-    "tslib": "^2.8.1",
-    "tsx": "^4.20.3",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.36.0",
-    "vitest": "^3.2.4"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/cjs/index.js"
-    },
-    "./nunjucks": {
-      "types": "./dist/integration/nunjucks/index.d.ts",
-      "import": "./dist/integration/nunjucks/index.js",
-      "require": "./dist/cjs/integration/nunjucks/index.js"
-    },
-    "./ejs": {
-      "types": "./dist/integration/ejs/index.d.ts",
-      "import": "./dist/integration/ejs/index.js",
-      "require": "./dist/cjs/integration/ejs/index.js"
-    },
-    "./static": {
-      "types": "./dist/integration/static/index.d.ts",
-      "import": "./dist/integration/static/index.js",
-      "require": "./dist/cjs/integration/static/index.js"
-    },
-    "./session": {
-      "types": "./dist/integration/session/index.d.ts",
-      "import": "./dist/integration/session/index.js",
-      "require": "./dist/cjs/integration/session/index.js"
-    },
-    "./integration": {
-      "types": "./dist/integration/index.d.ts",
-      "import": "./dist/integration/index.js",
-      "require": "./dist/cjs/integration/index.js"
-    },
-    "./service": {
-      "types": "./dist/service/index.d.ts",
-      "import": "./dist/service/index.js",
-      "require": "./dist/cjs/service/index.js"
-    },
-    "./routes": {
-      "types": "./dist/routes/index.d.ts",
-      "import": "./dist/routes/index.js",
-      "require": "./dist/cjs/routes/index.js"
-    },
-    "./cors": {
-      "types": "./dist/middleware/cors/index.d.ts",
-      "import": "./dist/middleware/cors/index.js",
-      "require": "./dist/cjs/middleware/cors/index.js"
-    },
-    "./basic-auth": {
-      "types": "./dist/middleware/basic-auth/index.d.ts",
-      "import": "./dist/middleware/basic-auth/index.js",
-      "require": "./dist/cjs/middleware/basic-auth/index.js"
-    },
-    "./middleware": {
-      "types": "./dist/middleware/index.d.ts",
-      "import": "./dist/middleware/index.js",
-      "require": "./dist/cjs/middleware/index.js"
-    },
-    "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js",
-      "require": "./dist/cjs/utils/index.js"
-    },
-    "./file": {
-      "types": "./dist/context/formdata/file/index.d.ts",
-      "import": "./dist/context/formdata/file/index.js",
-      "require": "./dist/cjs/context/formdata/file/index.js"
-    },
-    "./formdata": {
-      "types": "./dist/context/formdata/index.d.ts",
-      "import": "./dist/context/formdata/index.js",
-      "require": "./dist/cjs/context/formdata/index.js"
-    },
-    "./cookies": {
-      "types": "./dist/context/cookies/index.d.ts",
-      "import": "./dist/context/cookies/index.js",
-      "require": "./dist/cjs/context/cookies/index.js"
-    },
-    "./exception": {
-      "types": "./dist/error/index.d.ts",
-      "import": "./dist/error/index.js",
-      "require": "./dist/cjs/error/index.js"
-    },
-    "./headers": {
-      "types": "./dist/headers/index.d.ts",
-      "import": "./dist/headers/index.js",
-      "require": "./dist/cjs/headers/index.js"
-    },
-    "./block": {
-      "types": "./dist/block/index.d.ts",
-      "import": "./dist/block/index.js",
-      "require": "./dist/cjs/block/index.js"
-    },
-    "./response": {
-      "types": "./dist/response.d.ts",
-      "import": "./dist/response.js",
-      "require": "./dist/cjs/response.js"
-    },
-    "./next": {
-      "types": "./dist/next.d.ts",
-      "import": "./dist/next.js",
-      "require": "./dist/cjs/next.js"
-    },
-    "./types": {
-      "types": "./dist/types.d.ts",
-      "import": "./dist/types.js",
-      "require": "./dist/cjs/types.js"
-    },
-    "./app": {
-      "types": "./dist/gaman-app.d.ts",
-      "import": "./dist/gaman-app.js",
-      "require": "./dist/cjs/gaman-app.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "nunjucks": [
-        "./dist/integration/nunjucks/index"
-      ],
-      "ejs": [
-        "./dist/integration/ejs/index"
-      ],
-      "static": [
-        "./dist/integration/static/index"
-      ],
-      "session": [
-        "./dist/integration/session/index"
-      ],
-      "integration": [
-        "./dist/integration/index"
-      ],
-      "service": [
-        "./dist/service/index"
-      ],
-      "routes": [
-        "./dist/routes/index"
-      ],
-      "cors": [
-        "./dist/middleware/cors/index"
-      ],
-      "basic-auth": [
-        "./dist/middleware/basic-auth/index"
-      ],
-      "middleware": [
-        "./dist/middleware/index"
-      ],
-      "utils": [
-        "./dist/utils/index"
-      ],
-      "file": [
-        "./dist/context/formdata/file/index"
-      ],
-      "formdata": [
-        "./dist/context/formdata/index"
-      ],
-      "cookies": [
-        "./dist/context/cookies/index"
-      ],
-      "exception": [
-        "./dist/error/index"
-      ],
-      "headers": [
-        "./dist/headers/index"
-      ],
-      "block": [
-        "./dist/block/index"
-      ],
-      "response": [
-        "./dist/response"
-      ],
-      "next": [
-        "./dist/next"
-      ],
-      "types": [
-        "./dist/types"
-      ],
-      "app": [
-        "./dist/gaman-app"
-      ]
-    }
-  }
+	"name": "gaman",
+	"type": "module",
+	"main": "index.js",
+	"version": "0.0.1",
+	"scripts": {
+		"build": "tsc -b ",
+		"clean": "tsc -b --clean",
+		"test": "vitest run",
+		"publish": "npm run build && ./node_modules/.bin/lerna publish --dist-tag=latest --no-private --no-push --yes -m \"chore(gaman) publish packages\"",
+		"publish:next": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --dist-tag=next --no-private --no-push --yes -m \"chore(gaman) publish packages\"",
+		"publish:beta": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --dist-tag=beta --no-private -m \"chore(gaman) publish packages\"",
+		"publish:test": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --force-publish --dist-tag=test --no-private --no-push -m \"chore(gaman) publish packages\"",
+		"yalc:push": "npm run build && cd ./packages/core && yalc push && cd ../common && yalc push && cd ../cli && yalc push"
+	},
+	"workspaces": [
+    "apps/*",
+		"packages/*"
+	],
+	"author": "angga7togk",
+	"license": "MIT",
+	"repository": {
+		"url": "git+https://github.com/7TogkID/gaman.git"
+	},
+	"bugs": {
+		"url": "https://github.com/7TogkID/gaman/issues"
+	},
+	"homepage": "https://gaman.7togk.id",
+	"dependencies": {
+		"@types/ws": "^8.18.1",
+		"cookie": "^1.0.2",
+		"esbuild": "^0.25.8",
+		"install": "^0.13.0",
+		"npm": "^11.5.2",
+		"ws": "^8.18.2"
+	},
+	"devDependencies": {
+		"@types/ejs": "^3.1.5",
+		"@types/fs-extra": "^11.0.4",
+		"@types/nunjucks": "^3.2.6",
+		"@types/yargs": "^17.0.33",
+		"arg": "^5.0.2",
+		"axios": "^1.11.0",
+		"ejs": "^3.1.10",
+		"eslint": "^9.31.0",
+		"form-data": "^4.0.4",
+		"glob": "^10.4.5",
+		"globals": "^16.3.0",
+		"k6": "^0.0.0",
+		"lerna": "^8.2.3",
+		"mongodb": "^6.17.0",
+		"nunjucks": "^3.2.4",
+		"redis": "^5.6.1",
+		"sqlite": "^5.1.1",
+		"sqlite3": "^5.1.7",
+		"ts-jest": "^29.4.0",
+		"tsc-alias": "^1.8.16",
+		"tslib": "^2.8.1",
+		"tsx": "^4.20.3",
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.36.0",
+		"vitest": "^3.2.4"
+	}
 }

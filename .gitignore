@@ -11,6 +11,8 @@ dist
 # bundle
 packages/**/*.d.ts
 packages/**/*.js
+apps/**/*.d.ts
+apps/**/*.js
 
 # code coverage
 coverage

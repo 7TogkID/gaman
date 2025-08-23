@@ -21,7 +21,21 @@
 		"strictNullChecks": true,
 		"forceConsistentCasingInFileNames": true,
 		"strictPropertyInitialization": false,
-		"types": ["node"]
-		
-	}
+		"types": ["node"],
+		"baseUrl": ".",
+		"rootDir": ".",
+		"paths": {
+			"@gaman/core": ["apps/core"],
+			"@gaman/core/*": ["apps/core/*"],
+			"@gaman/common": ["apps/common"],
+			"@gaman/common/*": ["apps/common/*"]
+		}
+	},
+	"jest": {},
+	"tsc-alias": {
+		"resolveFullPaths": true,
+		"verbose": false
+	},
+	"include": ["apps/**/*"],
+	"exclude": ["node_modules", "dist", "**/*.test.*"]
 }
