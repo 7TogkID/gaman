@@ -6,7 +6,6 @@ import { Log } from "@gaman/common/utils/logger";
 import * as crypto from "crypto";
 import { detectMime } from "@gaman/common/utils/mime";
 import { Priority } from "@gaman/common/utils/priority";
-import { next } from "@gaman/core/next";
 
 // Tipe opsi konfigurasi middleware
 export interface StaticFileOptions {
@@ -100,15 +99,15 @@ export function gamanStatic(options: StaticFileOptions = {}) {
             stats = await fsPromises.stat(filePath);
           } catch {
             await options.onNotFound?.(filePath, ctx);
-            return next();
+            return undefined;
           }
         } else {
           await options.onNotFound?.(filePath, ctx);
-          return next();
+          return undefined;
         }
       }
 
-      if (!stats.isFile()) return next();
+      if (!stats.isFile()) return undefined;
 
       // Gzip/Brotli: cek Accept-Encoding dan cari file terkompresi
       const acceptEncoding = ctx.request.headers.get("accept-encoding") || "";

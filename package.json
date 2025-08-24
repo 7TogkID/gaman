@@ -4,9 +4,10 @@
 	"main": "index.js",
 	"version": "0.0.1",
 	"scripts": {
-		"build": "tsc -b ",
+		"build": "tsc -b -v",
 		"clean": "tsc -b --clean",
 		"test": "vitest run",
+		"test:server": "cd test && npm run dev",
 		"publish": "npm run build && ./node_modules/.bin/lerna publish --dist-tag=latest --no-private --no-push --yes -m \"chore(gaman) publish packages\"",
 		"publish:next": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --dist-tag=next --no-private --no-push --yes -m \"chore(gaman) publish packages\"",
 		"publish:beta": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --dist-tag=beta --no-private -m \"chore(gaman) publish packages\"",
@@ -14,7 +15,6 @@
 		"yalc:push": "npm run build && cd ./packages/core && yalc push && cd ../common && yalc push && cd ../cli && yalc push"
 	},
 	"workspaces": [
-    "apps/*",
 		"packages/*"
 	],
 	"author": "angga7togk",

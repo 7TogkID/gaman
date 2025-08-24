@@ -1,0 +1,20 @@
+{
+  "version": "v1",
+  "packages": {
+    "@gaman/core": {
+      "signature": "776b4e4d5bad1addf43b1d3b096421ab",
+      "file": true,
+      "replaced": "^1.0.15-alpha.0"
+    },
+    "@gaman/common": {
+      "signature": "d0257833b5a5ca9514af856b2e17ff6e",
+      "file": true,
+      "replaced": "^1.0.2-alpha.0"
+    },
+    "@gaman/cli": {
+      "signature": "341d6578f5ea38b1e8c29b5eeb3b078b",
+      "file": true,
+      "replaced": "^1.0.14-alpha.0"
+    }
+  }
+}

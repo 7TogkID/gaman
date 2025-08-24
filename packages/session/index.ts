@@ -9,7 +9,6 @@
 import { defineIntegration } from '@gaman/core/integration';
 import { Log } from '@gaman/common/utils/logger';
 import { GamanSession } from './session';
-import { next } from '@gaman/core/next';
 import { MemoryStore } from './store/memory';
 import { FileStore } from './store/file';
 
@@ -161,7 +160,7 @@ export function session(options: IGamanSessionOptions = {}) {
 		},
 		async onRequest(ctx) {
 			ctx.session = new GamanSession(app, ctx.cookies, ctx.request);
-			return next();
+			return undefined;
 		},
 	}));
 }

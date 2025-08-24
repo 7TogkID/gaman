@@ -15,6 +15,7 @@
 		"experimentalDecorators": true,
 		"useUnknownInCatchVariables": false,
 		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
 		"sourceMap": false,
 		"allowJs": false,
 		"strict": true,
@@ -25,10 +26,10 @@
 		"baseUrl": ".",
 		"rootDir": ".",
 		"paths": {
-			"@gaman/core": ["apps/core"],
-			"@gaman/core/*": ["apps/core/*"],
-			"@gaman/common": ["apps/common"],
-			"@gaman/common/*": ["apps/common/*"]
+			"@gaman/core": ["packages/core"],
+			"@gaman/core/*": ["packages/core/*"],
+			"@gaman/common": ["packages/common"],
+			"@gaman/common/*": ["packages/common/*"]
 		}
 	},
 	"jest": {},
@@ -36,6 +37,13 @@
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["apps/**/*"],
-	"exclude": ["node_modules", "dist", "**/*.test.*"]
+	"include": ["packages/**/*"],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"**/*.test.*",
+		"packages/orm/**/*",
+		"packages/validation/**/*",
+		"packages/rate-limit/**/*"
+	]
 }

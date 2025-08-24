@@ -5,9 +5,8 @@
  * credentials and dynamic verification logic.
  */
 
-import { next } from '@gaman/core/next';
 import { Context } from '@gaman/core/types';
-import { defineMiddleware } from '@gaman/core';
+import { composeMiddleware } from '@gaman/core';
 
 export type MessageFunction = (
 	ctx: Context,
@@ -93,7 +92,7 @@ export const basicAuth = (options: BasicAuthOptions) => {
 		return credentials.split(':');
 	}
 
-	return defineMiddleware(async (ctx) => {
+	return composeMiddleware(async (ctx, next) => {
 		const cred = getCredentials(ctx.request.headers.get('Authorization'));
 
 		// Validate credentials

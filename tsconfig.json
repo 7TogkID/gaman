@@ -29,15 +29,25 @@
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["apps/**/*"],
-	"exclude": ["node_modules", "dist", "**/*.test.*"],
+	"include": ["packages/**/*"],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"**/*.test.*",
+		"packages/orm/**/*",
+		"packages/validation/**/*",
+		"packages/rate-limit/**/*"
+	],
 	"files": [],
 	"references": [
 		{
-			"path": "./apps/core"
+			"path": "./packages/common"
 		},
 		{
-			"path": "./apps/common"
+			"path": "./packages/core"
+		},
+		{
+			"path": "./packages/session"
 		}
 	]
 }
