@@ -22,7 +22,16 @@
 
 ---
 
-## Create a New Project
+> [!WARNING]
+> This Project under development
+
+## EN
+Please be patient; this project is still in development. GamanJS is currently exploring the right direction and characteristics for its long-term use.
+
+## ID
+Mohon bersabar, proyek ini masih dalam tahap pengembangan. Saat ini GamanJS sedang mencari arah dan karakteristik yang tepat untuk digunakan dalam jangka panjang ke depannya.
+
+<!-- ## Create a New Project
 
 There are two ways to scaffold a new GamanJS project:
 
@@ -40,4 +49,4 @@ visit our [official documentation](https://gaman.7togk.id)
 
 ## Links
 - [License (MIT)](https://github.com/7togkid/gaman/blob/main/LICENSE)
-- [Official Website](https://gaman.7togk.id)
+- [Official Website](https://gaman.7togk.id) -->
