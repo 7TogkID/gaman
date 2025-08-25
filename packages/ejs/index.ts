@@ -55,7 +55,7 @@ export function ejs(ops: GamanEJSOptions = {}) {
 			await loadEJS();
 		},
 		async onResponse(_ctx, res) {
-			const renderData = res.renderData;
+			const renderData = res.view;
 			if (renderData == null) return res; // ! next() if renderData null
 
 			const filePath = join(

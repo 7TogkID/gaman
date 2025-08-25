@@ -4,7 +4,7 @@
  * Implements Cross-Origin Resource Sharing (CORS) with customizable options.
  */
 
-import { Context } from '@gaman/core/types';
+import { Context } from '@gaman/common/types';
 import { composeMiddleware } from '@gaman/core';
 import { Response } from '@gaman/core/response';
 

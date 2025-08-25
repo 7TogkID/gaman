@@ -11,6 +11,7 @@ import { Log } from '@gaman/common/utils/logger';
 import { GamanSession } from './session';
 import { MemoryStore } from './store/memory';
 import { FileStore } from './store/file';
+import { Response } from '@gaman/core/response';
 
 const SESSION_OPTIONS_SYMBOL = Symbol.for('gaman.sessionOptions');
 const SESSION_STORE_SYMBOL = Symbol.for('gaman.sessionStore');
@@ -160,7 +161,7 @@ export function session(options: IGamanSessionOptions = {}) {
 		},
 		async onRequest(ctx) {
 			ctx.session = new GamanSession(app, ctx.cookies, ctx.request);
-			return undefined;
+			return new Response();
 		},
 	}));
 }

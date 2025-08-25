@@ -1,4 +1,4 @@
-import { IS_SERVICE_FACTORY_SYMBOL } from "@gaman/common/contants";
+import { IS_SERVICE_FACTORY } from "@gaman/common/contants";
 
 export type Fn = (...args: any[]) => any;
 export type ServiceFactory<
@@ -11,6 +11,6 @@ export function defineService<
 	TReturn extends Record<string, Fn>,
 >(factory: ServiceFactory<TDeps, TReturn>): ServiceFactory<TDeps, TReturn> {
 	// @ts-ignore
-	factory[IS_SERVICE_FACTORY_SYMBOL] = true;
+	factory[IS_SERVICE_FACTORY] = true;
 	return factory;
 }

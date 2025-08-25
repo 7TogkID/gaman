@@ -1,5 +1,5 @@
 import { GamanApp } from '@gaman/core/gaman-app';
-import { Request } from '@gaman/core/types';
+import { Request } from '@gaman/common/types';
 import { sign, verify } from '@gaman/common/utils/signature';
 import {
 	GamanCookies,

@@ -1,8 +1,15 @@
-import type { Context, NextResponse } from '@gaman/core/types';
+import type {
+	Context,
+	DefaultMiddlewareOptions,
+	InterceptorHandler,
+	MiddlewareHandler,
+	RequestHandler,
+	Route,
+} from '@gaman/common/types';
 import * as http from 'node:http';
 import { Log } from '@gaman/common/utils/logger';
 import { createContext } from '@gaman/core/context';
-import { isHtmlString, pathMatch } from '@gaman/common/utils/utils';
+import {  pathMatch } from '@gaman/common/utils/utils';
 import { Response } from '@gaman/core/response';
 import { sortArrayByPriority } from '@gaman/common/utils/priority';
 import { performance } from 'perf_hooks';
@@ -10,14 +17,11 @@ import { Readable } from 'node:stream';
 import { GamanCookies } from '@gaman/core/context/cookies';
 import { IntegrationFactory } from '@gaman/core/integration';
 import { loadEnv } from '@gaman/common/utils/load-env';
-import { Route } from '@gaman/core/routes';
 import {
-	HTTP_RESPONSE_SYMBOL,
+	HTTP_RESPONSE_METADATA,
 	IGNORED_LOG_FOR_PATH_REGEX,
 	MIDDLEWARE_CONFIG_METADATA,
 } from '@gaman/common/contants';
-import { MiddlewareHandler } from '@gaman/core/middleware';
-
 export class GamanApp {
 	middlewares: MiddlewareHandler[] = [];
 	routes: Route[] = [];
@@ -57,12 +61,6 @@ export class GamanApp {
 		loadEnv(envPath);
 	}
 
-	/** ✅ Register Middleware */
-	use(middleware: MiddlewareHandler) {
-		this.middlewares.push(middleware);
-	}
-
-	/** ✅ Pipeline Request Handler */
 	private async requestHandle(
 		req: http.IncomingMessage,
 		res: http.ServerResponse,
@@ -88,24 +86,46 @@ export class GamanApp {
 				ctx.params[key] = match?.[index + 1] || '';
 			});
 
-			// ? Build Pipeline: middleware[] + handler
+			// **** MIDDLEWARE ****
+			// ? filter global middlewares dari options kek includes: [] dan excludes: []
 			const activeMiddlewares = this.middlewares.filter((mw) =>
 				this.shouldRunMiddleware(mw, ctx.request.pathname),
 			);
-			const handlers = [...activeMiddlewares, route.handler];
+
+			// ? sort by priority global middlewares + route.middlewares
+			const sortedMiddlewares = sortArrayByPriority<MiddlewareHandler>(
+				[...activeMiddlewares, ...route.middlewares],
+				(mw) => {
+					const mwConfig = mw[
+						MIDDLEWARE_CONFIG_METADATA
+					] as DefaultMiddlewareOptions;
+					return mwConfig.priority || 'normal';
+				},
+			);
+
+			// ? Build Pipeline: middleware[] + handler
+			const handlers: Array<
+				MiddlewareHandler | InterceptorHandler | RequestHandler
+			> = [
+				...sortedMiddlewares, // ? middleware harus paling awal
+				...route.interceptors, // ? interceptor harus sebelum handler
+				route.handler, // ? final handler
+			];
 
 			let index = -1;
-			const next = async (i: number): Promise<NextResponse> => {
-				if (i <= index) throw new Error('next() called multiple times');
+			const next = async (i: number): Promise<Response>  => {
+				if (i <= index) {
+					throw new Error('next() called multiple times');
+				}
 				index = i;
 				const fn = handlers[i];
-				if (!fn) return;
+				if (!fn) return new Response(undefined, { status: 404 });
 
 				return await fn(ctx, () => next(i + 1));
 			};
 
 			const result = await next(0);
-			await this.handleResponse(result, ctx);
+			await this.handleResponse(result as Response, ctx);
 		} catch (error: any) {
 			Log.error(error.message);
 			console.error(error.details);
@@ -132,32 +152,13 @@ export class GamanApp {
 		}
 	}
 
-	private async handleResponse(
-		result: string | object | any[] | Response | undefined,
-		ctx: Context,
-	) {
+	private async handleResponse(response: Response | undefined, ctx: Context) {
 		//@ts-ignore
-		const res: http.ServerResponse = ctx[HTTP_RESPONSE_SYMBOL];
+		const res: http.ServerResponse = ctx[HTTP_RESPONSE_METADATA];
 		if (res.writableEnded) return;
 
-		const isResponse = (value: unknown): value is Response => {
-			return value instanceof Response;
-		};
-
-		let response: Response = new Response(undefined, { status: 404 });
-
-		if (isResponse(result)) {
-			response = result;
-		} else {
-			if (typeof result === 'string') {
-				if (isHtmlString(result)) {
-					response = Response.html(result, { status: 200 });
-				} else {
-					response = Response.text(result, { status: 200 });
-				}
-			} else if (result) {
-				response = Response.json(result, { status: 200 });
-			}
+		if (!response) {
+			response = new Response(undefined, { status: 404 });
 		}
 
 		if (this.integrations) {
@@ -250,7 +251,7 @@ export class GamanApp {
 	private findRoute(path: string, method: string): Route | undefined {
 		for (const route of this.routes) {
 			const methods = route.methods;
-			if (!methods.length || methods.includes(method.toUpperCase())) {
+			if (!methods.length || methods.includes(method.toUpperCase() as any)) {
 				const match = route.pattern?.regex.exec(path);
 				if (match) return route;
 			}

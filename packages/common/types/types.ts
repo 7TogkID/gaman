@@ -7,7 +7,7 @@ import { File } from '@gaman/core/context/formdata/file';
 /*                                   Handler                                  */
 /* -------------------------------------------------------------------------- */
 
-export type RequestHandler = (c: Context) => NextResponse;
+export type RequestHandler = (c: Context) => Response | Promise<Response>;
 
 /* -------------------------------------------------------------------------- */
 /*                                   Router                                   */
@@ -131,7 +131,7 @@ export interface Request {
 	/**
 	 * Gets a many file values from form data by name
 	 *
-	 * Equivalent to `formData().get(name).asFile()`
+	 * Equivalent to `Array<formData().get(name).asFile()>`
 	 * @param name - The form field name
 	 */
 	files: (name: string) => Promise<Array<File | undefined>>;
@@ -169,11 +169,3 @@ export interface Context
 	get<T = any>(k: string): T;
 	has(k: string): boolean;
 }
-
-export type NextResponse =
-	| Promise<Response | undefined>
-	| Response
-	| object
-	| Array<any>
-	| string
-	| undefined;

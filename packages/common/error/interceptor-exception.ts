@@ -1,4 +1,4 @@
-import { Context } from "@gaman/core/types";
+import { Context } from "@gaman/common/types";
 
 export class InterceptorException extends Error {
 	public readonly statusCode: number;

@@ -1,6 +1,6 @@
 import { GamanHeader } from '@gaman/core/headers';
 
-export class RenderResponse {
+export class ViewResponse {
 	private viewName: string;
 	private viewData: Record<string, any>;
 	private init: IResponseOptions;
@@ -28,7 +28,6 @@ export class RenderResponse {
 	}
 }
 
-const responseRenderSymbol = Symbol.for('gaman.responseRender');
 
 export interface IResponseOptions {
 	status?: number;
@@ -37,16 +36,15 @@ export interface IResponseOptions {
 }
 
 export class Response {
-	[responseRenderSymbol]: RenderResponse | null;
-
+	public view?: ViewResponse;
 	public headers: GamanHeader;
 	public status: number;
 	public statusText: string;
+	public body?: any;
 	constructor(
-		public body?: any,
+		body?: any,
 		options: IResponseOptions = {},
 	) {
-		this[responseRenderSymbol] = null;
 		this.body = body;
 		this.headers = new GamanHeader(options.headers || {});
 		this.status = options.status || 200;
@@ -95,7 +93,7 @@ export class Response {
 				...(init.headers || {}),
 			},
 		});
-		res[responseRenderSymbol] = new RenderResponse(viewName, viewData, init);
+		res.view =  new ViewResponse(viewName, viewData, init);
 		return res;
 	}
 
@@ -116,12 +114,5 @@ export class Response {
 				Location: location,
 			},
 		});
-	}
-
-	/**
-	 * Akses helper untuk render view
-	 */
-	get renderData(): RenderResponse | null {
-		return this[responseRenderSymbol];
 	}
 }

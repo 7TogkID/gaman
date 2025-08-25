@@ -1,7 +1,7 @@
 import { Priority } from '@gaman/common/utils/priority';
 import { GamanApp } from '@gaman/core/gaman-app';
 import { Response } from '@gaman/core/response';
-import { Context, NextResponse } from '@gaman/core/types';
+import { Context } from '@gaman/common/types';
 import * as http from 'node:http';
 import { IS_INTEGRATION_FACTORY_SYMBOL } from '@gaman/common/contants';
 
@@ -40,7 +40,7 @@ export type IntegrationFactory = (app: GamanApp) => {
 	 * @param ctx - The current request context.
 	 * @returns A NextResponse to handle the request or let it continue.
 	 */
-	onRequest?: (ctx: Context) => NextResponse;
+	onRequest?: (ctx: Context) => Response | Promise<Response>;
 
 	/**
 	 * Hook that runs just before the response is sent back to the client.

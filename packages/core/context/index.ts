@@ -1,6 +1,6 @@
 import * as http from 'node:http';
 import * as querystring from 'node:querystring';
-import type { Context, Request } from '@gaman/core/types';
+import type { Context, Request } from '@gaman/common/types';
 import { GamanHeader } from '@gaman/core/headers';
 import { GamanCookies } from '@gaman/core/context/cookies';
 import { GamanApp } from '@gaman/core/gaman-app';
@@ -9,8 +9,8 @@ import { FormData, FormDataEntryValue, IFormDataEntryValue } from '@gaman/core/c
 import { File } from '@gaman/core/context/formdata/file';
 import { parseMultipart } from '@gaman/common/utils/multipart-parser';
 import {
-	HTTP_REQUEST_SYMBOL,
-	HTTP_RESPONSE_SYMBOL,
+	HTTP_REQUEST_METADATA,
+	HTTP_RESPONSE_METADATA,
 } from '@gaman/common/contants';
 
 export async function createContext(
@@ -152,8 +152,8 @@ export async function createContext(
 		},
 
 		// @ts-ignore
-		[HTTP_REQUEST_SYMBOL]: req,
-		[HTTP_RESPONSE_SYMBOL]: res,
+		[HTTP_REQUEST_METADATA]: req,
+		[HTTP_RESPONSE_METADATA]: res,
 	};
 	return ctx;
 }

@@ -124,7 +124,7 @@ export function nunjucks(ops: GamanNunjucksOptions = {}) {
 			}
 		},
 		async onResponse(_ctx, res) {
-			const renderData = res.renderData;
+			const renderData = res.view;
 			if (renderData == null) return res;
 
 			const pathname = renderData.getName().includes('.')

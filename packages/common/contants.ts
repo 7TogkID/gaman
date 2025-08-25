@@ -2,18 +2,34 @@ export const SRC_DIR = 'src',
 	MAIN_BLOCK_PATH = `${SRC_DIR}/main.block.ts`,
 	INDEX_PATH = `${SRC_DIR}/index.ts`;
 
-export const RESPONSE_RENDER_SYMBOL = Symbol.for('gaman.responseRender');
-export const HTTP_REQUEST_SYMBOL = Symbol.for('gaman.httpRequest');
-export const HTTP_RESPONSE_SYMBOL = Symbol.for('gaman.httpResponse');
-export const IS_SERVICE_FACTORY_SYMBOL = Symbol.for('gaman.isServiceFactory');
-export const IS_ROUTES_FACTORY_SYMBOL = Symbol.for('gaman.isRoutesFactory');
+/* -------------------------------------------------------------------------- */
+/*                               COMPOSE FACTORY                              */
+/* -------------------------------------------------------------------------- */
+export const IS_COMPOSE_HANDLER_FACTORY = '___compose:handler___';
+export const IS_COMPOSE_INTERCEPTOR_FACTORY = '___compose:interceptor___';
+
+/* -------------------------------------------------------------------------- */
+/*                                   FACTORY                                  */
+/* -------------------------------------------------------------------------- */
+export const IS_SERVICE_FACTORY = Symbol.for('gaman.isServiceFactory');
+export const IS_ROUTES_FACTORY = Symbol.for('gaman.isRoutesFactory');
 export const IS_BLOCK_SYMBOL = Symbol.for('gaman.isBlock');
-export const IS_MIDDLEWARE_SYMBOL = Symbol.for('gaman.isMiddleware');
 export const IS_INTEGRATION_FACTORY_SYMBOL = Symbol.for(
 	'gaman.isIntegrationFactory',
 );
 
+/* -------------------------------------------------------------------------- */
+/*                                   HANDLER                                  */
+/* -------------------------------------------------------------------------- */
+export const IS_MIDDLEWARE_HANDLER = '___handler:middleware___';
+
+/* -------------------------------------------------------------------------- */
+/*                                  META DATA                                 */
+/* -------------------------------------------------------------------------- */
 export const MIDDLEWARE_CONFIG_METADATA = '___middleware:config___';
+export const HTTP_REQUEST_METADATA = '___http:request___';
+export const HTTP_RESPONSE_METADATA = '___http:response___';
+export const RESPONSE_RENDER_METADATA = '___response:render___';
 
 /**
  * * ignored log from google request

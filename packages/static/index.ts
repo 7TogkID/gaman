@@ -99,15 +99,15 @@ export function gamanStatic(options: StaticFileOptions = {}) {
             stats = await fsPromises.stat(filePath);
           } catch {
             await options.onNotFound?.(filePath, ctx);
-            return undefined;
+            return new Response();
           }
         } else {
           await options.onNotFound?.(filePath, ctx);
-          return undefined;
+          return new Response();
         }
       }
 
-      if (!stats.isFile()) return undefined;
+      if (!stats.isFile()) return new Response();
 
       // Gzip/Brotli: cek Accept-Encoding dan cari file terkompresi
       const acceptEncoding = ctx.request.headers.get("accept-encoding") || "";
