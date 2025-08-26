@@ -3,9 +3,12 @@ import * as querystring from 'node:querystring';
 import type { Context, Request } from '@gaman/common/types';
 import { GamanHeader } from '@gaman/core/headers';
 import { GamanCookies } from '@gaman/core/context/cookies';
-import { GamanApp } from '@gaman/core/gaman-app';
 import { Buffer } from 'node:buffer';
-import { FormData, FormDataEntryValue, IFormDataEntryValue } from '@gaman/core/context/formdata';
+import {
+	FormData,
+	FormDataEntryValue,
+	IFormDataEntryValue,
+} from '@gaman/core/context/formdata';
 import { File } from '@gaman/core/context/formdata/file';
 import { parseMultipart } from '@gaman/common/utils/multipart-parser';
 import {
@@ -14,12 +17,12 @@ import {
 } from '@gaman/common/contants';
 
 export async function createContext(
-	_app: GamanApp,
+	params: any,
 	req: http.IncomingMessage,
 	res: http.ServerResponse,
 ): Promise<Context> {
-	const urlString = req.url || '/';
 	const method = req.method?.toUpperCase() || 'GET';
+	const urlString = req.url || '/';
 	const url = new URL(urlString, `http://${req.headers.host}`);
 	const contentType = req.headers['content-type'] || '';
 	const headers = new GamanHeader(req.headers);
@@ -40,7 +43,7 @@ export async function createContext(
 		param: (name) => {
 			return gamanRequest.params[name];
 		},
-		params: {}, // ? akan di set dari router
+		params,
 
 		query: createQuery(url.searchParams),
 

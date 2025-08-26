@@ -1,22 +1,14 @@
 export const SRC_DIR = 'src',
 	MAIN_BLOCK_PATH = `${SRC_DIR}/main.block.ts`,
 	INDEX_PATH = `${SRC_DIR}/index.ts`;
-
-/* -------------------------------------------------------------------------- */
-/*                               COMPOSE FACTORY                              */
-/* -------------------------------------------------------------------------- */
-export const IS_COMPOSE_HANDLER_FACTORY = '___compose:handler___';
-export const IS_COMPOSE_INTERCEPTOR_FACTORY = '___compose:interceptor___';
-
 /* -------------------------------------------------------------------------- */
 /*                                   FACTORY                                  */
 /* -------------------------------------------------------------------------- */
-export const IS_SERVICE_FACTORY = Symbol.for('gaman.isServiceFactory');
-export const IS_ROUTES_FACTORY = Symbol.for('gaman.isRoutesFactory');
-export const IS_BLOCK_SYMBOL = Symbol.for('gaman.isBlock');
-export const IS_INTEGRATION_FACTORY_SYMBOL = Symbol.for(
-	'gaman.isIntegrationFactory',
-);
+export const IS_ROUTES_FACTORY = '___factory:routes___';
+export const IS_INTEGRATION_FACTORY = '___factory:integration___';
+export const IS_CONTROLLER_FACTORY = '___factory:controller___';
+export const IS_INTERCEPTOR_FACTOR = '___factory:interceptor___';
+export const IS_MIDDLEWARE_FACTORY = '___factory:middleware___';
 
 /* -------------------------------------------------------------------------- */
 /*                                   HANDLER                                  */

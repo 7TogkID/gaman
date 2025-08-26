@@ -5,7 +5,9 @@ import {
 	Route,
 	RouteDefinition,
 } from '@gaman/common/types';
-import { HandlerFactory } from '../handler';
+import { ControllerFactory } from '@gaman/common/types/controller.types';
+import { normalizePath } from '@gaman/common/utils/utils';
+import { registerRoutes } from '@gaman/core/registry';
 
 type RouteFactory = (route: RouteBuilder) => void;
 class RouteBuilder {
@@ -22,13 +24,10 @@ class RouteBuilder {
 		return this.routes;
 	}
 
-	private addRoute<
-		T extends Record<string, RequestHandler>,
-		F extends HandlerFactory<T>,
-	>(
+	private addRoute(
 		method: HttpMethod,
 		path: string,
-		handler: RequestHandler | [fn: F, name: keyof T],
+		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	): RouteDefinition {
 		const fullPath = normalizePath(`${this.prefix}/${path}`);
 		const { regex, keys } = compilePath(fullPath);
@@ -121,68 +120,66 @@ class RouteBuilder {
 		};
 	}
 
-	get<T extends Record<string, RequestHandler>, F extends HandlerFactory<T>>(
+	get(
 		path: string,
-		handler: RequestHandler | [fn: F, name: keyof T],
+		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	) {
 		return this.addRoute('GET', path, handler);
 	}
-	post<T extends Record<string, RequestHandler>, F extends HandlerFactory<T>>(
+	post(
 		path: string,
-		handler: RequestHandler | [fn: F, name: keyof T],
+		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	) {
 		return this.addRoute('POST', path, handler);
 	}
-	put<T extends Record<string, RequestHandler>, F extends HandlerFactory<T>>(
+	put(
 		path: string,
-		handler: RequestHandler | [fn: F, name: keyof T],
+		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	) {
 		return this.addRoute('PUT', path, handler);
 	}
-	delete<T extends Record<string, RequestHandler>, F extends HandlerFactory<T>>(
+	delete(
 		path: string,
-		handler: RequestHandler | [fn: F, name: keyof T],
+		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	) {
 		return this.addRoute('DELETE', path, handler);
 	}
-	patch<T extends Record<string, RequestHandler>, F extends HandlerFactory<T>>(
+	patch(
 		path: string,
-		handler: RequestHandler | [fn: F, name: keyof T],
+		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	) {
 		return this.addRoute('PATCH', path, handler);
 	}
-	all<T extends Record<string, RequestHandler>, F extends HandlerFactory<T>>(
+	all(
 		path: string,
-		handler: RequestHandler | [fn: F, name: keyof T],
+		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	) {
 		return this.addRoute('ALL', path, handler);
 	}
-	head<T extends Record<string, RequestHandler>, F extends HandlerFactory<T>>(
+	head(
 		path: string,
-		handler: RequestHandler | [fn: F, name: keyof T],
+		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	) {
 		return this.addRoute('HEAD', path, handler);
 	}
-	options<
-		T extends Record<string, RequestHandler>,
-		F extends HandlerFactory<T>,
-	>(path: string, handler: RequestHandler | [fn: F, name: keyof T]) {
+	options(
+		path: string,
+		handler: RequestHandler | [fn: ControllerFactory, name: string],
+	) {
 		return this.addRoute('OPTIONS', path, handler);
 	}
+}
+
+export function autoComposeRoutes(callback: RouteFactory): Route[] {
+	const routes = composeRoutes(callback);
+	registerRoutes(...routes);
+	return routes;
 }
 
 export function composeRoutes(callback: RouteFactory): Route[] {
 	const builder = new RouteBuilder();
 	callback(builder);
 	return builder.getRoutes();
-}
-
-function normalizePath(path: string): string {
-	let normalized = path.trim();
-	if (!normalized.startsWith('/')) normalized = '/' + normalized;
-	normalized = normalized.replace(/\/+$/, '');
-	normalized = normalized.replace(/\/+/g, '/');
-	return normalized === '' ? '/' : normalized;
 }
 
 function compilePath(pattern: string): { regex: RegExp; keys: string[] } {

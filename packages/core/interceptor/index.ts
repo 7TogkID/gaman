@@ -1,4 +1,4 @@
-import { IS_COMPOSE_INTERCEPTOR_FACTORY } from '@gaman/common/contants';
+import { IS_INTERCEPTOR_FACTOR } from '@gaman/common/contants';
 import { InterceptorException } from '@gaman/common/error/interceptor-exception';
 import {
 	InterceptorErrorFn,
@@ -16,7 +16,7 @@ export function composeInterceptor(
 
 		return factory(ctx, next, defaultError);
 	};
-	Object.defineProperty(newFactory, IS_COMPOSE_INTERCEPTOR_FACTORY, {
+	Object.defineProperty(newFactory, IS_INTERCEPTOR_FACTOR, {
 		value: true,
 		writable: false,
 		enumerable: false,
