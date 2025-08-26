@@ -23,8 +23,8 @@ export class StartCommand extends Command {
 			);
 			process.exit(1);
 		}
-
-		const child = spawn('npx', ['tsx', entryFile], {
+		const userArgs = process.argv.slice(2); // ['--port=3000', '--debug']
+		const child = spawn('npx', ['tsx', entryFile, ...userArgs], {
 			stdio: 'inherit',
 			env: process.env,
 		});
