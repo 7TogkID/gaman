@@ -7,12 +7,16 @@ import { fileURLToPath } from 'url';
 const ROUTE_DIRS = ['routes', 'router'];
 const MIDDLEWARE_DIRS = ['middlewares', 'middleware'];
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+function getProjectDir(dirName: string) {
+	const baseDir = fs.existsSync(path.join(process.cwd(), 'dist'))
+		? 'dist'
+		: 'src';
+	return path.join(process.cwd(), baseDir, dirName);
+}
 
 async function importDirIfExists(dirs: string[]) {
 	for (const dirName of dirs) {
-		const fullPath = path.join(__dirname, dirName); // bukan lagi hardcode 'src'
+		const fullPath = getProjectDir(dirName);
 		if (!fs.existsSync(fullPath)) continue;
 
 		const files = fs.readdirSync(fullPath);
