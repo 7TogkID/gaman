@@ -6,13 +6,11 @@
 		"moduleResolution": "bundler",
 		"allowSyntheticDefaultImports": true,
 		"forceConsistentCasingInFileNames": true,
+		"esModuleInterop": true,
+		"strict": true,
 		"noEmit": true,
 		"allowImportingTsExtensions": true,
-		"types": ["node", "./src/index.d.ts"],
-		"baseUrl": ".",
-		"paths": {
-			"*": ["./src/*"]
-		}
+		"types": ["node", "./src/index.d.ts"]
 	},
 	"include": ["./src/**/*.ts"],
 	"exclude": ["node_modules", "dist", "**/*test.ts"]
