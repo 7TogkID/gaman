@@ -10,8 +10,6 @@ export class GamanApp {
 		typeof http.ServerResponse
 	>;
 
-	mountEnvrionment;
-
 	async mountRoutes(rt: Route[]) {
 		registerRoutes(...rt);
 	}

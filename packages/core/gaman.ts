@@ -2,13 +2,17 @@ import { GamanApp } from '@gaman/core/gaman-app';
 import { loadEnv } from '@gaman/common/utils/load-env';
 import * as path from 'path';
 import * as fs from 'fs';
+import { fileURLToPath } from 'url';
 
 const ROUTE_DIRS = ['routes', 'router'];
 const MIDDLEWARE_DIRS = ['middlewares', 'middleware'];
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 async function importDirIfExists(dirs: string[]) {
 	for (const dirName of dirs) {
-		const fullPath = path.join(process.cwd(), 'src', dirName);
+		const fullPath = path.join(__dirname, dirName); // bukan lagi hardcode 'src'
 		if (!fs.existsSync(fullPath)) continue;
 
 		const files = fs.readdirSync(fullPath);
