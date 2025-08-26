@@ -14,6 +14,6 @@
 	"dependencies": {
 		"@gaman/cli": "^1.0.17",
 		"@gaman/common": "^1.1.0",
-		"@gaman/core": "^1.1.1"
+		"@gaman/core": "^1.1.2"
 	}
 }
