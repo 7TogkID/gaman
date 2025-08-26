@@ -19,11 +19,11 @@ async function getPackageLatest(dep) {
 	);
 }
 
-async function getTemplateMap() {
-	return await fetch(
-		'https://raw.githubusercontent.com/7TogkID/gaman/refs/heads/master/template/map.json',
-	).then((r) => r.json());
-}
+// async function getTemplateMap() {
+// 	return await fetch(
+// 		'https://raw.githubusercontent.com/7TogkID/gaman/refs/heads/master/template/map.json',
+// 	).then((r) => r.json());
+// }
 
 async function main() {
 	console.clear();
@@ -35,7 +35,7 @@ async function main() {
   ╚██████╔╝██║░░██║██║░╚═╝░██║██║░░██║██║░╚███║
   ░╚═════╝░╚═╝░░╚═╝╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝
 `);
-	const templateMap = await getTemplateMap();
+	// const templateMap = await getTemplateMap();
 
 	const answers = await inquirer.prompt([
 		{
@@ -46,10 +46,10 @@ async function main() {
 		},
 		{
 			type: 'list',
-			name: 'template',
-			message: 'What template do you want to use?',
-			choices: Object.keys(templateMap),
-			default: 'Blank',
+			name: 'language',
+			message: 'What language do you want to use?',
+			choices: ['typescript', 'javascript'],
+			default: 'typescript',
 		},
 		{
 			type: 'list',
@@ -81,7 +81,7 @@ async function main() {
 		process.exit(1);
 	}
 
-	const subfolder = templateMap[answers.template];
+	const subfolder = answers.language;
 	const degitPath = `7TogkID/gaman/template/${subfolder}`;
 
 	console.log(`\n📁 Fetching template "${answers.template}" from GitHub...`);
