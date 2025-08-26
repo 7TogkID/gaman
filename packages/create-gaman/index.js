@@ -84,7 +84,7 @@ async function main() {
 	const subfolder = answers.language;
 	const degitPath = `7TogkID/gaman/template/${subfolder}`;
 
-	console.log(`\n📁 Fetching template "${answers.template}" from GitHub...`);
+	console.log(`\n📁 Fetching template "${answers.language}" from GitHub...`);
 	try {
 		await degit(degitPath).clone(targetDir);
 		console.log(`✅ Template copied to ${answers.projectName}`);
