@@ -4,13 +4,8 @@
 
 <p align="center">
   <a href="https://gaman.7togk.id">
-    <img src="https://github.com/7TogkID/gaman/blob/main/.github/images/gaman.png?raw=true" width="25%">
+    <img src="https://raw.githubusercontent.com/7TogkID/gaman/refs/heads/master/.github/images/gaman-2.png" width="100%" >
   </a>
-</p>
-
-<h1 align="center">GamanJS</h1>
-<p align="center">
-  <strong>GamanJS is a modern backend framework built for resilience, scalability, and simplicity.</strong>
 </p>
 
 <p align="center">
@@ -22,16 +17,7 @@
 
 ---
 
-> [!WARNING]
-> This Project under development
-
-## EN
-Please be patient; this project is still in development. GamanJS is currently exploring the right direction and characteristics for its long-term use.
-
-## ID
-Mohon bersabar, proyek ini masih dalam tahap pengembangan. Saat ini GamanJS sedang mencari arah dan karakteristik yang tepat untuk digunakan dalam jangka panjang ke depannya.
-
-<!-- ## Create a New Project
+## Create a New Project
 
 There are two ways to scaffold a new GamanJS project:
 
@@ -49,4 +35,4 @@ visit our [official documentation](https://gaman.7togk.id)
 
 ## Links
 - [License (MIT)](https://github.com/7togkid/gaman/blob/main/LICENSE)
-- [Official Website](https://gaman.7togk.id) -->
+- [Official Website](https://gaman.7togk.id)
