@@ -1,5 +1,5 @@
 import { defineBootstrap } from '@gaman/core';
-import { TextFormat } from '@gaman/common/utils/textformat';
+import { TextFormat } from '@gaman/common';
 
 defineBootstrap(async (app) => {
 	await app.mountServer(':3431');
