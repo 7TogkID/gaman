@@ -25,7 +25,7 @@ class RouteBuilder {
 	}
 
 	private addRoute(
-		method: HttpMethod,
+		method: HttpMethod | HttpMethod[],
 		path: string,
 		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	): RouteDefinition {
@@ -50,7 +50,7 @@ class RouteBuilder {
 
 		const route: Route = {
 			path: fullPath,
-			methods: [method],
+			methods: Array.isArray(method) ? method : [method],
 			handler: finalHandler,
 			middlewares: [...this.middlewares],
 			interceptors: [],
@@ -167,6 +167,13 @@ class RouteBuilder {
 		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	) {
 		return this.addRoute('OPTIONS', path, handler);
+	}
+	match(
+		methods: HttpMethod[],
+		path: string,
+		handler: RequestHandler | [fn: ControllerFactory, name: string],
+	) {
+		return this.addRoute(methods, path, handler);
 	}
 }
 

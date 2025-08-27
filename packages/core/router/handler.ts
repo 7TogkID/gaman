@@ -194,7 +194,11 @@ function findRoute(
 } {
 	for (const route of getRegisteredRoutes()) {
 		const methods = route.methods;
-		if (!methods.length || methods.includes(method.toUpperCase() as any)) {
+		if (
+			!methods.length ||
+			methods.includes('ALL') ||
+			methods.includes(method.toUpperCase() as any)
+		) {
 			const match = route.pattern?.regex.exec(path);
 			// ? Inject Params dari Pattern
 			let params = {};
