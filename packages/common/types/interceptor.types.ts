@@ -1,6 +1,7 @@
 import { InterceptorException } from '@gaman/common/error/interceptor-exception.js';
 import { Context, QueryValue } from '@gaman/common/types/types.js';
 import { GamanHeader } from '@gaman/core/headers/index.js';
+import { FormData } from '@gaman/core/index.js';
 import { Response } from '@gaman/core/response.js';
 
 export type InterceptorNextHandler = Promise<Response> | Response;
