@@ -1,4 +1,4 @@
-import { IS_INTERCEPTOR_FACTOR } from '@gaman/common/contants.js';
+import { IS_INTERCEPTOR_FACTORY } from '@gaman/common/contants.js';
 import { InterceptorException } from '@gaman/common/error/index.js';
 import {
 	InterceptorContext,
@@ -44,7 +44,7 @@ export function composeInterceptor(factory: InterceptorFactory): InterceptorHand
     return factory(ctx as InterceptorContext, next, defaultError);
   };
 
-  Object.defineProperty(handler, IS_INTERCEPTOR_FACTOR, {
+  Object.defineProperty(handler, IS_INTERCEPTOR_FACTORY, {
     value: true,
     writable: false,
     enumerable: false,
