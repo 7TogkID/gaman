@@ -15,5 +15,8 @@
     "@gaman/common": "file:.yalc/@gaman/common",
     "@gaman/core": "file:.yalc/@gaman/core",
     "@gaman/cors": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0"
   }
 }

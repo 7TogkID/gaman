@@ -31,6 +31,7 @@ export async function runBuild() {
 		sourcemap: true,
 		legalComments: 'none',
 		packages: 'external',
+		outExtension: {'.js': '.js'},
 		plugins: [
 			{
 				name: 'gaman-build-log',

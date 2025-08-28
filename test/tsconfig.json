@@ -1,20 +1,13 @@
 {
 	"compilerOptions": {
-		"module": "ES2022",
+		"module": "commonjs",
 		"outDir": "./dist",
 		"target": "ES2021",
-		"moduleResolution": "bundler",
 		"allowSyntheticDefaultImports": true,
 		"forceConsistentCasingInFileNames": true,
-		"noEmit": true,
 		"strict": true,
 		"esModuleInterop": true,
-		"allowImportingTsExtensions": true,
-		"types": ["./src/index.d.ts"],
-		"baseUrl": ".",
-		"paths": {
-			"*": ["./src/*"]
-		}
+		"types": ["./src/index.d.ts", "node"],
 	},
 	"include": ["./src/**/*.ts"],
 	"exclude": ["node_modules", "dist", "**/*test.ts"]
