@@ -18,196 +18,262 @@ import { sortArrayByPriority } from '@gaman/common/utils/index.js';
 import {
 	getRegisteredMiddlewares,
 	getRegisteredRoutes,
+	registerMiddlewares,
+	registerRoutes,
 } from '@gaman/core/registry.js';
 import { Readable } from 'node:stream';
 import { GamanCookies } from '@gaman/core/context/cookies/index.js';
+import { ExceptionHandler } from '../exception/index.js';
+import { isInterceptorHandler } from '@gaman/common/validation/is.js';
+import { HttpException, InterceptorException } from '@gaman/common/index.js';
 
-export async function requestHandle(
-	req: http.IncomingMessage,
-	res: http.ServerResponse,
-) {
-	const startTime = performance.now();
-	const method = req.method?.toUpperCase() || 'GET';
-	const urlString = req.url || '/';
-	const url = new URL(urlString, `http://${req.headers.host}`);
+export class Router {
+	protected exceptionHandlers: ExceptionHandler[] = [];
 
-	// ? mencari route yang cocok
-	const { route, params } = findRoute(url.pathname, method);
-	if (!route?.handler) {
-		return await handleResponse(new Response(undefined, { status: 404 }), res);
+	async mountRoutes(rt: Route[]) {
+		registerRoutes(...rt);
 	}
 
-	const ctx = await createContext(params, req, res);
-	Log.setRoute(ctx.request.pathname || '/');
-	Log.setMethod(ctx.request.method.toUpperCase());
+	async mountMiddleware(mw: MiddlewareHandler | Array<MiddlewareHandler>) {
+		if (Array.isArray(mw)) {
+			registerMiddlewares(...mw);
+		} else {
+			registerMiddlewares(mw);
+		}
+	}
 
-	try {
-		// **** MIDDLEWARE ****
-		// ? filter global middlewares dari options kek includes: [] dan excludes: []
-		const activeMiddlewares = getRegisteredMiddlewares().filter((mw) =>
-			shouldRunMiddleware(mw, ctx.request.pathname),
-		);
+	async mountExceptionHandler(eh: ExceptionHandler | Array<ExceptionHandler>) {
+		if (Array.isArray(eh)) {
+			this.exceptionHandlers.push(...eh);
+		} else {
+			this.exceptionHandlers.push(eh);
+		}
+	}
 
-		// ? sort by priority global middlewares + route.middlewares
-		const sortedMiddlewares = sortArrayByPriority<MiddlewareHandler>(
-			[...activeMiddlewares, ...route.middlewares],
-			(mw) => {
-				const mwConfig = mw[
-					MIDDLEWARE_CONFIG_METADATA
-				] as DefaultMiddlewareOptions;
-				return mwConfig.priority || 'normal';
-			},
-		);
+	protected async requestHandle(
+		req: http.IncomingMessage,
+		res: http.ServerResponse,
+	) {
+		const startTime = performance.now();
+		const method = req.method?.toUpperCase() || 'GET';
+		const urlString = req.url || '/';
+		const url = new URL(urlString, `http://${req.headers.host}`);
 
-		// ? Build Pipeline: middleware[] + handler
-		const handlers: Array<
-			MiddlewareHandler | InterceptorHandler | RequestHandler
-		> = [
-			...sortedMiddlewares, // ? middleware harus paling awal
-			...route.interceptors, // ? interceptor harus sebelum handler
-			route.handler, // ? final handler
-		];
-
-		let index = -1;
-		const next = async (i: number): Promise<Response> => {
-			if (i <= index) {
-				throw new Error('next() called multiple times');
-			}
-			index = i;
-			const fn = handlers[i];
-			if (!fn) return new Response(undefined, { status: 404 });
-
-			return await fn(ctx, () => next(i + 1));
-		};
-
-		const result = await next(0);
-		await handleResponse(result as Response, res, ctx);
-	} catch (error: any) {
-		Log.error(error.message);
-		console.error(error.details);
-		return await handleResponse(
-			new Response(undefined, { status: 500 }),
-			res,
-			ctx,
-		);
-	} finally {
-		const endTime = performance.now();
-		if (
-			Log.response.route &&
-			Log.response.status &&
-			Log.response.method &&
-			!IGNORED_LOG_FOR_PATH_REGEX.test(Log.response.route)
-		) {
-			Log.log(
-				`Request processed in §a(${(endTime - startTime).toFixed(1)}ms)§r`,
+		// ? mencari route yang cocok
+		const { route, params } = this.findRoute(url.pathname, method);
+		if (!route?.handler) {
+			return await this.handleResponse(
+				new Response(undefined, { status: 404 }),
+				res,
 			);
 		}
-		Log.setRoute('');
-		Log.setMethod('');
-		Log.setStatus(null);
+
+		const ctx = await createContext(params, req, res);
+		Log.setRoute(ctx.request.pathname || '/');
+		Log.setMethod(ctx.request.method.toUpperCase());
+
+		try {
+			// **** MIDDLEWARE ****
+			// ? filter global middlewares dari options kek includes: [] dan excludes: []
+			const activeMiddlewares = getRegisteredMiddlewares().filter((mw) =>
+				this.shouldRunMiddleware(mw, ctx.request.pathname),
+			);
+
+			// ? sort by priority global middlewares + route.middlewares
+			const sortedMiddlewares = sortArrayByPriority<MiddlewareHandler>(
+				[...activeMiddlewares, ...route.middlewares],
+				(mw) => {
+					const mwConfig = mw[
+						MIDDLEWARE_CONFIG_METADATA
+					] as DefaultMiddlewareOptions;
+					return mwConfig.priority || 'normal';
+				},
+			);
+
+			// ? Build Pipeline: middleware[] + handler
+			const handlers: Array<
+				MiddlewareHandler | InterceptorHandler | RequestHandler
+			> = [
+				...sortedMiddlewares, // ? middleware harus paling awal
+				...route.interceptors, // ? interceptor harus sebelum handler
+				route.handler, // ? final handler
+			];
+
+			let index = -1;
+			const next = async (i: number): Promise<Response> => {
+				if (i <= index) {
+					throw new Error('next() called multiple times');
+				}
+				index = i;
+				const fn = handlers[i];
+				if (!fn) return new Response(undefined, { status: 404 });
+				return await fn(ctx, () => next(i + 1));
+			};
+
+			const result = await next(0);
+			await this.handleResponse(result as Response, res, ctx);
+		} catch (error: any) {
+			for (const except of [...this.exceptionHandlers, ...route.exceptions]) {
+				let response;
+				if (error.gamanException) {
+					response = await except(error);
+				} else {
+					response = await except(
+						new HttpException(error.message, error.status, ctx, error),
+					);
+				}
+				if (response instanceof Response) {
+					return await this.handleResponse(response, res, ctx);
+				}
+			}
+
+			/**
+			 * ? Jika error adalah dari interceptor
+			 * ? maka akan di kasih default response seperti berikut
+			 * ? bisa di rewrite tinggal buat `composeExceptionHandler` aja
+			 */
+			if (error instanceof InterceptorException) {
+				return await this.handleResponse(
+					Res.json(
+						{
+							statusCode: error.statusCode,
+							message: error.message,
+						},
+						{
+							status: error.statusCode,
+						},
+					),
+					res,
+					ctx,
+				);
+			}
+
+			Log.error(error.message);
+			console.error(error.details);
+			return await this.handleResponse(
+				new Response(undefined, { status: 500 }),
+				res,
+				ctx,
+			);
+		} finally {
+			const endTime = performance.now();
+			if (
+				Log.response.route &&
+				Log.response.status &&
+				Log.response.method &&
+				!IGNORED_LOG_FOR_PATH_REGEX.test(Log.response.route)
+			) {
+				Log.log(
+					`Request processed in §a(${(endTime - startTime).toFixed(1)}ms)§r`,
+				);
+			}
+			Log.setRoute('');
+			Log.setMethod('');
+			Log.setStatus(null);
+		}
 	}
-}
 
-function shouldRunMiddleware(
-	middleware: MiddlewareHandler,
-	path: string,
-): boolean {
-	const config = (middleware as any)[MIDDLEWARE_CONFIG_METADATA] || {};
-	const includes: string[] = config.includes || [];
-	const excludes: string[] = config.excludes || [];
+	protected shouldRunMiddleware(
+		middleware: MiddlewareHandler,
+		path: string,
+	): boolean {
+		const config = (middleware as any)[MIDDLEWARE_CONFIG_METADATA] || {};
+		const includes: string[] = config.includes || [];
+		const excludes: string[] = config.excludes || [];
 
-	// ! check includes: harus ada minimal satu yang match
-	if (includes.length > 0 && !includes.some((p) => pathMatch(p, path))) {
-		return false;
+		// ! check includes: harus ada minimal satu yang match
+		if (includes.length > 0 && !includes.some((p) => pathMatch(p, path))) {
+			return false;
+		}
+
+		// ! check excludes: jika ada yang match, skip
+		if (excludes.length > 0 && excludes.some((p) => pathMatch(p, path))) {
+			return false;
+		}
+
+		return true;
 	}
 
-	// ! check excludes: jika ada yang match, skip
-	if (excludes.length > 0 && excludes.some((p) => pathMatch(p, path))) {
-		return false;
-	}
+	protected async handleResponse(
+		response: Response | undefined,
+		res: http.ServerResponse,
+		ctx?: Context,
+	) {
+		if (res.writableEnded) return;
 
-	return true;
-}
+		if (!response) {
+			response = new Response(undefined, { status: 404 });
+		}
 
-async function handleResponse(
-	response: Response | undefined,
-	res: http.ServerResponse,
-	ctx?: Context,
-) {
-	if (res.writableEnded) return;
+		// if (integrations) {
+		// 	const integrations = sortArrayByPriority<ReturnType<IntegrationFactory>>(
+		// 		integrations,
+		// 		'priority',
+		// 		'asc',
+		// 	);
 
-	if (!response) {
-		response = new Response(undefined, { status: 404 });
-	}
+		// 	for (const integration of integrations) {
+		// 		if (integration.onResponse) {
+		// 			const integrationResponse = await integration.onResponse(
+		// 				ctx,
+		// 				response,
+		// 			);
+		// 			if (integrationResponse) {
+		// 				response = integrationResponse;
+		// 				break;
+		// 			}
+		// 		}
+		// 	}
+		// }
 
-	// if (integrations) {
-	// 	const integrations = sortArrayByPriority<ReturnType<IntegrationFactory>>(
-	// 		integrations,
-	// 		'priority',
-	// 		'asc',
-	// 	);
+		if (ctx) {
+			for (const [key, value] of ctx.headers.entries()) {
+				if (value[1] == true) {
+					response.headers.set(key, value[0]);
+				}
+			}
 
-	// 	for (const integration of integrations) {
-	// 		if (integration.onResponse) {
-	// 			const integrationResponse = await integration.onResponse(
-	// 				ctx,
-	// 				response,
-	// 			);
-	// 			if (integrationResponse) {
-	// 				response = integrationResponse;
-	// 				break;
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	if (ctx) {
-		for (const [key, value] of ctx.headers.entries()) {
-			if (value[1] == true) {
-				response.headers.set(key, value[0]);
+			const cookieHeaders = Array.from(GamanCookies.consume(ctx.cookies));
+			if (cookieHeaders.length > 0) {
+				response.headers.set('Set-Cookie', cookieHeaders);
 			}
 		}
 
-		const cookieHeaders = Array.from(GamanCookies.consume(ctx.cookies));
-		if (cookieHeaders.length > 0) {
-			response.headers.set('Set-Cookie', cookieHeaders);
+		res.statusCode = response.status;
+		res.statusMessage = response.statusText;
+		res.setHeaders(response.headers.toMap());
+		Log.setStatus(response.status);
+
+		if (response.body instanceof Readable) {
+			return response.body.pipe(res);
 		}
+		return res.end(response.body);
 	}
 
-	res.statusCode = response.status;
-	res.statusMessage = response.statusText;
-	res.setHeaders(response.headers.toMap());
-	Log.setStatus(response.status);
-
-	if (response.body instanceof Readable) {
-		return response.body.pipe(res);
-	}
-	return res.end(response.body);
-}
-
-function findRoute(
-	path: string,
-	method: string,
-): {
-	route: Route | undefined;
-	params: any;
-} {
-	for (const route of getRegisteredRoutes()) {
-		const methods = route.methods;
-		if (
-			!methods.length ||
-			methods.includes('ALL') ||
-			methods.includes(method.toUpperCase() as any)
-		) {
-			const match = route.pattern?.regex.exec(path);
-			// ? Inject Params dari Pattern
-			let params = {};
-			route.pattern?.keys.forEach((key, index) => {
-				params[key] = match?.[index + 1] || '';
-			});
-			if (match) return { route, params };
+	private findRoute(
+		path: string,
+		method: string,
+	): {
+		route: Route | undefined;
+		params: any;
+	} {
+		for (const route of getRegisteredRoutes()) {
+			const methods = route.methods;
+			if (
+				!methods.length ||
+				methods.includes('ALL') ||
+				methods.includes(method.toUpperCase() as any)
+			) {
+				const match = route.pattern?.regex.exec(path);
+				// ? Inject Params dari Pattern
+				let params = {};
+				route.pattern?.keys.forEach((key, index) => {
+					params[key] = match?.[index + 1] || '';
+				});
+				if (match) return { route, params };
+			}
 		}
-	}
 
-	return { route: undefined, params: {} };
+		return { route: undefined, params: {} };
+	}
 }

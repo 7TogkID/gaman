@@ -53,6 +53,7 @@ class RouteBuilder {
 			methods: Array.isArray(method) ? method : [method],
 			handler: finalHandler,
 			middlewares: [...this.middlewares],
+			exceptions: [],
 			interceptors: [],
 			pattern: { regex, keys },
 		};
@@ -73,6 +74,14 @@ class RouteBuilder {
 					route.interceptors.push(...fn);
 				} else {
 					route.interceptors.push(fn);
+				}
+				return this;
+			},
+			exception(eh) {
+				if (Array.isArray(eh)) {
+					route.exceptions.push(...eh);
+				} else {
+					route.exceptions.push(eh);
 				}
 				return this;
 			},
@@ -110,6 +119,16 @@ class RouteBuilder {
 						r.interceptors.unshift(...fn);
 					} else {
 						r.interceptors.unshift(fn);
+					}
+				}
+				return this;
+			},
+			exception(eh) {
+				for (const r of childRoutes) {
+					if (Array.isArray(eh)) {
+						r.exceptions.unshift(...eh);
+					} else {
+						r.exceptions.unshift(eh);
 					}
 				}
 				return this;
