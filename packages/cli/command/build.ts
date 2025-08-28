@@ -40,7 +40,7 @@ export async function runBuild() {
 						Logger.log(`✔ Loaded: ${args.path}`);
 						return null;
 					});
-					build.onStart(() => {
+					build.onStart(() => { 
 						Logger.log('Build started...');
 					});
 					build.onEnd(() => {

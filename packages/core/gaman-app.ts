@@ -11,7 +11,7 @@ export class GamanApp {
 	>;
 
 	async mountRoutes(rt: Route[]) {
-		registerRoutes(...rt);
+		registerRoutes(...rt); 
 	}
 
 	async mountMiddleware(mw: MiddlewareHandler | Array<MiddlewareHandler>) {
