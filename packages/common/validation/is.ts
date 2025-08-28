@@ -1,11 +1,11 @@
 import {
 	IS_INTERCEPTOR_FACTOR,
 	IS_MIDDLEWARE_FACTORY,
-} from '@gaman/common/contants';
+} from '@gaman/common/contants.js';
 import {
 	InterceptorHandler,
 	MiddlewareHandler,
-} from '@gaman/common/types';
+} from '@gaman/common/types/index.js';
 
 export function isInterceptorHandler(v: any): v is InterceptorHandler {
 	return v[IS_INTERCEPTOR_FACTOR] as boolean;

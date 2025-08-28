@@ -1,10 +1,10 @@
-import _path from 'path';
-import fs from 'fs';
-import { Command } from '../command';
-import { parsePath } from '../../utils/parse';
+import * as _path from 'path';
+import * as fs from 'fs';
+import { Command } from '../command.js';
+import { parsePath } from '../../utils/parse.js';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
-import { Log } from '@gaman/common/utils/logger';
-import { SRC_DIR } from '@gaman/common/contants';
+import { Log } from '@gaman/common/utils/logger.js';
+import { SRC_DIR } from '@gaman/common/contants.js';
 
 class MakeService extends Command {
   constructor() {

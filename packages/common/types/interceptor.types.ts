@@ -1,6 +1,6 @@
-import { InterceptorException } from '@gaman/common/error/interceptor-exception';
-import { Context } from '@gaman/common/types/types';
-import { Response } from '@gaman/core/response';
+import { InterceptorException } from '@gaman/common/error/interceptor-exception.js';
+import { Context } from '@gaman/common/types/types.js';
+import { Response } from '@gaman/core/response.js';
 
 export type InterceptorNextHandler = Promise<Response> | Response;
 

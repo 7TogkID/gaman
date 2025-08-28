@@ -1,4 +1,4 @@
-import { TextFormat } from './textformat';
+import { TextFormat } from '@gaman/common/utils/textformat.js';
 
 export const Logger = {
 	level: 'debug',

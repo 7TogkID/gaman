@@ -1,4 +1,4 @@
-import { GamanHeader } from '@gaman/core/headers';
+import { GamanHeader } from '@gaman/core/headers/index.js';
 
 export class ViewResponse {
 	private viewName: string;

@@ -1,8 +1,8 @@
 import esbuild from 'esbuild';
 import fg from 'fast-glob';
 import { existsSync, rmSync } from 'fs';
-import { Logger } from '@gaman/common/utils/logger';
-import { Command } from './command';
+import { Logger } from '@gaman/common/utils/logger.js';
+import { Command } from './command.js';
 
 export async function runBuild() {
 	const start = Date.now();

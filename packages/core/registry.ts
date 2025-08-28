@@ -1,5 +1,5 @@
-import { MiddlewareHandler, Route } from '@gaman/common/types';
-import { IntegrationFactory } from '@gaman/core/integration';
+import { MiddlewareHandler, Route } from '@gaman/common/types/index.js';
+import { IntegrationFactory } from '@gaman/core/integration/index.js';
 
 const middlewares: MiddlewareHandler[] = [];
 const routes: Route[] = [];

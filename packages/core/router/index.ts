@@ -1,2 +1,2 @@
-export * from '@gaman/core/router/compose';
+export * from '@gaman/core/router/compose.js';
 

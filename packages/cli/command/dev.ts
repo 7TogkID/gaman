@@ -1,6 +1,6 @@
 import { existsSync } from 'fs';
 import { spawn } from 'child_process';
-import { Command } from './command';
+import { Command } from './command.js';
 
 function getEntryFile(): string {
 	const candidates = ['src/index.ts', 'src/index.js', 'src/index.mjs'];

@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import { existsSync } from 'fs';
-import { Logger } from '@gaman/common/utils/logger';
-import { Command } from './command';
+import { Logger } from '@gaman/common/utils/logger.js';
+import { Command } from './command.js';
 
 const entryFile = './dist/index.js';
 
@@ -24,7 +24,7 @@ export class StartCommand extends Command {
 			process.exit(1);
 		}
 		const userArgs = process.argv.slice(2); // ['--port=3000', '--debug']
-		const child = spawn('npx', ['tsx', entryFile, ...userArgs], {
+		const child = spawn(process.execPath, [entryFile, ...userArgs], {
 			stdio: 'inherit',
 			env: process.env,
 		});

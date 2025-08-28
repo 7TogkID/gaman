@@ -1,8 +1,8 @@
-import { GamanHeader } from '@gaman/core/headers';
-import { FormData } from '@gaman/core/context/formdata';
-import { GamanCookies } from '@gaman/core/context/cookies';
-import { Response } from '@gaman/core/response';
-import { File } from '@gaman/core/context/formdata/file';
+import { GamanHeader } from '@gaman/core/headers/index.js';
+import { FormData } from '@gaman/core/context/formdata/index.js';
+import { GamanCookies } from '@gaman/core/context/cookies/index.js';
+import { Response } from '@gaman/core/response.js';
+import { File } from '@gaman/core/context/formdata/file/index.js';
 /* -------------------------------------------------------------------------- */
 /*                                   Handler                                  */
 /* -------------------------------------------------------------------------- */

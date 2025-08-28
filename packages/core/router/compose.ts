@@ -1,13 +1,13 @@
-import { HttpMethod } from '@gaman/common/enums/http-method.enum';
+import { HttpMethod } from '@gaman/common/enums/http-method.enum.js';
 import {
 	MiddlewareHandler,
 	RequestHandler,
 	Route,
 	RouteDefinition,
-} from '@gaman/common/types';
-import { ControllerFactory } from '@gaman/common/types/controller.types';
-import { normalizePath } from '@gaman/common/utils/utils';
-import { registerRoutes } from '@gaman/core/registry';
+} from '@gaman/common/types/index.js';
+import { ControllerFactory } from '@gaman/common/types/controller.types.js';
+import { normalizePath } from '@gaman/common/utils/utils.js';
+import { registerRoutes } from '@gaman/core/registry.js';
 
 type RouteFactory = (route: RouteBuilder) => void;
 class RouteBuilder {

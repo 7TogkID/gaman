@@ -1,17 +1,17 @@
 #!/usr/bin/env tsx
 
-import dev from './command/dev';
-import build from './command/build';
-import start from './command/start';
-import { parseArgs } from './utils/parse';
-import { Command } from './command/command';
-import makeBlock from './command/make/make-block';
-import makeIntegration from './command/make/make-integration';
-import makeMiddleware from './command/make/make-middleware';
-import makeRoutes from './command/make/make-routes';
-import { TextFormat } from '@gaman/common/utils/textformat';
-import makeService from './command/make/make-service';
-import makeModule from './command/make/make-module';
+import dev from './command/dev.js';
+import build from './command/build.js';
+import start from './command/start.js';
+import { parseArgs } from './utils/parse.js';
+import { Command } from './command/command.js';
+import makeBlock from './command/make/make-block.js';
+import makeIntegration from './command/make/make-integration.js';
+import makeMiddleware from './command/make/make-middleware.js';
+import makeRoutes from './command/make/make-routes.js';
+import { TextFormat } from '@gaman/common/utils/textformat.js';
+import makeService from './command/make/make-service.js';
+import makeModule from './command/make/make-module.js';
 
 // Daftar perintah yang tersedia
 const commands: Command[] = [

@@ -1,8 +1,8 @@
-import { Log } from '@gaman/common/utils/logger';
-import { Command } from '../command';
-import makeBlock from './make-block';
-import makeRoutes from './make-routes';
-import makeService from './make-service';
+import { Log } from '@gaman/common/utils/logger.js';
+import { Command } from '../command.js';
+import makeBlock from './make-block.js';
+import makeRoutes from './make-routes.js';
+import makeService from './make-service.js';
 
 class MakeModule extends Command {
 	constructor() {

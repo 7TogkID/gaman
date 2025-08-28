@@ -1,8 +1,8 @@
 import * as _path from "path";
-import { Command } from "../command";
-import { parsePath } from "../../utils/parse";
+import { Command } from "../command.js";
+import { parsePath } from "../../utils/parse.js";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
-import { Log } from "@gaman/common/utils/logger";
+import { Log } from "@gaman/common/utils/logger.js";
 
 class MakeBlock extends Command {
   constructor() {

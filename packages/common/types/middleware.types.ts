@@ -1,6 +1,6 @@
-import { Priority } from '@gaman/common/utils';
-import { Context } from '@gaman/common/types';
-import { Response } from '@gaman/core/response';
+import { Priority } from '@gaman/common/utils/index.js';
+import { Context } from '@gaman/common/types/index.js';
+import { Response } from '@gaman/core/response.js';
 
 export type MiddlewareHandler = (
 	ctx: Context,

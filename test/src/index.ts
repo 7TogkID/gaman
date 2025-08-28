@@ -1,4 +1,4 @@
-import { TextFormat } from '@gaman/common/utils/textformat';
+import { TextFormat } from '@gaman/common';
 import { defineBootstrap } from '@gaman/core';
 
 defineBootstrap(async (app) => {

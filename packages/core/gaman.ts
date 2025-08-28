@@ -1,8 +1,8 @@
-import { GamanApp } from '@gaman/core/gaman-app';
-import { loadEnv } from '@gaman/common/utils/load-env';
+import { GamanApp } from '@gaman/core/gaman-app.js';
+import { loadEnv } from '@gaman/common/utils/load-env.js';
 import * as path from 'path';
 import * as fs from 'fs';
-import { fileURLToPath } from 'url';
+import { pathToFileURL } from 'url';
 
 const ROUTE_DIRS = ['routes', 'router'];
 const MIDDLEWARE_DIRS = ['middlewares', 'middleware'];
@@ -21,9 +21,10 @@ async function importDirIfExists(dirs: string[]) {
 
 		const files = fs.readdirSync(fullPath);
 		for (const file of files) {
-			if (file.endsWith('.ts') || file.endsWith('.js')) {
+			if (file.endsWith('.ts') || file.endsWith('.js') || file.endsWith('.mjs')) {
 				const modulePath = path.join(fullPath, file);
-				await import(modulePath);
+				// ? Konversi path Windows jadi URL valid
+				await import(pathToFileURL(modulePath).href);
 			}
 		}
 	}
@@ -31,10 +32,11 @@ async function importDirIfExists(dirs: string[]) {
 
 export async function defineBootstrap(cb: (app: GamanApp) => any) {
 	loadEnv();
-	let app = new GamanApp();
+	const app = new GamanApp();
 
 	// *** ROUTES ***
 	await importDirIfExists(ROUTE_DIRS);
+
 	// *** MIDDLEWARES ***
 	await importDirIfExists(MIDDLEWARE_DIRS);
 

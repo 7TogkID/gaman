@@ -1,5 +1,5 @@
 import * as crypto from 'node:crypto';
-import { base64UrlEncode, base64UrlDecode } from './encode';
+import { base64UrlEncode, base64UrlDecode } from '@gaman/common/utils/encode.js';
 
 /**
  * Sign a payload using HMAC SHA256 (HS256)

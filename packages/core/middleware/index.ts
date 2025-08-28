@@ -2,12 +2,12 @@ import {
 	IS_MIDDLEWARE_FACTORY,
 	IS_MIDDLEWARE_HANDLER,
 	MIDDLEWARE_CONFIG_METADATA,
-} from '@gaman/common/contants';
+} from '@gaman/common/contants.js';
 import {
 	DefaultMiddlewareOptions,
 	MiddlewareHandler,
-} from '@gaman/common/types';
-import { registerMiddlewares } from '@gaman/core/registry';
+} from '@gaman/common/types/index.js';
+import { registerMiddlewares } from '@gaman/core/registry.js';
 
 export function autoComposeMiddleware<Config = any>(
 	mh: MiddlewareHandler,

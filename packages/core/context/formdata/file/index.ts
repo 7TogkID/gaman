@@ -1,5 +1,5 @@
 import { Blob, BlobOptions } from 'node:buffer';
-import { detectMime } from '@gaman/common/utils/mime';
+import { detectMime } from '@gaman/common/utils/mime.js';
 import { BinaryLike } from 'node:crypto';
 
 /**

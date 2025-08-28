@@ -1,4 +1,4 @@
-import { File } from '@gaman/core/context/formdata/file';
+import { File } from '@gaman/core/context/formdata/file/index.js';
 
 /**
  * * ini untuk schema buat inputan aja kek buat sistem gaman ngeset data form

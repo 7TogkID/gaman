@@ -1,8 +1,8 @@
-import { MiddlewareHandler, Route } from '@gaman/common/types';
+import { MiddlewareHandler, Route } from '@gaman/common/types/index.js';
 import * as http from 'node:http';
-import { registerMiddlewares, registerRoutes } from '@gaman/core/registry';
-import { requestHandle } from '@gaman/core/router/handler';
-import { getArg } from '@gaman/common';
+import { registerMiddlewares, registerRoutes } from '@gaman/core/registry.js';
+import { requestHandle } from '@gaman/core/router/handler.js';
+import { getArg } from '@gaman/common/index.js';
 
 export class GamanApp {
 	private server?: http.Server<

@@ -1,20 +1,20 @@
 import * as http from 'node:http';
 import * as querystring from 'node:querystring';
-import type { Context, Request } from '@gaman/common/types';
-import { GamanHeader } from '@gaman/core/headers';
-import { GamanCookies } from '@gaman/core/context/cookies';
+import type { Context, Request } from '@gaman/common/types/index.js';
+import { GamanHeader } from '@gaman/core/headers/index.js';
+import { GamanCookies } from '@gaman/core/context/cookies/index.js';
 import { Buffer } from 'node:buffer';
 import {
 	FormData,
 	FormDataEntryValue,
 	IFormDataEntryValue,
-} from '@gaman/core/context/formdata';
-import { File } from '@gaman/core/context/formdata/file';
-import { parseMultipart } from '@gaman/common/utils/multipart-parser';
+} from '@gaman/core/context/formdata/index.js';
+import { File } from '@gaman/core/context/formdata/file/index.js';
+import { parseMultipart } from '@gaman/common/utils/multipart-parser.js';
 import {
 	HTTP_REQUEST_METADATA,
 	HTTP_RESPONSE_METADATA,
-} from '@gaman/common/contants';
+} from '@gaman/common/contants.js';
 
 export async function createContext(
 	params: any,

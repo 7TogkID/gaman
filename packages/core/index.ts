@@ -1,10 +1,10 @@
-import '@gaman/core/global';
+import '@gaman/core/global.js';
 
 // modules
-export * from '@gaman/core/router';
-export * from "@gaman/core/controller"
-export * from "@gaman/core/interceptor"
-export * from '@gaman/core/integration';
-export * from '@gaman/core/middleware';
+export * from '@gaman/core/router/index.js';
+export * from "@gaman/core/controller/index.js"
+export * from "@gaman/core/interceptor/index.js"
+export * from '@gaman/core/integration/index.js';
+export * from '@gaman/core/middleware/index.js';
 
-export { defineBootstrap } from '@gaman/core/gaman';
+export { defineBootstrap } from '@gaman/core/gaman.js';

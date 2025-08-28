@@ -1,10 +1,10 @@
 import * as _path from 'path';
-import fs from 'fs';
-import { Command } from '../command';
-import { parsePath } from '../../utils/parse';
+import * as fs from 'fs';
+import { Command } from '../command.js';
+import { parsePath } from '../../utils/parse.js';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
-import { Log } from '@gaman/common/utils/logger';
-import { INDEX_PATH } from '@gaman/common/contants';
+import { Log } from '@gaman/common/utils/logger.js';
+import { INDEX_PATH } from '@gaman/common/contants.js';
 
 class MakeIntegration extends Command {
 	constructor() {

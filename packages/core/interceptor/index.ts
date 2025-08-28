@@ -1,10 +1,10 @@
-import { IS_INTERCEPTOR_FACTOR } from '@gaman/common/contants';
-import { InterceptorException } from '@gaman/common/error/interceptor-exception';
+import { IS_INTERCEPTOR_FACTOR } from '@gaman/common/contants.js';
+import { InterceptorException } from '@gaman/common/error/interceptor-exception.js';
 import {
 	InterceptorErrorFn,
 	InterceptorFactory,
 	InterceptorHandler,
-} from '@gaman/common/types';
+} from '@gaman/common/types/index.js';
 
 export function composeInterceptor(
 	factory: InterceptorFactory,

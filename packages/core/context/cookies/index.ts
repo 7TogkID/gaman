@@ -1,6 +1,6 @@
 import { parse, serialize, SerializeOptions } from 'cookie';
-import { Request } from '@gaman/common/types';
-import { parseBoolean, parseExpires } from '@gaman/common/utils/utils';
+import { Request } from '@gaman/common/types/index.js';
+import { parseBoolean, parseExpires } from '@gaman/common/utils/utils.js';
 
 export interface GamanCookieInterface {
 	value: string;

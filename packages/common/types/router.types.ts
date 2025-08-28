@@ -1,9 +1,9 @@
-import { HttpMethod } from '@gaman/common/enums/http-method.enum';
+import { HttpMethod } from '@gaman/common/enums/http-method.enum.js';
 import {
 	InterceptorHandler,
 	MiddlewareHandler,
 	RequestHandler,
-} from '@gaman/common/types';
+} from '@gaman/common/types/index.js';
 
 export interface Route {
 	path: string;
