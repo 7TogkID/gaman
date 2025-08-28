@@ -4,6 +4,7 @@ import {
 	MiddlewareHandler,
 	RequestHandler,
 } from '@gaman/common/types/index.js';
+import { ExceptionHandler } from '@gaman/core/exception/index.js';
 
 export interface Route {
 	path: string;
@@ -11,6 +12,7 @@ export interface Route {
 	handler: RequestHandler | null;
 	middlewares: MiddlewareHandler[];
 	interceptors: InterceptorHandler[];
+	exceptions: ExceptionHandler[];
 	pattern: { regex: RegExp; keys: string[] };
 	name?: string;
 }
@@ -20,5 +22,6 @@ export interface RouteDefinition {
 	interceptor(
 		fn: InterceptorHandler | Array<InterceptorHandler>,
 	): RouteDefinition;
+	exception(eh: ExceptionHandler | Array<ExceptionHandler>): RouteDefinition;
 	name(s: string): RouteDefinition;
 }

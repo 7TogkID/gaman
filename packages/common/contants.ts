@@ -7,7 +7,7 @@ export const SRC_DIR = 'src',
 export const IS_ROUTES_FACTORY = '___factory:routes___';
 export const IS_INTEGRATION_FACTORY = '___factory:integration___';
 export const IS_CONTROLLER_FACTORY = '___factory:controller___';
-export const IS_INTERCEPTOR_FACTOR = '___factory:interceptor___';
+export const IS_INTERCEPTOR_FACTORY = '___factory:interceptor___';
 export const IS_MIDDLEWARE_FACTORY = '___factory:middleware___';
 
 /* -------------------------------------------------------------------------- */

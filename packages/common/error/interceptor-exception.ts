@@ -1,10 +1,11 @@
-import { Context } from "@gaman/common/types/index.js";
+import { Context } from '@gaman/common/types/index.js';
 
 export class InterceptorException extends Error {
 	public readonly statusCode: number;
-	public readonly context?: Context;
+	public readonly context: Context;
+  public readonly gamanException = true;
 
-	constructor(message: string, statusCode = 400, context?: Context) {
+	constructor(message: string, statusCode = 400, context: Context) {
 		super(message);
 		this.name = 'InterceptorException';
 		this.statusCode = statusCode;

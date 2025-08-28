@@ -1,24 +1,34 @@
+import { Context } from '@gaman/common/types/types.js';
+
 export class HttpException extends Error {
-  public status: number;
-  public details?: any;
+	public readonly statusCode: number;
+	public readonly context: Context;
+	public readonly details?: any;
+  public readonly gamanException = true;
 
-  constructor(status: number, message: string, details?: any) {
-    super(message);
-    this.name = "HttpException";
-    this.status = status;
-    this.details = details;
+	constructor(
+		message: string,
+		statusCode: number,
+		context: Context,
+		details?: any,
+	) {
+		super(message);
+		this.name = 'HttpException';
+		this.statusCode = statusCode;
+		this.context = context;
+		this.details = details;
 
-    // Maintain proper stack trace (only works on V8 environments like Node.js)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, HttpException);
-    }
-  }
+		// Maintain proper stack trace (only works on V8 environments like Node.js)
+		if (Error.captureStackTrace) {
+			Error.captureStackTrace(this, HttpException);
+		}
+	}
 
-  toJSON() {
-    return {
-      status: this.status,
-      message: this.message,
-      details: this.details,
-    };
-  }
+	toJSON() {
+		return {
+			status: this.statusCode,
+			message: this.message,
+			details: this.details,
+		};
+	}
 }
