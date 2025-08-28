@@ -13,7 +13,7 @@ export type RequestHandler = (c: Context) => Response | Promise<Response>;
 /*                                   Router                                   */
 /* -------------------------------------------------------------------------- */
 
-export type QueryValue = string | number | string[];
+export type QueryValue = any | any[];
 export type Query = ((name: string) => QueryValue) & Record<string, QueryValue>;
 
 /**
@@ -168,4 +168,5 @@ export interface Context
 	set(k: string, v: any): void;
 	get<T = any>(k: string): T;
 	has(k: string): boolean;
+	delete(k: string): void;
 }

@@ -1,8 +1,19 @@
 import { InterceptorException } from '@gaman/common/error/interceptor-exception.js';
-import { Context } from '@gaman/common/types/types.js';
+import { Context, QueryValue } from '@gaman/common/types/types.js';
+import { GamanHeader } from '@gaman/core/headers/index.js';
 import { Response } from '@gaman/core/response.js';
 
 export type InterceptorNextHandler = Promise<Response> | Response;
+
+export interface InterceptorContext extends Context {
+	transformJson: (data: any) => void;
+	transformFormData: (data: FormData) => void;
+	transformParams: (data: Record<string, any>) => void;
+	transformQuery: (data: Record<string, QueryValue>) => void;
+	transformHeaders: (data: GamanHeader) => void;
+	transformBody: (data: Buffer<ArrayBufferLike>) => void;
+	transformText: (data: string) => void;
+}
 
 export type InterceptorErrorFn = (
 	message: string,
@@ -14,7 +25,7 @@ export interface InterceptorHandler {
 }
 
 export type InterceptorFactory = (
-	ctx: Context,
+	ctx: InterceptorContext,
 	next: () => InterceptorNextHandler,
 	error: InterceptorErrorFn,
 ) => InterceptorNextHandler;

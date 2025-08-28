@@ -122,28 +122,52 @@ export async function createContext(
 		ip: getClientIP(req),
 	};
 	const cookies = new GamanCookies(gamanRequest);
-	const ctx: Context = {
+		const ctx: Context = {
 		locals: {},
 		env: process.env,
 		url,
 		cookies,
-		request: gamanRequest,
+		
+		get request() {
+			return gamanRequest;
+		},
+		get headers() {
+			return gamanRequest.headers;
+		},
+		get header() {
+			return gamanRequest.header;
+		},
+		get param() {
+			return gamanRequest.param;
+		},
+		get params() {
+			return gamanRequest.params;
+		},
+		get query() {
+			return gamanRequest.query;
+		},
+		get text() {
+			return gamanRequest.text;
+		},
+		get json() {
+			return gamanRequest.json;
+		},
+		get formData() {
+			return gamanRequest.formData;
+		},
+		get input() {
+			return gamanRequest.input;
+		},
+		get inputs() {
+			return gamanRequest.inputs;
+		},
+		get file() {
+			return gamanRequest.file;
+		},
+		get files() {
+			return gamanRequest.files;
+		},
 
-		// data dari request
-		headers: gamanRequest.headers,
-		header: gamanRequest.header,
-		param: gamanRequest.param,
-		params: gamanRequest.params,
-		query: gamanRequest.query,
-		text: gamanRequest.text,
-		json: gamanRequest.json,
-		formData: gamanRequest.formData,
-		input: gamanRequest.input,
-		inputs: gamanRequest.inputs,
-		file: gamanRequest.file,
-		files: gamanRequest.files,
-
-		// data set
 		set(k, v) {
 			dataSet[k] = v;
 		},
@@ -152,6 +176,9 @@ export async function createContext(
 		},
 		has(k) {
 			return k in dataSet;
+		},
+		delete(k) {
+			delete dataSet[k]
 		},
 
 		// @ts-ignore
