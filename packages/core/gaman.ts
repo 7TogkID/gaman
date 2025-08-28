@@ -6,6 +6,8 @@ import { pathToFileURL } from 'url';
 
 const ROUTE_DIRS = ['routes', 'router'];
 const MIDDLEWARE_DIRS = ['middlewares', 'middleware'];
+const INTERCEPTOR_DIRS = ['interceptors', 'interceptor'];
+const EXCEPTION_DIRS = ['exceptions', 'exception'];
 
 function getProjectDir(dirName: string) {
 	const baseDir = fs.existsSync(path.join(process.cwd(), 'dist'))
@@ -21,7 +23,11 @@ async function importDirIfExists(dirs: string[]) {
 
 		const files = fs.readdirSync(fullPath);
 		for (const file of files) {
-			if (file.endsWith('.ts') || file.endsWith('.js') || file.endsWith('.mjs')) {
+			if (
+				file.endsWith('.ts') ||
+				file.endsWith('.js') ||
+				file.endsWith('.mjs')
+			) {
 				const modulePath = path.join(fullPath, file);
 				// ? Konversi path Windows jadi URL valid
 				await import(pathToFileURL(modulePath).href);
@@ -39,6 +45,12 @@ export async function defineBootstrap(cb: (app: GamanApp) => any) {
 
 	// *** MIDDLEWARES ***
 	await importDirIfExists(MIDDLEWARE_DIRS);
+
+	// *** INTERCEPTORS ***
+	await importDirIfExists(INTERCEPTOR_DIRS);
+
+	// *** EXCEPTIONS ***
+	await importDirIfExists(EXCEPTION_DIRS);
 
 	cb(app);
 }

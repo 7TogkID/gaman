@@ -16,19 +16,21 @@ import { pathMatch } from '@gaman/common/utils/utils.js';
 import { Response } from '@gaman/core/response.js';
 import { sortArrayByPriority } from '@gaman/common/utils/index.js';
 import {
+	getRegisteredExceptions,
+	getRegisteredInterceptors,
 	getRegisteredMiddlewares,
 	getRegisteredRoutes,
+	registerExceptions,
+	registerInterceptors,
 	registerMiddlewares,
 	registerRoutes,
 } from '@gaman/core/registry.js';
 import { Readable } from 'node:stream';
 import { GamanCookies } from '@gaman/core/context/cookies/index.js';
 import { ExceptionHandler } from '../exception/index.js';
-import { isInterceptorHandler } from '@gaman/common/validation/is.js';
 import { HttpException, InterceptorException } from '@gaman/common/index.js';
 
 export class Router {
-	protected exceptionHandlers: ExceptionHandler[] = [];
 
 	async mountRoutes(rt: Route[]) {
 		registerRoutes(...rt);
@@ -44,9 +46,17 @@ export class Router {
 
 	async mountExceptionHandler(eh: ExceptionHandler | Array<ExceptionHandler>) {
 		if (Array.isArray(eh)) {
-			this.exceptionHandlers.push(...eh);
+			registerExceptions(...eh);
 		} else {
-			this.exceptionHandlers.push(eh);
+			registerExceptions(eh);
+		}
+	}
+
+	async mountInterceptor(ih: InterceptorHandler | Array<InterceptorHandler>) {
+		if (Array.isArray(ih)) {
+			registerInterceptors(...ih);
+		} else {
+			registerInterceptors(ih);
 		}
 	}
 
@@ -95,6 +105,7 @@ export class Router {
 				MiddlewareHandler | InterceptorHandler | RequestHandler
 			> = [
 				...sortedMiddlewares, // ? middleware harus paling awal
+				...getRegisteredInterceptors(),
 				...route.interceptors, // ? interceptor harus sebelum handler
 				route.handler, // ? final handler
 			];
@@ -113,7 +124,7 @@ export class Router {
 			const result = await next(0);
 			await this.handleResponse(result as Response, res, ctx);
 		} catch (error: any) {
-			for (const except of [...this.exceptionHandlers, ...route.exceptions]) {
+			for (const except of [...getRegisteredExceptions(), ...route.exceptions]) {
 				let response;
 				if (error.gamanException) {
 					response = await except(error);
