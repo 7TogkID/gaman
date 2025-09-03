@@ -12,8 +12,8 @@
 	"author": "",
 	"description": "",
 	"dependencies": {
-		"@gaman/cli": "^1.0.19",
-		"@gaman/common": "^1.1.2",
-		"@gaman/core": "^1.1.4"
+		"@gaman/cli": "^1.0.20",
+		"@gaman/common": "^1.1.5",
+		"@gaman/core": "^1.1.7"
 	}
 }
