@@ -5,3 +5,4 @@ export * from '@gaman/common/utils/mime.js';
 export * from '@gaman/common/utils/priority.js';
 export * from '@gaman/common/utils/signature.js';
 export * from '@gaman/common/utils/arg.js';
+export * from '@gaman/common/utils/get-config.js';
