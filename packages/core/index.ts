@@ -11,6 +11,8 @@ export * from '@gaman/core/integration/index.js';
 export * from '@gaman/core/middleware/index.js';
 export * from '@gaman/core/exception/index.js';
 
+export * from '@gaman/core/config/index.js';
+
 export * from '@gaman/core/context/cookies/index.js';
 export * from '@gaman/core/context/formdata/index.js';
 export * from '@gaman/core/context/formdata/file/index.js';

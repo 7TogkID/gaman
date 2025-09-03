@@ -1,6 +1,6 @@
 import * as http from 'node:http';
 import { Router } from '@gaman/core/router/handler.js';
-import { getArg } from '@gaman/common/index.js';
+import { parseArgs } from '@gaman/common/index.js';
 
 export class GamanApp extends Router {
 	private server?: http.Server<
@@ -9,13 +9,16 @@ export class GamanApp extends Router {
 	>;
 
 	async mountServer(address?: string) {
-		const DEFAULT_HOST = getArg('--host', '-h', {
-			default: process.env.HOST || '127.0.0.1',
-		});
-		const DEFAULT_PORT = getArg('--port', '-p', {
-			parseNumber: true,
-			default: process.env.PORT ? parseInt(process.env.PORT, 10) : 3431,
-		}) as number;
+		const { args } = parseArgs();
+
+		const DEFAULT_HOST =
+			args['host'] === true
+				? '0.0.0.0'
+				: args['host'] || process.env.HOST || '127.0.0.1';
+
+		const DEFAULT_PORT =
+			args['port'] ||
+			(process.env.PORT ? parseInt(process.env.PORT, 10) : 3431);
 
 		let host = DEFAULT_HOST;
 		let port = DEFAULT_PORT;
