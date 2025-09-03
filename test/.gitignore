@@ -4,6 +4,8 @@ dist/
 # dependencies
 node_modules/
 .yalc
+.yalc.lock
+package-lock.json
 
 # file session
 session.db

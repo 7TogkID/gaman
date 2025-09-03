@@ -2,19 +2,16 @@
   "version": "v1",
   "packages": {
     "@gaman/core": {
-      "signature": "19eac911f985f213d1db6461f37fba98",
-      "file": true,
-      "replaced": "^1.0.15-alpha.0"
+      "signature": "a0ccb5dae4cdda39e17d379bd6dd0872",
+      "file": true
     },
     "@gaman/common": {
-      "signature": "5064063e2c87906db2e1edc0a5e5dc9b",
-      "file": true,
-      "replaced": "^1.0.2-alpha.0"
+      "signature": "78dfb210712f5a3770f9f478b342e392",
+      "file": true
     },
     "@gaman/cli": {
-      "signature": "97f3c34b323a6a8542f2a9966a7ec870",
-      "file": true,
-      "replaced": "^1.0.14-alpha.0"
+      "signature": "a77ca9e2b4f3fac42a0ca533aba2bbea",
+      "file": true
     }
   }
 }

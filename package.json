@@ -28,8 +28,10 @@
 	"homepage": "https://gaman.7togk.id",
 	"dependencies": {
 		"@types/ws": "^8.18.1",
+		"chokidar": "^3.6.0",
 		"cookie": "^1.0.2",
 		"esbuild": "^0.25.8",
+		"esbuild-plugin-file-path-extensions": "^2.1.4",
 		"install": "^0.13.0",
 		"npm": "^11.5.2",
 		"ws": "^8.18.2"
