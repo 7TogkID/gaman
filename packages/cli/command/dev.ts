@@ -1,26 +1,90 @@
-import { existsSync } from 'fs';
-import { spawn } from 'child_process';
+import { existsSync, unlinkSync } from 'fs';
+import { spawn, ChildProcess } from 'child_process';
 import { Command } from './command.js';
-
-function getEntryFile(): string {
-	const candidates = ['src/index.ts', 'src/index.js', 'src/index.mjs'];
-	return candidates.find((file) => existsSync(file)) || 'src/index.ts';
-}
+import { Logger } from '@gaman/common/utils/logger.js';
+import chokidar from 'chokidar';
+import path from 'path';
+import { getGamanConfig } from '@gaman/common/index.js';
+import { buildAll, buildFile } from '../utils/esbuild.js';
 
 export class DevCommand extends Command {
 	constructor() {
-		super('dev', 'Run the application in development mode', 'gaman dev', [
-			'serve',
-		]);
+		super('dev', 'Run the application in development mode', 'gaman dev', []);
 	}
 
 	async execute(): Promise<void> {
-		const entry = getEntryFile();
-		const userArgs = process.argv.slice(2); // ['--port=3000', '--debug']
-		spawn('npx', ['tsx', 'watch', entry, ...userArgs], {
-			stdio: 'inherit',
-			shell: true,
-		});
+		const config = await getGamanConfig();
+		const outdir = config.build?.outdir || 'dist';
+		const verbose = config.verbose;
+		const rootdir = config.build?.rootdir || 'src';
+		const entryFile = path.join(outdir, 'index.js');
+
+		await buildAll(config, 'development');
+
+		let child: ChildProcess | null = null;
+		const restart = () => {
+			if (child) {
+				Logger.log('Restarting application...');
+				child.kill();
+			}
+			child = spawn(
+				process.execPath,
+				[entryFile, ...process.argv.slice(3)],
+				{
+					stdio: 'inherit',
+				},
+			);
+		};
+
+		restart();
+
+		let changeTimeout: NodeJS.Timeout | null = null;
+		chokidar
+			.watch(rootdir, {
+				ignored: ['**/node_modules/**', `**/${outdir}/**`],
+			})
+			.on('add', async (file) => {
+				if (/\.(ts|js)$/.test(file)) {
+					if (verbose) Logger.debug(`New file: ${file}`);
+					try {
+						await buildFile(file, config, 'development');
+					} catch (err) {
+						Logger.error(`Build error: ${err}`);
+					}
+				}
+			})
+			.on('change', (file) => {
+				if (/\.(ts|js)$/.test(file)) {
+					if (changeTimeout) clearTimeout(changeTimeout);
+					changeTimeout = setTimeout(async () => {
+						if (verbose) Logger.debug(`Changed: ${file}`);
+						try {
+							await buildFile(file, config, 'development');
+							restart();
+						} catch (err) {
+							Logger.error(`Build error: ${err}`);
+						}
+					}, 100); // tunggu 100ms
+				}
+			})
+			.on('unlink', async (file) => {
+				const relPath = path.relative(rootdir, file);
+				const outBase = path.join(outdir, relPath).replace(/\.(ts|js)$/, '');
+				const filesToRemove = [
+					outBase + '.js',
+					outBase + '.js.map',
+					outBase + '.d.ts',
+				];
+
+				filesToRemove.forEach((f) => {
+					if (existsSync(f)) {
+						unlinkSync(f);
+						if (verbose) Logger.debug(`Removed: ${f}`);
+					}
+				});
+
+				restart();
+			});
 	}
 }
 

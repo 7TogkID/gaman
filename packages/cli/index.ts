@@ -3,7 +3,6 @@
 import dev from './command/dev.js';
 import build from './command/build.js';
 import start from './command/start.js';
-import { parseArgs } from './utils/parse.js';
 import { Command } from './command/command.js';
 import makeBlock from './command/make/make-block.js';
 import makeIntegration from './command/make/make-integration.js';
@@ -12,13 +11,14 @@ import makeRoutes from './command/make/make-routes.js';
 import { TextFormat } from '@gaman/common/utils/textformat.js';
 import makeService from './command/make/make-service.js';
 import makeModule from './command/make/make-module.js';
+import { parseArgs } from '@gaman/common/index.js';
 
-// Daftar perintah yang tersedia
+
 const commands: Command[] = [
 	dev,
 	build,
 	start,
-	makeModule,
+	makeModule,	
 	makeBlock,
 	makeRoutes,
 	makeService,

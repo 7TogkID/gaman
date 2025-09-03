@@ -1,3 +1,5 @@
+import { Args } from "@gaman/common/index.js";
+
 export abstract class Command {
   constructor(
     public name: string,
@@ -6,5 +8,5 @@ export abstract class Command {
     public alias: string[] = []
   ) {}
 
-  abstract execute(args: Record<string, any>): Promise<void>;
+  abstract execute(args: Args): Promise<void>;
 }

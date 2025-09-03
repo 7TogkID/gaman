@@ -1,23 +1,5 @@
 import * as _path from 'path';
 
-export function parseArgs(argv = process.argv.slice(2)) {
-	const args: Record<string, any> = {};
-	let command = argv[0];
-
-	for (let i = 1; i < argv.length; i++) {
-		const arg = argv[i];
-		if (arg.startsWith('--')) {
-			const [key, value] = arg.slice(2).split('=');
-			args[key] = value ?? true;
-		} else {
-			args._ = args._ || [];
-			args._.push(arg);
-		}
-	}
-
-	return { command, args };
-}
-
 export function parsePath(pathName: string) {
 	pathName = removeStart(pathName, './');
 

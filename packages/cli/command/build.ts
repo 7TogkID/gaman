@@ -1,59 +1,6 @@
-import esbuild from 'esbuild';
-import fg from 'fast-glob';
-import { existsSync, rmSync } from 'fs';
-import { Logger } from '@gaman/common/utils/logger.js';
 import { Command } from './command.js';
-
-export async function runBuild() {
-	const start = Date.now();
-	const distDir = 'dist';
-	if (existsSync(distDir)) {
-		Logger.log('Cleaning previous build...');
-		rmSync(distDir, { recursive: true, force: true });
-	}
-
-	Logger.log('Searching entry points...');
-
-	const entryPoints = await fg(['src/**/*.{ts,js}'], {
-		ignore: ['**/node_modules/**', '**/dist/**', '**/*.test.*', '**/*.d.*'],
-	});
-
-	Logger.log(`Found ${entryPoints.length} entry files`);
-
-	await esbuild.build({
-		entryPoints,
-		outdir: 'dist',
-		bundle: true,
-		format: 'esm',
-		platform: 'node',
-		target: 'node18',
-		minify: true,
-		sourcemap: true,
-		legalComments: 'none',
-		packages: 'external',
-		outExtension: {'.js': '.js'},
-		plugins: [
-			{
-				name: 'gaman-build-log',
-				setup(build) {
-					build.onLoad({ filter: /\.(ts|js)$/ }, async (args) => {
-						Logger.log(`✔ Loaded: ${args.path}`);
-						return null;
-					});
-					build.onStart(() => { 
-						Logger.log('Build started...');
-					});
-					build.onEnd(() => {
-						Logger.log('Build output done. Reading output files...');
-
-						Logger.log('entry.mjs generated successfully.');
-						Logger.log(`Build finished in ${Date.now() - start}ms`);
-					});
-				},
-			},
-		],
-	});
-}
+import { getGamanConfig, Logger, TextFormat } from '@gaman/common/index.js';
+import { buildAll } from '../utils/esbuild.js';
 
 export class BuildCommand extends Command {
 	constructor() {
@@ -61,7 +8,12 @@ export class BuildCommand extends Command {
 	}
 
 	async execute(): Promise<void> {
-		await runBuild();
+		const start = Date.now();
+		Logger.debug('Build Started...');
+		const config = await getGamanConfig();
+		await buildAll({ ...config, verbose: true }, 'production');
+
+		Logger.debug(`Build finished in${TextFormat.GREEN} ${Date.now() - start}ms${TextFormat.RESET}`);
 	}
 }
 
