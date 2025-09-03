@@ -8,7 +8,7 @@ const form = new MultipartForm("WebKitFormBoundaryABC123");
 form.append("avatar", {
   filename: "avatar.png",
   contentType: "image/png", 
-  content: fs.readFileSync("./test/images/gaman.png"), 
+  content: fs.readFileSync(".github/images/gaman.png"), 
 });
 
 describe("Multipart Parser", () => {

@@ -68,7 +68,7 @@ describe('Response', () => {
 		expect(res.body).toBeNull();
 		expect(res.headers.get('Content-Type')).toBe('text/html');
 
-		const render = res.renderData;
+		const render = res.view;
 		expect(render?.getName()).toBe('home');
 		expect(render?.getData()).toEqual({ user: 'Joni' });
 		expect(render?.getOptions().status).toBe(200);
