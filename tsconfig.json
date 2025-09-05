@@ -29,7 +29,7 @@
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["packages/**/*", "plugins/cors/**/*"],
+	"include": ["packages/**/*", "plugins/cors"],
 	"exclude": [
 		"node_modules",
 		"dist",
