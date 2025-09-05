@@ -36,3 +36,5 @@ visit our [official documentation](https://gaman.7togk.id)
 ## Links
 - [License (MIT)](https://github.com/7togkid/gaman/blob/main/LICENSE)
 - [Official Website](https://gaman.7togk.id)
+- [Discord](https://discord.gg/CQ6fEqBe8f)
+- [WhatsApp](https://whatsapp.com/channel/0029VbB0keR7z4kgczdSZ33s)
