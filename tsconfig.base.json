@@ -37,13 +37,6 @@
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["packages/**/*"],
-	"exclude": [
-		"node_modules",
-		"dist",
-		"**/*.test.*",
-		"packages/orm/**/*",
-		"packages/validation/**/*",
-		"packages/rate-limit/**/*"
-	]
+	"include": ["packages/**/*", "plugins/cors/**/*"],
+	"exclude": ["node_modules", "dist", "**/*.test.*"]
 }

@@ -3,6 +3,9 @@
 	"type": "module",
 	"main": "index.js",
 	"version": "0.0.1",
+	"engines": {
+		"node": ">=18.20.8"
+	},
 	"scripts": {
 		"build": "tsc -b -v",
 		"clean": "tsc -b --clean",
@@ -15,7 +18,8 @@
 		"yalc:push": "npm run build && cd ./packages/core && yalc push && cd ../common && yalc push && cd ../cli && yalc push"
 	},
 	"workspaces": [
-		"packages/*"
+		"packages/*",
+		"plugins/cors"
 	],
 	"author": "angga7togk",
 	"license": "MIT",
@@ -27,6 +31,7 @@
 	},
 	"homepage": "https://gaman.7togk.id",
 	"dependencies": {
+		"@types/node": "^24.3.1",
 		"@types/ws": "^8.18.1",
 		"chokidar": "^3.6.0",
 		"cookie": "^1.0.2",

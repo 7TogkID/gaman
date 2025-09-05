@@ -29,14 +29,11 @@
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["packages/**/*"],
+	"include": ["packages/**/*", "plugins/cors/**/*"],
 	"exclude": [
 		"node_modules",
 		"dist",
 		"**/*.test.*",
-		"packages/orm/**/*",
-		"packages/validation/**/*",
-		"packages/rate-limit/**/*"
 	],
 	"files": [],
 	"references": [
