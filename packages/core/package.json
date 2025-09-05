@@ -21,6 +21,9 @@
 		"access": "public",
 		"registry": "https://registry.npmjs.org"
 	},
+	"dependencies": {
+		"@types/node": "^24.3.1"
+	},
 	"peerDependencies": {
 		"cookie": ">=1.0.2",
 		"tslib": ">=2.8.1"
