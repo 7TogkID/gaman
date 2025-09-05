@@ -4,14 +4,14 @@
  * Implements Cross-Origin Resource Sharing (CORS) with customizable options.
  */
 
-import { Context } from '@gaman/common/types/index.js';
+import { DefaultMiddlewareOptions, Middleware } from '@gaman/common/index.js';
 import { composeMiddleware } from '@gaman/core';
 import { Response } from '@gaman/core/response.js';
 
 /**
  * CORS middleware options.
  */
-export type CorsOptions = {
+export interface CorsOptions extends DefaultMiddlewareOptions {
 	/** Allowed origin(s) for the request. */
 	origin?: string | string[] | null;
 	/** HTTP methods allowed for the request. Default: `["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"]` */
@@ -24,7 +24,7 @@ export type CorsOptions = {
 	credentials?: boolean;
 	/** Headers exposed to the client in the response. */
 	exposeHeaders?: string[];
-};
+}
 
 /**
  * Middleware for handling Cross-Origin Resource Sharing (CORS).
@@ -32,7 +32,7 @@ export type CorsOptions = {
  * @returns Middleware function for handling CORS.
  */
 
-export const cors = (options: CorsOptions) => {
+export const cors = (options?: CorsOptions): Middleware => {
 	const {
 		origin = '*',
 		allowMethods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -40,9 +40,9 @@ export const cors = (options: CorsOptions) => {
 		maxAge,
 		credentials,
 		exposeHeaders,
-	} = options;
+	} = options || {};
 
-	return composeMiddleware(async (ctx, next) => {
+	const middleware = composeMiddleware(async (ctx, next) => {
 		const requestOrigin = ctx.header('Origin');
 		// Determine allowed origin
 		let allowedOrigin: string | undefined = '*';
@@ -104,5 +104,11 @@ export const cors = (options: CorsOptions) => {
 		}
 
 		return await next();
+	});
+
+	return middleware({
+		priority: options?.priority || 'normal',
+		includes: options?.includes,
+		excludes: options?.excludes,
 	});
 };
