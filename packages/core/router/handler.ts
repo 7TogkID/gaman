@@ -2,17 +2,16 @@ import * as http from 'node:http';
 import { createContext } from '@gaman/core/context/index.js';
 import {
 	Context,
-	DefaultMiddlewareOptions,
 	InterceptorHandler,
+	Middleware,
 	MiddlewareHandler,
+	MiddlewareOptions,
 	RequestHandler,
 	Route,
 } from '@gaman/common/types/index.js';
 import {
 	IGNORED_LOG_FOR_PATH_REGEX,
-	MIDDLEWARE_CONFIG_METADATA,
 } from '@gaman/common/contants.js';
-import { pathMatch } from '@gaman/common/utils/utils.js';
 import { Response } from '@gaman/core/response.js';
 import { sortArrayByPriority } from '@gaman/common/utils/index.js';
 import {
@@ -31,19 +30,22 @@ import { ExceptionHandler } from '../exception/index.js';
 import { HttpException, InterceptorException } from '@gaman/common/index.js';
 
 export class Router {
-
 	async mountRoutes(rt: Route[]) {
 		registerRoutes(...rt);
 	}
 
-	async mountMiddleware(mw: MiddlewareHandler | Array<MiddlewareHandler>) {
+	/**
+	 * @ID Mendaftarkan middleware secara global, sehingga bisa di pakai untuk semua routes.
+	 * @EN Register middleware globally, so it can be used for all routes.
+	 */
+	async mountMiddleware(mw: Middleware | Array<Middleware>) {
 		if (Array.isArray(mw)) {
 			registerMiddlewares(...mw);
 		} else {
 			registerMiddlewares(mw);
 		}
 	}
-
+	
 	async mountExceptionHandler(eh: ExceptionHandler | Array<ExceptionHandler>) {
 		if (Array.isArray(eh)) {
 			registerExceptions(...eh);
@@ -86,17 +88,14 @@ export class Router {
 			// **** MIDDLEWARE ****
 			// ? filter global middlewares dari options kek includes: [] dan excludes: []
 			const activeMiddlewares = getRegisteredMiddlewares().filter((mw) =>
-				this.shouldRunMiddleware(mw, ctx.request.pathname),
+				this.shouldRunMiddleware(mw, ctx.request.pathname, ctx.request.method),
 			);
 
 			// ? sort by priority global middlewares + route.middlewares
-			const sortedMiddlewares = sortArrayByPriority<MiddlewareHandler>(
+			const sortedMiddlewares = sortArrayByPriority<Middleware>(
 				[...activeMiddlewares, ...route.middlewares],
 				(mw) => {
-					const mwConfig = mw[
-						MIDDLEWARE_CONFIG_METADATA
-					] as DefaultMiddlewareOptions;
-					return mwConfig.priority || 'normal';
+					return mw.config.priority;
 				},
 			);
 
@@ -104,7 +103,7 @@ export class Router {
 			const handlers: Array<
 				MiddlewareHandler | InterceptorHandler | RequestHandler
 			> = [
-				...sortedMiddlewares, // ? middleware harus paling awal
+				...sortedMiddlewares.map((m) => m.handler), // ? middleware harus paling awal
 				...getRegisteredInterceptors(),
 				...route.interceptors, // ? interceptor harus sebelum handler
 				route.handler, // ? final handler
@@ -124,7 +123,10 @@ export class Router {
 			const result = await next(0);
 			await this.handleResponse(result as Response, res, ctx);
 		} catch (error: any) {
-			for (const except of [...getRegisteredExceptions(), ...route.exceptions]) {
+			for (const except of [
+				...getRegisteredExceptions(),
+				...route.exceptions,
+			]) {
 				let response;
 				if (error.gamanException) {
 					response = await except(error);
@@ -185,20 +187,37 @@ export class Router {
 	}
 
 	protected shouldRunMiddleware(
-		middleware: MiddlewareHandler,
+		middleware: Middleware,
 		path: string,
+		method: string,
 	): boolean {
-		const config = (middleware as any)[MIDDLEWARE_CONFIG_METADATA] || {};
-		const includes: string[] = config.includes || [];
-		const excludes: string[] = config.excludes || [];
+		const config = middleware.config;
+
+		const methodMatch = (
+			p: MiddlewareOptions['includes' | 'excludes'][0],
+			m: string,
+		) => {
+			// ? kalau methods kosong di anggap "ALL"
+			if (p.methods.length <= 0) {
+				return true;
+			}
+
+			return p.methods.some((mm) => mm.toUpperCase() === m.toUpperCase());
+		};
 
 		// ! check includes: harus ada minimal satu yang match
-		if (includes.length > 0 && !includes.some((p) => pathMatch(p, path))) {
+		if (
+			config.includes.length > 0 &&
+			!config.includes.some((p) => p.match(path) && methodMatch(p, method))
+		) {
 			return false;
 		}
 
 		// ! check excludes: jika ada yang match, skip
-		if (excludes.length > 0 && excludes.some((p) => pathMatch(p, path))) {
+		if (
+			config.excludes.length > 0 &&
+			config.excludes.some((p) => p.match(path) && methodMatch(p, method))
+		) {
 			return false;
 		}
 
@@ -275,13 +294,10 @@ export class Router {
 				methods.includes('ALL') ||
 				methods.includes(method.toUpperCase() as any)
 			) {
-				const match = route.pattern?.regex.exec(path);
-				// ? Inject Params dari Pattern
-				let params = {};
-				route.pattern?.keys.forEach((key, index) => {
-					params[key] = match?.[index + 1] || '';
-				});
-				if (match) return { route, params };
+				const result = route.match(path);
+				if (result) {
+					return { route, params: result.params };
+				}
 			}
 		}
 

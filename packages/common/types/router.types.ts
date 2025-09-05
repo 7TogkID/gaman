@@ -1,24 +1,25 @@
 import { HttpMethod } from '@gaman/common/enums/http-method.enum.js';
 import {
 	InterceptorHandler,
-	MiddlewareHandler,
+	Middleware,
 	RequestHandler,
 } from '@gaman/common/types/index.js';
 import { ExceptionHandler } from '@gaman/core/exception/index.js';
+import { MatchFunction } from 'path-to-regexp';
 
 export interface Route {
 	path: string;
 	methods: HttpMethod[];
 	handler: RequestHandler | null;
-	middlewares: MiddlewareHandler[];
+	middlewares: Middleware[];
 	interceptors: InterceptorHandler[];
 	exceptions: ExceptionHandler[];
-	pattern: { regex: RegExp; keys: string[] };
+	match: MatchFunction<Partial<Record<string, string | string[]>>>,
 	name?: string;
 }
 
 export interface RouteDefinition {
-	middleware(fn: MiddlewareHandler | Array<MiddlewareHandler>): RouteDefinition;
+	middleware(fn: Middleware | Array<Middleware>): RouteDefinition;
 	interceptor(
 		fn: InterceptorHandler | Array<InterceptorHandler>,
 	): RouteDefinition;

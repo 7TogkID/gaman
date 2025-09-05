@@ -1,11 +1,38 @@
 import { Priority } from '@gaman/common/utils/index.js';
 import { Context } from '@gaman/common/types/index.js';
 import { Response } from '@gaman/core/response.js';
+import { MatchFunction } from 'path-to-regexp';
 
 export type MiddlewareHandler = (
 	ctx: Context,
 	next: () => Response | Promise<Response>,
 ) => Response | Promise<Response>;
+
+export interface MiddlewareOptions {
+	priority: Priority;
+	includes: Array<
+		Pick<MiddlewarePathOptions, 'path'> & {
+			methods: Array<string>;
+			match: MatchFunction<Partial<Record<string, string | string[]>>>;
+		}
+	>;
+	excludes: Array<
+		Pick<MiddlewarePathOptions, 'path'> & {
+			methods: Array<string>;
+			match: MatchFunction<Partial<Record<string, string | string[]>>>;
+		}
+	>;
+}
+
+export interface Middleware {
+	handler: MiddlewareHandler;
+	config: MiddlewareOptions;
+}
+
+export type MiddlewarePathOptions = {
+	path: string;
+	method?: string | Array<string>;
+};
 
 export type DefaultMiddlewareOptions = {
 	/**
@@ -17,10 +44,10 @@ export type DefaultMiddlewareOptions = {
 	 * @EN `includes` to set which route the middleware will be run on.
 	 * @ID `includes` untuk mengatur di route mana middleware akan di jalankan.
 	 */
-	includes?: string[];
+	includes?: Array<string | MiddlewarePathOptions>;
 	/**
 	 * @EN `includes` to set on which routes the middleware will not be executed.
 	 * @ID `includes` untuk mengatur di route mana middleware tidak akan di jalankan.
 	 */
-	excludes?: string[];
+	excludes?: Array<string | MiddlewarePathOptions>;
 };

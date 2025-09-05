@@ -18,7 +18,6 @@ export const IS_MIDDLEWARE_HANDLER = '___handler:middleware___';
 /* -------------------------------------------------------------------------- */
 /*                                  META DATA                                 */
 /* -------------------------------------------------------------------------- */
-export const MIDDLEWARE_CONFIG_METADATA = '___middleware:config___';
 export const HTTP_REQUEST_METADATA = '___http:request___';
 export const HTTP_RESPONSE_METADATA = '___http:response___';
 export const RESPONSE_RENDER_METADATA = '___response:render___';

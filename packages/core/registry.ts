@@ -1,21 +1,21 @@
 import {
 	InterceptorHandler,
-	MiddlewareHandler,
+	Middleware,
 	Route,
 } from '@gaman/common/types/index.js';
 import { IntegrationFactory } from '@gaman/core/integration/index.js';
 import { ExceptionHandler } from './exception/index.js';
 
-const middlewares: MiddlewareHandler[] = [];
+const middlewares: Middleware[] = [];
 const routes: Route[] = [];
 const integrations: Array<ReturnType<IntegrationFactory>> = [];
 const exceptions: Array<ExceptionHandler> = [];
 const interceptors: Array<InterceptorHandler> = [];
 
-export function registerMiddlewares(...mws: MiddlewareHandler[]) {
+export function registerMiddlewares(...mws: Middleware[]) {
 	middlewares.push(...mws);
 }
-export function getRegisteredMiddlewares(): MiddlewareHandler[] {
+export function getRegisteredMiddlewares(): Middleware[] {
 	return middlewares;
 }
 

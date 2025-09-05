@@ -24,12 +24,5 @@
 	"publishConfig": {
 		"registry": "https://registry.npmjs.org"
 	},
-	"peerDependencies": {
-		"chokidar": ">=3.6.0",
-		"esbuild": ">=0.25.8",
-		"fast-glob": ">=3.3.3",
-		"tsx": ">=3.12.7",
-		"typescript": ">=5.0.0"
-	},
 	"gitHead": "f3c12a3d4b0f5638afca69b3bf3f742a8e5a9997"
 }

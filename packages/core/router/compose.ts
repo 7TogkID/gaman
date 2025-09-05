@@ -1,6 +1,6 @@
 import { HttpMethod } from '@gaman/common/enums/http-method.enum.js';
 import {
-	MiddlewareHandler,
+	Middleware,
 	RequestHandler,
 	Route,
 	RouteDefinition,
@@ -8,12 +8,13 @@ import {
 import { ControllerFactory } from '@gaman/common/types/controller.types.js';
 import { normalizePath } from '@gaman/common/utils/utils.js';
 import { registerRoutes } from '@gaman/core/registry.js';
+import { match } from 'path-to-regexp';
 
 type RouteFactory = (route: RouteBuilder) => void;
 class RouteBuilder {
 	private prefix: string;
 	// ? Pipeline Request Handler
-	private middlewares: MiddlewareHandler[] = [];
+	private middlewares: Middleware[] = [];
 	private routes: Route[] = [];
 
 	constructor(prefix: string = '') {
@@ -30,7 +31,6 @@ class RouteBuilder {
 		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	): RouteDefinition {
 		const fullPath = normalizePath(`${this.prefix}/${path}`);
-		const { regex, keys } = compilePath(fullPath);
 
 		let finalHandler: RequestHandler;
 
@@ -55,7 +55,7 @@ class RouteBuilder {
 			middlewares: [...this.middlewares],
 			exceptions: [],
 			interceptors: [],
-			pattern: { regex, keys },
+			match: match(fullPath),
 		};
 
 		this.routes.push(route);

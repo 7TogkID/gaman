@@ -20,5 +20,16 @@
 		"access": "public",
 		"registry": "https://registry.npmjs.org"
 	},
+	"peerDependencies": {
+		"@types/node": "*",
+		"cookie": "*",
+		"tslib": "*",
+		"chokidar": "*",
+		"esbuild": "*",
+		"fast-glob": "*",
+		"tsx": "*",
+		"typescript": "*",
+		"path-to-regexp": "*"
+	},
 	"gitHead": "8d1bf3bbac4b72847e9157e2c95d75b5e90c89cf"
 }
