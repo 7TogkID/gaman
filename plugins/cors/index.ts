@@ -4,9 +4,9 @@
  * Implements Cross-Origin Resource Sharing (CORS) with customizable options.
  */
 
-import { Context } from '@gaman/common/types';
+import { Context } from '@gaman/common/types/index.js';
 import { composeMiddleware } from '@gaman/core';
-import { Response } from '@gaman/core/response';
+import { Response } from '@gaman/core/response.js';
 
 /**
  * CORS middleware options.
@@ -42,7 +42,7 @@ export const cors = (options: CorsOptions) => {
 		exposeHeaders,
 	} = options;
 
-	return composeMiddleware(async (ctx: Context, next) => {
+	return composeMiddleware(async (ctx, next) => {
 		const requestOrigin = ctx.header('Origin');
 		// Determine allowed origin
 		let allowedOrigin: string | undefined = '*';
