@@ -15,7 +15,7 @@
     "@gaman/cli": "file:.yalc/@gaman/cli",
     "@gaman/common": "file:.yalc/@gaman/common",
     "@gaman/core": "file:.yalc/@gaman/core",
-    "@gaman/cors": "^1.0.1"
+    "@gaman/cors": "file:.yalc/@gaman/cors"
   },
   "devDependencies": {
     "@types/node": "^24.3.0"
