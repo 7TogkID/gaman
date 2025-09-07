@@ -11,10 +11,8 @@
 		"clean": "tsc -b --clean",
 		"test": "vitest run",
 		"test:server": "npm run yalc:push && cd test && npm run dev",
-		"publish": "npm run build && ./node_modules/.bin/lerna publish --dist-tag=latest --no-private --no-push --yes -m \"chore(gaman) publish packages\"",
-		"publish:next": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --dist-tag=next --no-private --no-push --yes -m \"chore(gaman) publish packages\"",
-		"publish:beta": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --dist-tag=beta --no-private -m \"chore(gaman) publish packages\"",
-		"publish:test": "npm run build && npx tsc-alias && ./node_modules/.bin/lerna publish --force-publish --dist-tag=test --no-private --no-push -m \"chore(gaman) publish packages\"",
+		"version-packages": "npx changeset version",
+		"publish-packages": "npm run build && npx changeset publish --tag latest",
 		"yalc:push": "./scripts/yalc-push.sh"
 	},
 	"workspaces": [
@@ -43,6 +41,7 @@
 		"ws": "^8.18.2"
 	},
 	"devDependencies": {
+		"@changesets/cli": "^2.29.6",
 		"@types/ejs": "^3.1.5",
 		"@types/fs-extra": "^11.0.4",
 		"@types/nunjucks": "^3.2.6",
@@ -55,7 +54,6 @@
 		"glob": "^10.4.5",
 		"globals": "^16.3.0",
 		"k6": "^0.0.0",
-		"lerna": "^8.2.3",
 		"mongodb": "^6.17.0",
 		"nunjucks": "^3.2.4",
 		"redis": "^5.6.1",
