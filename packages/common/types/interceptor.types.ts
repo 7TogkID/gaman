@@ -30,3 +30,7 @@ export type InterceptorFactory = (
 	next: () => InterceptorNextHandler,
 	error: InterceptorErrorFn,
 ) => InterceptorNextHandler;
+
+export type Interceptor = {
+	handler: InterceptorHandler;
+};

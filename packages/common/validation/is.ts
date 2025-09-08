@@ -1,16 +1,28 @@
 import {
-	IS_INTERCEPTOR_FACTORY,
-	IS_MIDDLEWARE_FACTORY,
+	IS_EXCEPTION_HANDLER,
+	IS_INTERCEPTOR,
+	IS_MIDDLEWARE,
+	IS_ROUTES,
 } from '@gaman/common/contants.js';
 import {
-	InterceptorHandler,
-	MiddlewareHandler,
+	Interceptor,
+	Middleware,
+	Routes,
 } from '@gaman/common/types/index.js';
+import { ExceptionHandler } from '@gaman/core/index.js';
 
-export function isInterceptorHandler(v: any): v is InterceptorHandler {
-	return v[IS_INTERCEPTOR_FACTORY] as boolean;
+export function isInterceptor(v: any): v is Interceptor {
+	return v[IS_INTERCEPTOR] as boolean;
 }
 
-export function isMiddlewareHandler(v: any): v is MiddlewareHandler {
-	return v[IS_MIDDLEWARE_FACTORY] as boolean;
+export function isMiddleware(v: any): v is Middleware {
+	return v[IS_MIDDLEWARE] as boolean;
+}
+
+export function isExceptionHandler(v: any): v is ExceptionHandler {
+	return v[IS_EXCEPTION_HANDLER] as boolean;
+}
+
+export function isRoutes(v: any): v is Routes {
+	return v[IS_ROUTES] as boolean;
 }

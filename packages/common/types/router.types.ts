@@ -1,7 +1,9 @@
 import { HttpMethod } from '@gaman/common/enums/http-method.enum.js';
 import {
+	Interceptor,
 	InterceptorHandler,
 	Middleware,
+	MiddlewareHandler,
 	RequestHandler,
 } from '@gaman/common/types/index.js';
 import { ExceptionHandler } from '@gaman/core/exception/index.js';
@@ -12,17 +14,18 @@ export interface Route {
 	methods: HttpMethod[];
 	handler: RequestHandler | null;
 	middlewares: Middleware[];
-	interceptors: InterceptorHandler[];
+	interceptors: Interceptor[];
 	exceptions: ExceptionHandler[];
-	match: MatchFunction<Partial<Record<string, string | string[]>>>,
+	match: MatchFunction<Partial<Record<string, string | string[]>>>;
+	pipes: Array<MiddlewareHandler | InterceptorHandler | RequestHandler>;
 	name?: string;
 }
 
+export type Routes = Array<Route>;
+
 export interface RouteDefinition {
 	middleware(fn: Middleware | Array<Middleware>): RouteDefinition;
-	interceptor(
-		fn: InterceptorHandler | Array<InterceptorHandler>,
-	): RouteDefinition;
+	interceptor(fn: Interceptor | Array<Interceptor>): RouteDefinition;
 	exception(eh: ExceptionHandler | Array<ExceptionHandler>): RouteDefinition;
 	name(s: string): RouteDefinition;
 }

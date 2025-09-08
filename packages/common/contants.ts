@@ -2,13 +2,14 @@ export const SRC_DIR = 'src',
 	MAIN_BLOCK_PATH = `${SRC_DIR}/main.block.ts`,
 	INDEX_PATH = `${SRC_DIR}/index.ts`;
 /* -------------------------------------------------------------------------- */
-/*                                   FACTORY                                  */
+/*                                   IS WHAT?                                 */
 /* -------------------------------------------------------------------------- */
-export const IS_ROUTES_FACTORY = '___factory:routes___';
-export const IS_INTEGRATION_FACTORY = '___factory:integration___';
-export const IS_CONTROLLER_FACTORY = '___factory:controller___';
-export const IS_INTERCEPTOR_FACTORY = '___factory:interceptor___';
-export const IS_MIDDLEWARE_FACTORY = '___factory:middleware___';
+export const IS_ROUTES = '___is:routes___';
+export const IS_INTEGRATION = '___is:integration___';
+export const IS_CONTROLLER = '___is:controller___';
+export const IS_INTERCEPTOR = '___is:interceptor___';
+export const IS_MIDDLEWARE = '___is:middleware___';
+export const IS_EXCEPTION_HANDLER = '___is:exception___';
 
 /* -------------------------------------------------------------------------- */
 /*                                   HANDLER                                  */
