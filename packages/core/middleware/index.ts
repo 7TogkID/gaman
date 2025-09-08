@@ -1,5 +1,5 @@
 import {
-	IS_MIDDLEWARE_FACTORY,
+	IS_MIDDLEWARE,
 	IS_MIDDLEWARE_HANDLER,
 } from '@gaman/common/contants.js';
 import {
@@ -87,15 +87,18 @@ export function composeMiddleware<Config = any>(
 			writable: false,
 			enumerable: false,
 		});
-		return {
+
+		const middleware = {
 			handler,
 			config: useable_config,
 		};
+		Object.defineProperty(middleware, IS_MIDDLEWARE, {
+			value: true,
+			writable: false,
+			enumerable: false,
+		});
+
+		return middleware;
 	};
-	Object.defineProperty(factory, IS_MIDDLEWARE_FACTORY, {
-		value: true,
-		writable: false,
-		enumerable: false,
-	});
 	return factory;
 }

@@ -1,6 +1,24 @@
 import * as http from 'node:http';
 import { Router } from '@gaman/core/router/handler.js';
-import { parseArgs } from '@gaman/common/index.js';
+import {
+	Interceptor,
+	Middleware,
+	parseArgs,
+	Routes,
+} from '@gaman/common/index.js';
+import { ExceptionHandler } from './exception/index.js';
+import {
+	isExceptionHandler,
+	isInterceptor,
+	isMiddleware,
+	isRoutes,
+} from '@gaman/common/validation/is.js';
+import {
+	registerExceptions,
+	registerInterceptors,
+	registerMiddlewares,
+	registerRoutes,
+} from './registry.js';
 
 export class GamanApp extends Router {
 	private server?: http.Server<
@@ -8,7 +26,25 @@ export class GamanApp extends Router {
 		typeof http.ServerResponse
 	>;
 
-	async mountServer(address?: string) {
+	mount(...v: Array<Interceptor | Middleware | ExceptionHandler | Routes>) {
+		for (const value of v) {
+			if (isInterceptor(value)) {
+				registerInterceptors(value);
+			} else if (isMiddleware(value)) {
+				registerMiddlewares(value);
+			} else if (isExceptionHandler(value)) {
+				registerExceptions(value);
+			} else if (isRoutes(value)) {
+				registerRoutes(value);
+			}
+		}
+	}
+
+	async mountServer(
+		address?: string,
+	): Promise<
+		http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
+	> {
 		const { args } = parseArgs();
 
 		const DEFAULT_HOST =
@@ -30,10 +66,16 @@ export class GamanApp extends Router {
 			if (p) port = parseInt(p, 10);
 		}
 
-		return new Promise<void>((resolve, reject) => {
+		return new Promise<
+			http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
+		>((resolve, reject) => {
 			try {
-				this.server = http.createServer(this.requestHandle.bind(this));
-				this.server.listen(port, host == true ? '0.0.0.0' : `${host}`, resolve);
+				const server = http.createServer(this.requestHandle.bind(this));
+
+				this.server = server;
+				this.server.listen(port, host == true ? '0.0.0.0' : `${host}`, () => {
+					resolve(server);
+				});
 				this.server.on('error', reject);
 			} catch (err) {
 				reject(err);

@@ -3,7 +3,7 @@ import { GamanApp } from '@gaman/core/gaman-app.js';
 import { Response } from '@gaman/core/response.js';
 import { Context } from '@gaman/common/types/index.js';
 import * as http from 'node:http';
-import { IS_INTEGRATION_FACTORY } from '@gaman/common/contants.js';
+import { IS_INTEGRATION } from '@gaman/common/contants.js';
 
 /**
  * A factory function that defines a GamanJS integration.
@@ -71,6 +71,6 @@ export function defineIntegration(
 ): IntegrationFactory {
 
 	//@ts-ignore
-	factory[IS_INTEGRATION_FACTORY] = true;
+	factory[IS_INTEGRATION] = true;
 	return factory;
 }

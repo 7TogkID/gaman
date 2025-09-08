@@ -2,16 +2,16 @@ import * as http from 'node:http';
 import { createContext } from '@gaman/core/context/index.js';
 import {
 	Context,
+	Interceptor,
 	InterceptorHandler,
 	Middleware,
 	MiddlewareHandler,
 	MiddlewareOptions,
 	RequestHandler,
 	Route,
+	Routes,
 } from '@gaman/common/types/index.js';
-import {
-	IGNORED_LOG_FOR_PATH_REGEX,
-} from '@gaman/common/contants.js';
+import { IGNORED_LOG_FOR_PATH_REGEX } from '@gaman/common/contants.js';
 import { Response } from '@gaman/core/response.js';
 import { sortArrayByPriority } from '@gaman/common/utils/index.js';
 import {
@@ -30,8 +30,9 @@ import { ExceptionHandler } from '../exception/index.js';
 import { HttpException, InterceptorException } from '@gaman/common/index.js';
 
 export class Router {
-	async mountRoutes(rt: Route[]) {
-		registerRoutes(...rt);
+	async mountRoutes(rt: Routes) {
+		Log.warn(`'app.mountRoutes()' is deprecated, please use the new function 'app.mount()'`)
+		registerRoutes(rt);
 	}
 
 	/**
@@ -39,14 +40,16 @@ export class Router {
 	 * @EN Register middleware globally, so it can be used for all routes.
 	 */
 	async mountMiddleware(mw: Middleware | Array<Middleware>) {
+		Log.warn(`'app.mountMiddleware()' is deprecated, please use the new function 'app.mount()'`)
 		if (Array.isArray(mw)) {
 			registerMiddlewares(...mw);
 		} else {
 			registerMiddlewares(mw);
 		}
 	}
-	
+
 	async mountExceptionHandler(eh: ExceptionHandler | Array<ExceptionHandler>) {
+		Log.warn(`'app.mountExceptionHandler()' is deprecated, please use the new function 'app.mount()'`)
 		if (Array.isArray(eh)) {
 			registerExceptions(...eh);
 		} else {
@@ -54,7 +57,8 @@ export class Router {
 		}
 	}
 
-	async mountInterceptor(ih: InterceptorHandler | Array<InterceptorHandler>) {
+	async mountInterceptor(ih: Interceptor | Array<Interceptor>) {
+		Log.warn(`'app.mountInterceptor()' is deprecated, please use the new function 'app.mount()'`)
 		if (Array.isArray(ih)) {
 			registerInterceptors(...ih);
 		} else {
@@ -104,9 +108,8 @@ export class Router {
 				MiddlewareHandler | InterceptorHandler | RequestHandler
 			> = [
 				...sortedMiddlewares.map((m) => m.handler), // ? middleware harus paling awal
-				...getRegisteredInterceptors(),
-				...route.interceptors, // ? interceptor harus sebelum handler
-				route.handler, // ? final handler
+				...getRegisteredInterceptors().map((i) => i.handler),
+				...route.pipes
 			];
 
 			let index = -1;

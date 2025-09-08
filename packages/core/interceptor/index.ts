@@ -1,6 +1,7 @@
-import { IS_INTERCEPTOR_FACTORY } from '@gaman/common/contants.js';
+import { IS_INTERCEPTOR } from '@gaman/common/contants.js';
 import { InterceptorException } from '@gaman/common/error/index.js';
 import {
+	Interceptor,
 	InterceptorContext,
 	InterceptorErrorFn,
 	InterceptorFactory,
@@ -11,15 +12,13 @@ import { registerInterceptors } from '@gaman/core/registry.js';
 
 export function autoComposeInterceptor(
 	factory: InterceptorFactory,
-): InterceptorHandler {
-	const handler = composeInterceptor(factory);
-	registerInterceptors(handler);
-	return handler;
+): Interceptor {
+	const interceptor = composeInterceptor(factory);
+	registerInterceptors(interceptor);
+	return interceptor;
 }
 
-export function composeInterceptor(
-	factory: InterceptorFactory,
-): InterceptorHandler {
+export function composeInterceptor(factory: InterceptorFactory): Interceptor {
 	const handler: InterceptorHandler = (ctx, next) => {
 		const defaultError: InterceptorErrorFn = (message, statusCode = 400) => {
 			return new InterceptorException(message, statusCode, ctx);
@@ -55,11 +54,13 @@ export function composeInterceptor(
 		return factory(ctx as InterceptorContext, next, defaultError);
 	};
 
-	Object.defineProperty(handler, IS_INTERCEPTOR_FACTORY, {
+	const interceptor = { handler };
+
+	Object.defineProperty(interceptor, IS_INTERCEPTOR, {
 		value: true,
 		writable: false,
 		enumerable: false,
 	});
 
-	return handler;
+	return interceptor;
 }

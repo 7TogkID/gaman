@@ -1,14 +1,18 @@
 import { HttpMethod } from '@gaman/common/enums/http-method.enum.js';
 import {
+	InterceptorHandler,
 	Middleware,
+	MiddlewareHandler,
 	RequestHandler,
 	Route,
 	RouteDefinition,
+	Routes,
 } from '@gaman/common/types/index.js';
 import { ControllerFactory } from '@gaman/common/types/controller.types.js';
 import { normalizePath } from '@gaman/common/utils/utils.js';
 import { registerRoutes } from '@gaman/core/registry.js';
 import { match } from 'path-to-regexp';
+import { IS_ROUTES } from '@gaman/common/contants.js';
 
 type RouteFactory = (route: RouteBuilder) => void;
 class RouteBuilder {
@@ -55,6 +59,7 @@ class RouteBuilder {
 			middlewares: [...this.middlewares],
 			exceptions: [],
 			interceptors: [],
+			pipes: [],
 			match: match(fullPath),
 		};
 
@@ -196,28 +201,39 @@ class RouteBuilder {
 	}
 }
 
-export function autoComposeRoutes(callback: RouteFactory): Route[] {
+export function autoComposeRoutes(callback: RouteFactory): Routes {
 	const routes = composeRoutes(callback);
-	registerRoutes(...routes);
+	registerRoutes(routes);
 	return routes;
 }
 
-export function composeRoutes(callback: RouteFactory): Route[] {
+export function composeRoutes(callback: RouteFactory): Routes {
 	const builder = new RouteBuilder();
 	callback(builder);
-	return builder.getRoutes();
-}
 
-function compilePath(pattern: string): { regex: RegExp; keys: string[] } {
-	const keys: string[] = [];
-	const regexPattern = pattern
-		.replace(/\/:(\w+)/g, (_: string, key: string) => {
-			keys.push(key);
-			return '/(?<' + key + '>[^/]+)';
-		})
-		.replace(/\//g, '\\/');
-	return {
-		regex: new RegExp(`^${regexPattern}$`),
-		keys,
-	};
+	const routes = builder.getRoutes();
+
+	const useable_routes = routes.map((r) => {
+		const pipes: Array<
+			MiddlewareHandler | InterceptorHandler | RequestHandler
+		> = [
+			...r.interceptors.map((i) => i.handler), // ? lalu interceptor
+		];
+
+		if (r.handler) {
+			pipes.push(r.handler); // ? final handler
+		}
+
+		return {
+			...r,
+			pipes,
+		};
+	});
+
+	Object.defineProperty(useable_routes, IS_ROUTES, {
+		value: true,
+		writable: false,
+		enumerable: false,
+	});
+	return useable_routes;
 }
