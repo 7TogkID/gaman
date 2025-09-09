@@ -21,9 +21,7 @@ function register(rts: Routes) {
 	for (const route of rts) {
 		if (isDynamicPath(route.path)) {
 			dynamicRoutes.push(route);
-			console.log(route.path, ' Dynamic ROUTE');
 		} else {
-			console.log(route.path, ' Static ROUTE');
 			if (!staticRoutes.has(route.path)) {
 				staticRoutes.set(route.path, new Map());
 			}
