@@ -1,10 +1,18 @@
 name: CI
 
 on:
-  push:
-    branches: ['master']
-  pull_request:
-    branches: ['master']
+  workflow_dispatch:
+
+  # push:
+  #   branches: ['master']
+  #   paths:
+  #     - 'packages/**'
+  #     - 'plugins/**'
+  # pull_request:
+  #   branches: ['master']
+  #   paths:
+  #     - 'packages/**'
+  #     - 'plugins/**'
 
 jobs:
   node:
@@ -43,7 +51,7 @@ jobs:
 
       - name: Install dependencies
         run: bun install
-      
+
       - name: Build gaman
         run: bun run build
 
@@ -66,7 +74,7 @@ jobs:
 
       - name: Install dependencies
         run: bun install
-      
+
       - name: Build gaman
         run: bun run build
 
