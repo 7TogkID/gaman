@@ -4,11 +4,9 @@
  */
 
 import { join } from 'path';
-import { defineIntegration } from '@gaman/core/integration';
-import { Response } from '@gaman/core/response';
-import { Log } from '@gaman/common/utils/logger';
 import type { ConfigureOptions, Environment } from 'nunjucks';
-import { Priority } from '@gaman/common/utils/priority';
+import { composeMiddleware } from '@gaman/core';
+import { DefaultMiddlewareOptions, Log } from '@gaman/common';
 
 let njk: typeof import('nunjucks');
 
@@ -33,19 +31,14 @@ async function loadNunjucks() {
  * @url https://mozilla.github.io/nunjucks/api.html#configure
  */
 export interface GamanNunjucksOptions
-	extends Omit<ConfigureOptions, 'express'> {
+	extends Omit<ConfigureOptions, 'express'>,
+		DefaultMiddlewareOptions {
 	/**
 	 * Directory path for views.
 	 * This specifies the root directory where your Nunjucks templates are located.
 	 * Default: `src/views`.
 	 */
 	viewPath?: string;
-
-	/**
-	 * Priority Integrations
-	 * Default: `normal`
-	 */
-	priority?: Priority;
 
 	/**
 	 * Custom environment handler for Nunjucks.
@@ -104,12 +97,11 @@ export function nunjucks(ops: GamanNunjucksOptions = {}) {
 
 	let env: Environment;
 
-	return defineIntegration(() => ({
-		name: 'nunjucks',
-		priority: ops.priority || 'normal',
-		async onLoad() {
+	const middleware = composeMiddleware(async (_, next) => {
+		if (!njk) {
 			await loadNunjucks();
-
+		}
+		if (njk) {
 			// Init Nunjucks Environment
 			env = njk.configure(join(process.cwd(), viewPath), njkOps);
 
@@ -122,21 +114,31 @@ export function nunjucks(ops: GamanNunjucksOptions = {}) {
 					njkOps.env(env);
 				}
 			}
-		},
-		async onResponse(_ctx, res) {
-			const renderData = res.view;
-			if (renderData == null) return res;
+		}
 
-			const pathname = renderData.getName().includes('.')
-				? renderData.getName()
-				: `${renderData.getName()}${njkOps.extension}`;
+		const res = await next();
 
-			return new Promise((resolve, reject) => {
-				env.render(pathname, renderData.getData(), (err, html) => {
-					if (err) return reject(err);
-					resolve(Response.html(html || '', { status: 200 }));
-				});
+		const renderData = res.view;
+		if (renderData == null) return res;
+
+		const pathname = renderData.getName().includes('.')
+			? renderData.getName()
+			: `${renderData.getName()}${njkOps.extension}`;
+
+		return new Promise((resolve, reject) => {
+			env.render(pathname, renderData.getData(), (err, html) => {
+				if (err) return reject(err);
+
+				res.headers.set('Content-Type', 'text/html');
+				res.body = html || '';
+				resolve(res);
 			});
-		},
-	}));
+		});
+	});
+
+	return middleware({
+		priority: ops.priority,
+		includes: ops.includes,
+		excludes: ops.excludes,
+	});
 }
