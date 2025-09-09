@@ -17,7 +17,6 @@ import {
 } from '@gaman/common/contants.js';
 
 export async function createContext(
-	params: any,
 	req: http.IncomingMessage,
 	res: http.ServerResponse,
 ): Promise<Context> {
@@ -43,7 +42,7 @@ export async function createContext(
 		param: (name) => {
 			return gamanRequest.params[name];
 		},
-		params,
+		params: Object.create(null), // ini akan di set nanti di route
 
 		query: createQuery(url.searchParams),
 
@@ -122,12 +121,12 @@ export async function createContext(
 		ip: getClientIP(req),
 	};
 	const cookies = new GamanCookies(gamanRequest);
-		const ctx: Context = {
+	const ctx: Context = {
 		locals: {},
 		env: process.env,
 		url,
 		cookies,
-		
+
 		get request() {
 			return gamanRequest;
 		},
@@ -178,7 +177,7 @@ export async function createContext(
 			return k in dataSet;
 		},
 		delete(k) {
-			delete dataSet[k]
+			delete dataSet[k];
 		},
 
 		// @ts-ignore

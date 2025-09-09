@@ -1,4 +1,5 @@
 import { IS_INTERCEPTOR } from '@gaman/common/contants.js';
+import interceptorData from '@gaman/common/data/interceptor-data.js';
 import { InterceptorException } from '@gaman/common/error/index.js';
 import {
 	Interceptor,
@@ -8,13 +9,12 @@ import {
 	InterceptorHandler,
 	Query,
 } from '@gaman/common/types/index.js';
-import { registerInterceptors } from '@gaman/core/registry.js';
 
 export function autoComposeInterceptor(
 	factory: InterceptorFactory,
 ): Interceptor {
 	const interceptor = composeInterceptor(factory);
-	registerInterceptors(interceptor);
+	interceptorData.register(interceptor);
 	return interceptor;
 }
 

@@ -10,9 +10,10 @@ import {
 } from '@gaman/common/types/index.js';
 import { ControllerFactory } from '@gaman/common/types/controller.types.js';
 import { normalizePath } from '@gaman/common/utils/utils.js';
-import { registerRoutes } from '@gaman/core/registry.js';
 import { match } from 'path-to-regexp';
 import { IS_ROUTES } from '@gaman/common/contants.js';
+import { sortArrayByPriority } from '@gaman/common/index.js';
+import routesData from '@gaman/common/data/routes-data.js';
 
 type RouteFactory = (route: RouteBuilder) => void;
 class RouteBuilder {
@@ -203,7 +204,7 @@ class RouteBuilder {
 
 export function autoComposeRoutes(callback: RouteFactory): Routes {
 	const routes = composeRoutes(callback);
-	registerRoutes(routes);
+	routesData.register(routes);
 	return routes;
 }
 
@@ -214,9 +215,17 @@ export function composeRoutes(callback: RouteFactory): Routes {
 	const routes = builder.getRoutes();
 
 	const useable_routes = routes.map((r) => {
+		const sortedMiddlewares = sortArrayByPriority<Middleware>(
+			r.middlewares,
+			(mw) => {
+				return mw.config.priority;
+			},
+		);
+
 		const pipes: Array<
 			MiddlewareHandler | InterceptorHandler | RequestHandler
 		> = [
+			...sortedMiddlewares.map((i) => i.handler),
 			...r.interceptors.map((i) => i.handler), // ? lalu interceptor
 		];
 

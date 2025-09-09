@@ -22,7 +22,8 @@
 	},
 	"homepage": "https://gaman.7togk.id",
 	"publishConfig": {
-		"registry": "https://registry.npmjs.org"
+		"registry": "https://registry.npmjs.org",
+		"access": "public"
 	},
 	"gitHead": "f3c12a3d4b0f5638afca69b3bf3f742a8e5a9997"
 }

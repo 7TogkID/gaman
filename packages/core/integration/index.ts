@@ -1,9 +1,9 @@
-import { Priority } from '@gaman/common/utils/priority.js';
 import { GamanApp } from '@gaman/core/gaman-app.js';
 import { Response } from '@gaman/core/response.js';
 import { Context } from '@gaman/common/types/index.js';
 import * as http from 'node:http';
 import { IS_INTEGRATION } from '@gaman/common/contants.js';
+import { Priority } from '@gaman/common/enums/priority.enum.js';
 
 /**
  * A factory function that defines a GamanJS integration.

@@ -1,12 +1,4 @@
-export type Priority = "very-high" | "high" | "normal" | "low" | "very-low";
-
-const priorityMap: Record<Priority, number> = {
-  "very-high": 1,
-  high: 2,
-  normal: 3,
-  low: 4,
-  "very-low": 5,
-};
+import { Priority } from '../enums/priority.enum.js';
 
 /**
  * Sort array by priority using key or custom selector function.
@@ -16,25 +8,25 @@ const priorityMap: Record<Priority, number> = {
  * @param order - 'asc' | 'desc'. Default: 'asc'.
  */
 export function sortArrayByPriority<T>(
-  array: T[],
-  selector: keyof T | ((item: T) => Priority | undefined),
-  order: "asc" | "desc" = "asc"
+	array: T[],
+	selector: keyof T | ((item: T) => Priority | undefined),
+	order: 'asc' | 'desc' = 'asc',
 ): T[] {
-  return [...array].sort((a, b) => {
-    const aPriority =
-      typeof selector === "function"
-        ? selector(a)
-        : (a[selector] as Priority) || "normal";
-    const bPriority =
-      typeof selector === "function"
-        ? selector(b)
-        : (b[selector] as Priority) || "normal";
+	return [...array].sort((a, b) => {
+		const aPriority =
+			typeof selector === 'function'
+				? selector(a)
+				: (a[selector] as Priority) || Priority.NORMAL;
+		const bPriority =
+			typeof selector === 'function'
+				? selector(b)
+				: (b[selector] as Priority) || Priority.NORMAL;
 
-    const aValue = priorityMap[aPriority!] || Number.MAX_VALUE;
-    const bValue = priorityMap[bPriority!] || Number.MAX_VALUE;
+		const aValue = aPriority || Number.MAX_VALUE;
+		const bValue = bPriority || Number.MAX_VALUE;
 
-    const comparison = aValue - bValue;
+		const comparison = aValue - bValue;
 
-    return order === "asc" ? comparison : -comparison;
-  });
+		return order === 'asc' ? comparison : -comparison;
+	});
 }

@@ -13,12 +13,11 @@ import {
 	isMiddleware,
 	isRoutes,
 } from '@gaman/common/validation/is.js';
-import {
-	registerExceptions,
-	registerInterceptors,
-	registerMiddlewares,
-	registerRoutes,
-} from './registry.js';
+import interceptorData from '@gaman/common/data/interceptor-data.js';
+import middlewareData from '@gaman/common/data/middleware-data.js';
+import exceptionData from '@gaman/common/data/exception-data.js';
+import routesData from '@gaman/common/data/routes-data.js';
+
 
 export class GamanApp extends Router {
 	private server?: http.Server<
@@ -29,13 +28,13 @@ export class GamanApp extends Router {
 	mount(...v: Array<Interceptor | Middleware | ExceptionHandler | Routes>) {
 		for (const value of v) {
 			if (isInterceptor(value)) {
-				registerInterceptors(value);
+				interceptorData.register(value);
 			} else if (isMiddleware(value)) {
-				registerMiddlewares(value);
+				middlewareData.register(value);
 			} else if (isExceptionHandler(value)) {
-				registerExceptions(value);
+				exceptionData.register(value);
 			} else if (isRoutes(value)) {
-				registerRoutes(value);
+				routesData.register(value);
 			}
 		}
 	}

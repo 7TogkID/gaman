@@ -1,7 +1,7 @@
-import { Priority } from '@gaman/common/utils/index.js';
 import { Context } from '@gaman/common/types/index.js';
 import { Response } from '@gaman/core/response.js';
 import { MatchFunction } from 'path-to-regexp';
+import { Priority } from '../enums/priority.enum.js';
 
 export type MiddlewareHandler = (
 	ctx: Context,

@@ -2,13 +2,14 @@ import {
 	IS_MIDDLEWARE,
 	IS_MIDDLEWARE_HANDLER,
 } from '@gaman/common/contants.js';
+import middlewareData from '@gaman/common/data/middleware-data.js';
+import { Priority } from '@gaman/common/enums/priority.enum.js';
 import {
 	DefaultMiddlewareOptions,
 	Middleware,
 	MiddlewareHandler,
 	MiddlewareOptions,
 } from '@gaman/common/types/index.js';
-import { registerMiddlewares } from '@gaman/core/registry.js';
 import { match } from 'path-to-regexp';
 
 export function autoComposeMiddleware<Config = any>(
@@ -16,7 +17,7 @@ export function autoComposeMiddleware<Config = any>(
 	defaultConfig?: Config & DefaultMiddlewareOptions,
 ): Middleware {
 	const mw = composeMiddleware(mh, defaultConfig)();
-	registerMiddlewares(mw);
+	middlewareData.register(mw);
 	return mw;
 }
 
@@ -35,7 +36,8 @@ export function composeMiddleware<Config = any>(
 			...customConfig,
 		};
 		const useable_config: MiddlewareOptions = {
-			priority: config.priority || 'normal',
+			priority:
+				config.priority === undefined ? Priority.NORMAL : config.priority,
 			includes: [],
 			excludes: [],
 		};
@@ -97,7 +99,6 @@ export function composeMiddleware<Config = any>(
 			writable: false,
 			enumerable: false,
 		});
-
 		return middleware;
 	};
 	return factory;

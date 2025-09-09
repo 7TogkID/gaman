@@ -13,56 +13,67 @@ import {
 } from '@gaman/common/types/index.js';
 import { IGNORED_LOG_FOR_PATH_REGEX } from '@gaman/common/contants.js';
 import { Response } from '@gaman/core/response.js';
-import { sortArrayByPriority } from '@gaman/common/utils/index.js';
-import {
-	getRegisteredExceptions,
-	getRegisteredInterceptors,
-	getRegisteredMiddlewares,
-	getRegisteredRoutes,
-	registerExceptions,
-	registerInterceptors,
-	registerMiddlewares,
-	registerRoutes,
-} from '@gaman/core/registry.js';
+
 import { Readable } from 'node:stream';
 import { GamanCookies } from '@gaman/core/context/cookies/index.js';
 import { ExceptionHandler } from '../exception/index.js';
 import { HttpException, InterceptorException } from '@gaman/common/index.js';
+import middlewareData from '@gaman/common/data/middleware-data.js';
+import routesData from '@gaman/common/data/routes-data.js';
+import exceptionData from '@gaman/common/data/exception-data.js';
+import interceptorData from '@gaman/common/data/interceptor-data.js';
+import { shouldRunMiddleware } from '@gaman/common/utils/should-middleware.js';
 
 export class Router {
+	/**
+	 * @deprecated
+	 */
 	async mountRoutes(rt: Routes) {
-		Log.warn(`'app.mountRoutes()' is deprecated, please use the new function 'app.mount()'`)
-		registerRoutes(rt);
+		Log.warn(
+			`'app.mountRoutes()' is deprecated, please use the new function 'app.mount()'`,
+		);
+		routesData.register(rt);
 	}
 
 	/**
-	 * @ID Mendaftarkan middleware secara global, sehingga bisa di pakai untuk semua routes.
-	 * @EN Register middleware globally, so it can be used for all routes.
+	 * @deprecated
 	 */
 	async mountMiddleware(mw: Middleware | Array<Middleware>) {
-		Log.warn(`'app.mountMiddleware()' is deprecated, please use the new function 'app.mount()'`)
+		Log.warn(
+			`'app.mountMiddleware()' is deprecated, please use the new function 'app.mount()'`,
+		);
 		if (Array.isArray(mw)) {
-			registerMiddlewares(...mw);
+			middlewareData.register(...mw);
 		} else {
-			registerMiddlewares(mw);
+			middlewareData.register(mw);
 		}
 	}
 
+	/**
+	 * @deprecated
+	 */
 	async mountExceptionHandler(eh: ExceptionHandler | Array<ExceptionHandler>) {
-		Log.warn(`'app.mountExceptionHandler()' is deprecated, please use the new function 'app.mount()'`)
+		Log.warn(
+			`'app.mountExceptionHandler()' is deprecated, please use the new function 'app.mount()'`,
+		);
 		if (Array.isArray(eh)) {
-			registerExceptions(...eh);
+			exceptionData.register(...eh);
 		} else {
-			registerExceptions(eh);
+			exceptionData.register(eh);
 		}
 	}
 
+	/**
+	 * @deprecated
+	 */
 	async mountInterceptor(ih: Interceptor | Array<Interceptor>) {
-		Log.warn(`'app.mountInterceptor()' is deprecated, please use the new function 'app.mount()'`)
+		Log.warn(
+			`'app.mountInterceptor()' is deprecated, please use the new function 'app.mount()'`,
+		);
 		if (Array.isArray(ih)) {
-			registerInterceptors(...ih);
+			interceptorData.register(...ih);
 		} else {
-			registerInterceptors(ih);
+			interceptorData.register(ih);
 		}
 	}
 
@@ -74,51 +85,64 @@ export class Router {
 		const method = req.method?.toUpperCase() || 'GET';
 		const urlString = req.url || '/';
 		const url = new URL(urlString, `http://${req.headers.host}`);
+		const ctx = await createContext(req, res);
 
-		// ? mencari route yang cocok
-		const { route, params } = this.findRoute(url.pathname, method);
-		if (!route?.handler) {
-			return await this.handleResponse(
-				new Response(undefined, { status: 404 }),
-				res,
-			);
-		}
+		// ? Build Pipeline: monitor middlewares
+		const pipeline: Array<
+			MiddlewareHandler | InterceptorHandler | RequestHandler
+		> = middlewareData
+			.getMonitorMiddlewares()
+			.filter((mw) => shouldRunMiddleware(mw, ctx.request.pathname, method))
+			.map((mw) => mw.handler);
 
-		const ctx = await createContext(params, req, res);
 		Log.setRoute(ctx.request.pathname || '/');
-		Log.setMethod(ctx.request.method.toUpperCase());
+		Log.setMethod(method);
 
+		let route: Route | undefined;
 		try {
-			// **** MIDDLEWARE ****
-			// ? filter global middlewares dari options kek includes: [] dan excludes: []
-			const activeMiddlewares = getRegisteredMiddlewares().filter((mw) =>
-				this.shouldRunMiddleware(mw, ctx.request.pathname, ctx.request.method),
-			);
-
-			// ? sort by priority global middlewares + route.middlewares
-			const sortedMiddlewares = sortArrayByPriority<Middleware>(
-				[...activeMiddlewares, ...route.middlewares],
-				(mw) => {
-					return mw.config.priority;
-				},
-			);
-
-			// ? Build Pipeline: middleware[] + handler
-			const handlers: Array<
-				MiddlewareHandler | InterceptorHandler | RequestHandler
-			> = [
-				...sortedMiddlewares.map((m) => m.handler), // ? middleware harus paling awal
-				...getRegisteredInterceptors().map((i) => i.handler),
-				...route.pipes
-			];
-
 			let index = -1;
+			let done_find_route = false;
 			const next = async (i: number): Promise<Response> => {
 				if (i <= index) {
 					throw new Error('next() called multiple times');
 				}
 				index = i;
-				const fn = handlers[i];
+
+				let fn = pipeline[i];
+
+				/**
+				 * ? jika next nya kosong dan `done_find_route` juga false maka saatnya nyari route
+				 * ? Karna sebelumnya kan jalanin `MONITOR_MIDDLEWARES`
+				 */
+				if (!fn && !done_find_route) {
+					done_find_route = true;
+					// ? mencari route yang cocok
+					const { route: r, params } = routesData.findRoute(url.pathname, method);
+					if (!r?.handler) {
+						return new Response(undefined, { status: 404 });
+					}
+
+					route = r; // ! set route
+					ctx.request.params = params; // ! set params
+
+					// **** MIDDLEWARE ****
+					// ? filter global middlewares dari options kek includes: [] dan excludes: []
+					const activeMiddlewares = middlewareData
+						.getMiddlewares()
+						.filter((mw) =>
+							shouldRunMiddleware(mw, ctx.request.pathname, method),
+						)
+						.map((m) => m.handler);
+
+					pipeline.push(
+						...activeMiddlewares, // ? middleware harus paling awal
+						...interceptorData.getInterceptors().map((i) => i.handler),
+						...r.pipes,
+					);
+
+					fn = pipeline[i]; // ! set ulang
+				}
+
 				if (!fn) return new Response(undefined, { status: 404 });
 				return await fn(ctx, () => next(i + 1));
 			};
@@ -127,8 +151,8 @@ export class Router {
 			await this.handleResponse(result as Response, res, ctx);
 		} catch (error: any) {
 			for (const except of [
-				...getRegisteredExceptions(),
-				...route.exceptions,
+				...exceptionData.getExceptionHandlers(),
+				...(route?.exceptions || []),
 			]) {
 				let response;
 				if (error.gamanException) {
@@ -189,44 +213,6 @@ export class Router {
 		}
 	}
 
-	protected shouldRunMiddleware(
-		middleware: Middleware,
-		path: string,
-		method: string,
-	): boolean {
-		const config = middleware.config;
-
-		const methodMatch = (
-			p: MiddlewareOptions['includes' | 'excludes'][0],
-			m: string,
-		) => {
-			// ? kalau methods kosong di anggap "ALL"
-			if (p.methods.length <= 0) {
-				return true;
-			}
-
-			return p.methods.some((mm) => mm.toUpperCase() === m.toUpperCase());
-		};
-
-		// ! check includes: harus ada minimal satu yang match
-		if (
-			config.includes.length > 0 &&
-			!config.includes.some((p) => p.match(path) && methodMatch(p, method))
-		) {
-			return false;
-		}
-
-		// ! check excludes: jika ada yang match, skip
-		if (
-			config.excludes.length > 0 &&
-			config.excludes.some((p) => p.match(path) && methodMatch(p, method))
-		) {
-			return false;
-		}
-
-		return true;
-	}
-
 	protected async handleResponse(
 		response: Response | undefined,
 		res: http.ServerResponse,
@@ -283,27 +269,5 @@ export class Router {
 		return res.end(response.body);
 	}
 
-	private findRoute(
-		path: string,
-		method: string,
-	): {
-		route: Route | undefined;
-		params: any;
-	} {
-		for (const route of getRegisteredRoutes()) {
-			const methods = route.methods;
-			if (
-				!methods.length ||
-				methods.includes('ALL') ||
-				methods.includes(method.toUpperCase() as any)
-			) {
-				const result = route.match(path);
-				if (result) {
-					return { route, params: result.params };
-				}
-			}
-		}
-
-		return { route: undefined, params: {} };
-	}
+	
 }
