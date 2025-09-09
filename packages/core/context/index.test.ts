@@ -63,7 +63,7 @@ describe('createContext(app, )', () => {
 		});
 		const res = mockResponse();
 
-		const ctx = await createContext(app, req, res);
+		const ctx = await createContext(req, res);
 
 		expect(ctx.query('name')).toBe('joni');
 		expect(ctx.header('x-forwarded-for')).toBe('1.2.3.4');
@@ -82,7 +82,7 @@ describe('createContext(app, )', () => {
 		});
 		const res = mockResponse();
 
-		const ctx = await createContext(app, req, res);
+		const ctx = await createContext(req, res);
 		const json = await ctx.json<{ message: string }>();
 
 		expect(json.message).toBe('hello');
@@ -101,7 +101,7 @@ describe('createContext(app, )', () => {
 		});
 		const res = mockResponse();
 
-		const ctx = await createContext(app, req, res);
+		const ctx = await createContext(req, res);
 		const form = await ctx.formData();
 
 		expect(form.get('username')?.asString()).toBe('joni');
@@ -133,7 +133,7 @@ describe('createContext(app, )', () => {
 			body: body,
 		});
 		const res = mockResponse();
-		const ctx = await createContext(app, req, res);
+		const ctx = await createContext(req, res);
 
 		const form = await ctx.formData();
 		expect(form.get('username')?.asString()).toBe('joni');
