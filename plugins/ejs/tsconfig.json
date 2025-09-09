@@ -1,8 +1,9 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "composite": true,
-    "declaration": true,
-    "declarationMap": false
-  },
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"module": "nodenext",
+		"composite": true,
+		"declaration": true,
+		"declarationMap": false
+	}
 }

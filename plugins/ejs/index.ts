@@ -4,10 +4,8 @@
  */
 import { type Options } from 'ejs';
 import { join } from 'path';
-import { defineIntegration } from '@gaman/core/integration';
-import { Response } from '@gaman/core/response';
-import { Log } from '@gaman/common/utils/logger';
-import { Priority } from '@gaman/common/utils/priority';
+import { Log, DefaultMiddlewareOptions } from '@gaman/common';
+import { composeMiddleware } from '@gaman/core/index.js';
 
 let _ejs: typeof import('ejs');
 
@@ -31,44 +29,47 @@ async function loadEJS() {
  * You can find the full list of supported options at:
  * @url https://github.com/mde/ejs?tab=readme-ov-file#options
  */
-export interface GamanEJSOptions extends Options {
+export interface GamanEJSOptions extends Options, DefaultMiddlewareOptions {
 	/**
 	 * Directory path for views.
 	 * This specifies the root directory where your EJS templates are located.
 	 * Default: `src/views`.
 	 */
 	viewPath?: string;
-
-	/**
-	 * Priority Integrations
-	 * @default normal
-	 */
-	priority?: Priority;
 }
 
 export function ejs(ops: GamanEJSOptions = {}) {
 	const { viewPath, ...ejsOps } = ops;
-	return defineIntegration(() => ({
-		name: 'ejs',
-		priority: ops.priority || 'normal',
-		async onLoad() {
-			await loadEJS();
-		},
-		async onResponse(_ctx, res) {
-			const renderData = res.view;
-			if (renderData == null) return res; // ! next() if renderData null
 
-			const filePath = join(
-				process.cwd(),
-				viewPath || 'src/views',
-				`${renderData.getName()}.ejs`,
-			);
-			const rendered = await _ejs.renderFile(
-				filePath,
-				renderData.getData(),
-				ejsOps,
-			);
-			return Response.html(rendered, { status: 200 });
-		},
-	}));
+	const middleware = composeMiddleware(async (ctx, next) => {
+		if (!_ejs) {
+			await loadEJS();
+		}
+
+		const res = await next();
+
+		const renderData = res.view;
+		if (renderData == null) return res; // ! next() if renderData null
+
+		const filePath = join(
+			process.cwd(),
+			viewPath || 'src/views',
+			`${renderData.getName()}.ejs`,
+		);
+		const rendered = await _ejs.renderFile(
+			filePath,
+			renderData.getData(),
+			ejsOps,
+		);
+
+		res.headers.set('Content-Type', 'text/html');
+		res.body = rendered;
+
+		return res;
+	});
+	return middleware({
+		priority: ops.priority,
+		includes: ops.includes,
+		excludes: ops.excludes,
+	});
 }
