@@ -1,6 +1,7 @@
-import { autoComposeMiddleware } from '@gaman/core';
+import { Priority } from '@gaman/common';
+import { autoComposeMiddleware, composeMiddleware } from '@gaman/core';
 
-export default autoComposeMiddleware(
+export default composeMiddleware(
 	(ctx, next) => {
 		// todo something
 		console.log('hai');
@@ -8,12 +9,6 @@ export default autoComposeMiddleware(
 		return next();
 	},
 	{
-		priority: 'high',
-		includes: [
-			{
-				path: '/user{/*splat}',
-			},
-			'/anu',
-		],
+		priority: Priority.MONITOR,
 	},
 );

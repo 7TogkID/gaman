@@ -12,10 +12,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@gaman/basic-auth": "file:.yalc/@gaman/basic-auth",
     "@gaman/cli": "file:.yalc/@gaman/cli",
     "@gaman/common": "file:.yalc/@gaman/common",
     "@gaman/core": "file:.yalc/@gaman/core",
-    "@gaman/cors": "file:.yalc/@gaman/cors"
+    "@gaman/cors": "file:.yalc/@gaman/cors",
+    "@gaman/ejs": "file:.yalc/@gaman/ejs",
+    "@gaman/nunjucks": "file:.yalc/@gaman/nunjucks",
+    "@gaman/static": "file:.yalc/@gaman/static"
   },
   "devDependencies": {
     "@types/node": "^24.3.0"

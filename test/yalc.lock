@@ -2,21 +2,37 @@
   "version": "v1",
   "packages": {
     "@gaman/core": {
-      "signature": "7d6f4d77d366dcefddcb8d45c1e22aa8",
+      "signature": "b86012882f8b39bdaac67a8f26799907",
       "file": true
     },
     "@gaman/common": {
-      "signature": "1fca3ecf1ff1b98c55df7f7600014e69",
+      "signature": "60f050870037ff6f554270200dc6d717",
       "file": true
     },
     "@gaman/cli": {
-      "signature": "239ab2cc78422e90a57563ee93fa1da3",
+      "signature": "fa7cf10a23b5291e23084aa398672cb9",
       "file": true
     },
     "@gaman/cors": {
-      "signature": "06ea7475f606f8f376f5924e1607a7c5",
+      "signature": "451b3823f03c89ff4aa871e6f49a1d2a",
       "file": true,
       "replaced": "^1.0.1"
+    },
+    "@gaman/nunjucks": {
+      "signature": "3529832c4eaf05d9037c375949521a7a",
+      "file": true
+    },
+    "@gaman/ejs": {
+      "signature": "bef40efaea89b016b73c05c8baabfdf4",
+      "file": true
+    },
+    "@gaman/basic-auth": {
+      "signature": "e8fee2cad3fe3735a00ababd5626fc44",
+      "file": true
+    },
+    "@gaman/static": {
+      "signature": "38b63abc2c2f226be87de45c9844f897",
+      "file": true
     }
   }
 }

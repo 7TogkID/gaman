@@ -1,17 +1,14 @@
 import { TextFormat } from '@gaman/common';
 import { defineBootstrap } from '@gaman/core';
-import { cors } from '@gaman/cors';
+import AppRoutes from './routes/AppRoutes';
+import { ejs } from '@gaman/ejs';
+import { staticServe } from '@gaman/static';
+import AppMiddleware from './middlewares/AppMiddleware';
 
 defineBootstrap(async (app) => {
-	app.mountMiddleware(
-		cors({
-			allowMethods: ['post'],
+	app.mount(AppRoutes, ejs(), staticServe(), AppMiddleware());
 
-		}),
-	);
-	// app.mountExceptionHandler(ErrorHandle)
 	await app.mountServer(':3431');
-	console.log(process.env.NODE_ENV);
 	Log.log(
 		`Server is running at ${TextFormat.UNDERLINE}http://localhost:3431${TextFormat.RESET}`,
 	);
