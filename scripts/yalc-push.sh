@@ -21,6 +21,15 @@ yalc push
 cd ../../plugins/cors
 yalc push
 
+cd ../static
+yalc push
+
+cd ../ejs
+yalc push
+
+cd ../nunjucks
+yalc push
+
 # Return to the root directory
 cd ../..
 
