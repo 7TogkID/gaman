@@ -5,9 +5,9 @@
  * credentials and dynamic verification logic.
  */
 
-import { Context } from '@gaman/common/types';
+import { Context, DefaultMiddlewareOptions } from '@gaman/common';
 import { composeMiddleware } from '@gaman/core';
-import { Response } from '@gaman/core/response';
+import { Response } from '@gaman/core/response.js';
 
 export type MessageFunction = (
 	ctx: Context,
@@ -19,7 +19,7 @@ export type MessageFunction = (
  * You can use either a static username/password combination or a dynamic
  * `verifyAuth` function to validate credentials.
  */
-export type BasicAuthOptions =
+export type BasicAuthOptions = (
 	| {
 			/** The static username for authentication. */
 			username: string;
@@ -50,7 +50,9 @@ export type BasicAuthOptions =
 			 * Can be a string, object, or a function that generates a response message.
 			 */
 			invalidAuthMessage?: string | object | MessageFunction;
-	  };
+	  }
+) &
+	DefaultMiddlewareOptions;
 
 /**
  * Basic Authentication middleware for Gaman.
@@ -93,7 +95,7 @@ export const basicAuth = (options: BasicAuthOptions) => {
 		return credentials.split(':');
 	}
 
-	return composeMiddleware(async (ctx, next) => {
+	const middleware = composeMiddleware(async (ctx, next) => {
 		const cred = getCredentials(ctx.request.headers.get('Authorization'));
 
 		// Validate credentials
@@ -127,5 +129,11 @@ export const basicAuth = (options: BasicAuthOptions) => {
 		return typeof responseMsg === 'string'
 			? new Response(responseMsg, { status, headers })
 			: Response.json(responseMsg, { status, headers });
+	});
+
+	return middleware({
+		priority: options.priority,
+		includes: options.includes,
+		excludes: options.excludes,
 	});
 };
