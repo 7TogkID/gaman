@@ -29,12 +29,15 @@
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["packages/**/*", "plugins/cors"],
-	"exclude": [
-		"node_modules",
-		"dist",
-		"**/*.test.*",
+	"include": [
+		"packages/**/*",
+		"plugins/cors",
+		"plugins/nunjucks",
+		"plugins/ejs",
+		"plugins/basic-auth",
+		"plugins/static"
 	],
+	"exclude": ["node_modules", "dist", "**/*.test.*"],
 	"files": [],
 	"references": [
 		{

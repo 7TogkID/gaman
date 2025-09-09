@@ -37,6 +37,13 @@
 		"resolveFullPaths": true,
 		"verbose": false
 	},
-	"include": ["packages/**/*", "plugins/cors"],
+	"include": [
+		"packages/**/*",
+		"plugins/cors",
+		"plugins/nunjucks",
+		"plugins/ejs",
+		"plugins/basic-auth",
+		"plugins/static",
+	],
 	"exclude": ["node_modules", "dist", "**/*.test.*"]
 }

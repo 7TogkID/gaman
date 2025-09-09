@@ -12,12 +12,16 @@
 		"test": "vitest run",
 		"test:server": "npm run yalc:push && cd test && npm run dev",
 		"version-packages": "npx changeset version",
-		"publish-packages": "npm run build && npx changeset publish --tag latest",
+		"publish-packages": "npm run build && npx changeset publish ",
 		"yalc:push": "./scripts/yalc-push.sh"
 	},
 	"workspaces": [
 		"packages/*",
-		"plugins/cors"
+		"plugins/cors",
+		"plugins/nunjucks",
+		"plugins/ejs",
+		"plugins/basic-auth",
+		"plugins/static"
 	],
 	"author": "angga7togk",
 	"license": "MIT",
