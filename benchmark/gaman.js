@@ -4,10 +4,11 @@ import { check } from "k6";
 export let options = {
   vus: 2000,
   duration: "1m",
-  // thresholds: {
-  //   http_req_duration: ["p(95)<100"],
-  //   http_req_failed: ["rate<0.01"],
-  // },
+  
+  thresholds: {
+    http_req_duration: ["p(95)<100"],
+    http_req_failed: ["rate<0.01"],
+  },
 };
 
 export default function () {

@@ -1,0 +1,25 @@
+{
+  "name": "crud-x-prismajs",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "gaman dev",
+    "build": "gaman build",
+    "start": "gaman start"
+  },
+  "keywords": [],
+  "author": "",
+  "description": "",
+  "dependencies": {
+    "@gaman/cli": "^1.2.0",
+    "@gaman/common": "^1.2.0",
+    "@gaman/core": "^1.2.0",
+    "@prisma/client": "^6.16.0",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.16.0"
+  }
+}
