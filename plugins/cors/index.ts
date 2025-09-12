@@ -4,7 +4,7 @@
  * Implements Cross-Origin Resource Sharing (CORS) with customizable options.
  */
 
-import { DefaultMiddlewareOptions, Middleware } from '@gaman/common/index.js';
+import { DefaultMiddlewareOptions, Middleware, Priority } from '@gaman/common/index.js';
 import { composeMiddleware } from '@gaman/core';
 import { Response } from '@gaman/core/response.js';
 
@@ -79,6 +79,7 @@ export const cors = (options?: CorsOptions): Middleware => {
 			headers['Access-Control-Expose-Headers'] = exposeHeaders.join(', ');
 		}
 
+		// Handle preflight request
 		if (ctx.request.method === 'OPTIONS') {
 			return new Response(null, { status: 204, headers });
 		}
@@ -92,11 +93,6 @@ export const cors = (options?: CorsOptions): Middleware => {
 			);
 		}
 
-		// Handle preflight request
-		if (ctx.request.method === 'OPTIONS') {
-			return new Response(undefined, { status: 204, headers });
-		}
-
 		for (const [key, value] of Object.entries(headers)) {
 			if (!ctx.headers.has(key)) {
 				ctx.headers.set(key, value);
@@ -107,7 +103,7 @@ export const cors = (options?: CorsOptions): Middleware => {
 	});
 
 	return middleware({
-		priority: options?.priority || 'normal',
+		priority: Priority.MONITOR,
 		includes: options?.includes,
 		excludes: options?.excludes,
 	});
