@@ -9,7 +9,7 @@ on:
 jobs:
   node:
     name: Node.js v${{ matrix.node-version }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
 
     strategy:
       matrix:
@@ -33,7 +33,7 @@ jobs:
 
   bun:
     name: Bun
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
 
     steps:
       - uses: actions/checkout@v4
