@@ -1,23 +1,15 @@
 name: CI
 
 on:
-  workflow_dispatch:
-
-  # push:
-  #   branches: ['master']
-  #   paths:
-  #     - 'packages/**'
-  #     - 'plugins/**'
-  # pull_request:
-  #   branches: ['master']
-  #   paths:
-  #     - 'packages/**'
-  #     - 'plugins/**'
+  push:
+    branches: ['master']
+  pull_request:
+    branches: ['master']
 
 jobs:
   node:
     name: Node.js v${{ matrix.node-version }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
 
     strategy:
       matrix:
@@ -41,7 +33,7 @@ jobs:
 
   bun:
     name: Bun
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
 
     steps:
       - uses: actions/checkout@v4
