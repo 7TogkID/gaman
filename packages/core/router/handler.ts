@@ -258,6 +258,8 @@ export class Router {
 			}
 		}
 
+		response.headers.set('X-Powered-By', 'Gaman')
+
 		res.statusCode = response.status;
 		res.statusMessage = response.statusText;
 		res.setHeaders(response.headers.toMap());
