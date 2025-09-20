@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 import inquirer from 'inquirer';
 import { execSync } from 'child_process';
 import degit from 'degit';
-import { randomBytes } from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,11 +18,11 @@ async function getPackageLatest(dep) {
 	);
 }
 
-// async function getTemplateMap() {
-// 	return await fetch(
-// 		'https://raw.githubusercontent.com/7TogkID/gaman/refs/heads/master/template/map.json',
-// 	).then((r) => r.json());
-// }
+async function getSampleMap() {
+	return await fetch(
+		'https://raw.githubusercontent.com/7TogkID/gaman/refs/heads/master/sample/map.json',
+	).then((r) => r.json());
+}
 
 async function main() {
 	console.clear();
@@ -35,61 +34,134 @@ async function main() {
   ╚██████╔╝██║░░██║██║░╚═╝░██║██║░░██║██║░╚███║
   ░╚═════╝░╚═╝░░╚═╝╚═╝░░░░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝
 `);
-	// const templateMap = await getTemplateMap();
 
-	const answers = await inquirer.prompt([
-		{
-			type: 'input',
-			name: 'projectName',
-			message: 'What is your project name?',
-			default: './gaman-app',
-		},
+	// 🔹 Step 1: pilih mode
+	const { mode } = await inquirer.prompt([
 		{
 			type: 'list',
-			name: 'language',
-			message: 'What language do you want to use?',
-			choices: ['typescript', 'javascript'],
-			default: 'typescript',
-		},
-		{
-			type: 'list',
-			name: 'packageManager',
-			message: 'Choose a package manager',
-			choices: ['npm', 'pnpm', 'bun', 'yarn'],
-			default: 'npm',
-		},
-		{
-			type: 'confirm',
-			name: 'installPack',
-			message: 'Install dependencies?',
-			default: true,
-		},
-		{
-			type: 'confirm',
-			name: 'gitInit',
-			message: 'Initialize a new git repository?',
-			default: true,
+			name: 'mode',
+			message: 'What do you want to do?',
+			choices: ['Start Project', 'Explore Samples'],
+			default: 'Start Project',
 		},
 	]);
 
-	const targetDir = path.resolve(process.cwd(), answers.projectName);
+	let projectType = 'template';
+	let subfolder = 'typescript'; // default
+	let projectName = './gaman-app';
+	let packageManager = 'npm';
+	let installPack = true;
+	let gitInit = true;
+
+	if (mode === 'Explore Samples') {
+		const sampleMap = await getSampleMap();
+		const { sampleKey } = await inquirer.prompt([
+			{
+				type: 'list',
+				name: 'sampleKey',
+				message: 'Choose a sample to use:',
+				choices: Object.keys(sampleMap),
+			},
+		]);
+
+		subfolder = sampleMap[sampleKey];
+		projectType = 'sample';
+
+		const ans = await inquirer.prompt([
+			{
+				type: 'input',
+				name: 'projectName',
+				message: 'What is your project name?',
+				default: `./${sampleKey.replace(/\s+/g, '-').toLowerCase()}`,
+			},
+			{
+				type: 'list',
+				name: 'packageManager',
+				message: 'Choose a package manager',
+				choices: ['npm', 'pnpm', 'bun', 'yarn'],
+				default: 'npm',
+			},
+			{
+				type: 'confirm',
+				name: 'installPack',
+				message: 'Install dependencies?',
+				default: true,
+			},
+			{
+				type: 'confirm',
+				name: 'gitInit',
+				message: 'Initialize a new git repository?',
+				default: true,
+			},
+		]);
+
+		projectName = ans.projectName;
+		packageManager = ans.packageManager;
+		installPack = ans.installPack;
+		gitInit = ans.gitInit;
+	} else {
+		// Start Project
+		const answers = await inquirer.prompt([
+			{
+				type: 'input',
+				name: 'projectName',
+				message: 'What is your project name?',
+				default: './gaman-app',
+			},
+			{
+				type: 'list',
+				name: 'language',
+				message: 'What language do you want to use?',
+				choices: ['typescript', 'javascript'],
+				default: 'typescript',
+			},
+			{
+				type: 'list',
+				name: 'packageManager',
+				message: 'Choose a package manager',
+				choices: ['npm', 'pnpm', 'bun', 'yarn'],
+				default: 'npm',
+			},
+			{
+				type: 'confirm',
+				name: 'installPack',
+				message: 'Install dependencies?',
+				default: true,
+			},
+			{
+				type: 'confirm',
+				name: 'gitInit',
+				message: 'Initialize a new git repository?',
+				default: true,
+			},
+		]);
+
+		projectName = answers.projectName;
+		subfolder = answers.language;
+		packageManager = answers.packageManager;
+		installPack = answers.installPack;
+		gitInit = answers.gitInit;
+	}
+	
+	const targetDir = path.resolve(process.cwd(), projectName);
 
 	if (fs.existsSync(targetDir)) {
-		console.error(
-			`\n❌ Error: Directory "${answers.projectName}" already exists.`,
-		);
+		console.error(`\n❌ Error: Directory "${projectName}" already exists.`);
 		process.exit(1);
 	}
 
-	const subfolder = answers.language;
-	const degitPath = `7TogkID/gaman/template/${subfolder}`;
+	// 🔹 Bedain path template / sample
+	const degitPath =
+		projectType === 'template'
+			? `7TogkID/gaman/template/${subfolder}`
+			: `7TogkID/gaman/sample/${subfolder}`;
 
-	console.log(`\n📁 Fetching template "${answers.language}" from GitHub...`);
+	console.log(`\n📁 Fetching ${projectType} "${subfolder}" from GitHub...`);
 	try {
 		await degit(degitPath).clone(targetDir);
-		console.log(`✅ Template copied to ${answers.projectName}`);
+		console.log(`✅ ${projectType} copied to ${projectName}`);
 	} catch (err) {
-		console.error('❌ Error cloning the template:', err);
+		console.error('❌ Error cloning the project:', err);
 		process.exit(1);
 	}
 
@@ -97,7 +169,7 @@ async function main() {
 	const packageJsonPath = path.join(targetDir, 'package.json');
 	if (fs.existsSync(packageJsonPath)) {
 		const packageJson = await fs.readJson(packageJsonPath);
-		packageJson.name = path.basename(answers.projectName);
+		packageJson.name = path.basename(projectName);
 
 		if (packageJson.dependencies) {
 			for (const dep of dependencies) {
@@ -111,7 +183,7 @@ async function main() {
 	}
 
 	// Init Git
-	if (answers.gitInit) {
+	if (gitInit) {
 		console.log('\n🔧 Initializing Git repository...');
 		execSync('git init', { cwd: targetDir });
 		await fs.writeFile(path.join(targetDir, '.gitignore'), 'node_modules\n');
@@ -119,17 +191,15 @@ async function main() {
 	}
 
 	// Install dependencies
-	if (answers.installPack) {
+	if (installPack) {
 		process.chdir(targetDir);
-		console.log(
-			`\n📦 Installing dependencies with ${answers.packageManager}...`,
-		);
+		console.log(`\n📦 Installing dependencies with ${packageManager}...`);
 		try {
-			execSync(`${answers.packageManager} install`, { stdio: 'inherit' });
+			execSync(`${packageManager} install`, { stdio: 'inherit' });
 			console.log('✅ Dependencies installed.');
 		} catch (err) {
 			console.error(
-				`❌ Error during install with ${answers.packageManager}. Please try manually.`,
+				`❌ Error during install with ${packageManager}. Please try manually.`,
 			);
 		}
 	}
@@ -137,8 +207,8 @@ async function main() {
 	// Done!
 	console.log('\n🎉 Project created successfully!');
 	console.log('\n🚀 Next steps:');
-	console.log(`  cd ${answers.projectName}`);
-	console.log(`  ${answers.packageManager} run dev`);
+	console.log(`  cd ${projectName}`);
+	console.log(`  ${packageManager} run dev`);
 }
 
 process.on('SIGINT', () => {
@@ -147,6 +217,5 @@ process.on('SIGINT', () => {
 });
 
 main().catch((err) => {
-	console.error('\n🛑 An error occurred:', err.message);
 	process.exit(1);
 });
