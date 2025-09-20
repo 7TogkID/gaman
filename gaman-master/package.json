@@ -1,0 +1,74 @@
+{
+	"name": "gaman",
+	"type": "module",
+	"main": "index.js",
+	"version": "0.0.1",
+	"engines": {
+		"node": ">=18.20.8"
+	},
+	"scripts": {
+		"build": "tsc -b -v",
+		"clean": "tsc -b --clean",
+		"test": "vitest run",
+		"test:server": "npm run yalc:push && cd test && npm run dev",
+		"version-packages": "npx changeset version",
+		"publish-packages": "npm run build && npx changeset publish ",
+		"yalc:push": "./scripts/yalc-push.sh"
+	},
+	"workspaces": [
+		"packages/*",
+		"plugins/cors",
+		"plugins/nunjucks",
+		"plugins/ejs",
+		"plugins/basic-auth",
+		"plugins/static"
+	],
+	"author": "angga7togk",
+	"license": "MIT",
+	"repository": {
+		"url": "git+https://github.com/7TogkID/gaman.git"
+	},
+	"bugs": {
+		"url": "https://github.com/7TogkID/gaman/issues"
+	},
+	"homepage": "https://gaman.7togk.id",
+	"dependencies": {
+		"@types/node": "^24.3.1",
+		"@types/ws": "^8.18.1",
+		"chokidar": "^3.6.0",
+		"cookie": "^1.0.2",
+		"esbuild": "^0.25.8",
+		"esbuild-plugin-file-path-extensions": "^2.1.4",
+		"install": "^0.13.0",
+		"npm": "^11.5.2",
+		"path-to-regexp": "^8.3.0",
+		"ws": "^8.18.2"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.29.6",
+		"@types/ejs": "^3.1.5",
+		"@types/fs-extra": "^11.0.4",
+		"@types/nunjucks": "^3.2.6",
+		"@types/yargs": "^17.0.33",
+		"arg": "^5.0.2",
+		"axios": "^1.11.0",
+		"ejs": "^3.1.10",
+		"eslint": "^9.31.0",
+		"form-data": "^4.0.4",
+		"glob": "^10.4.5",
+		"globals": "^16.3.0",
+		"k6": "^0.0.0",
+		"mongodb": "^6.17.0",
+		"nunjucks": "^3.2.4",
+		"redis": "^5.6.1",
+		"sqlite": "^5.1.1",
+		"sqlite3": "^5.1.7",
+		"ts-jest": "^29.4.0",
+		"tsc-alias": "^1.8.16",
+		"tslib": "^2.8.1",
+		"tsx": "^4.20.3",
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.36.0",
+		"vitest": "^3.2.4"
+	}
+}

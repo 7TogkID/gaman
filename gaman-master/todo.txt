@@ -1,0 +1,21 @@
+@gaman/firebase
+@gaman/auth
+@gaman/cors
+@gaman/crud
+@gaman/apikey
+@gaman/cron
+@gaman/rate-limit
+@gaman/orm
+@gaman/validation
+
+
+adapter support: Bun, Node, Deno, Cloudflare Worker, Lambda.
+
+
+-- Template
+starter kit blog app
+starter kit api app
+
+
+Compatibility layer dengan Express, Hono, ElisyaJS
+

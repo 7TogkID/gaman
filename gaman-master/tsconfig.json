@@ -1,0 +1,50 @@
+{
+	"compilerOptions": {
+		"composite": true,
+		"module": "nodenext",
+		"target": "ES2020",
+		"moduleResolution": "nodenext",
+		"declaration": true,
+		"noImplicitAny": false,
+		"skipLibCheck": true,
+		"noUnusedLocals": false,
+		"importHelpers": true,
+		"removeComments": false,
+		"noLib": false,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"useUnknownInCatchVariables": false,
+		"esModuleInterop": true,
+		"sourceMap": false,
+		"allowJs": false,
+		"strict": true,
+		"strictNullChecks": true,
+		"forceConsistentCasingInFileNames": true,
+		"strictPropertyInitialization": false,
+		"types": ["node"],
+		"baseUrl": "."
+	},
+	"jest": {},
+	"tsc-alias": {
+		"resolveFullPaths": true,
+		"verbose": false
+	},
+	"include": [
+		"packages/**/*",
+		"plugins/cors",
+		"plugins/nunjucks",
+		"plugins/ejs",
+		"plugins/basic-auth",
+		"plugins/static"
+	],
+	"exclude": ["node_modules", "dist", "**/*.test.*"],
+	"files": [],
+	"references": [
+		{
+			"path": "./packages/common"
+		},
+		{
+			"path": "./packages/core"
+		}
+	]
+}
