@@ -14,12 +14,21 @@ import { match } from 'path-to-regexp';
 import { IS_ROUTES } from '@gaman/common/contants.js';
 import { sortArrayByPriority } from '@gaman/common/index.js';
 import routesData from '@gaman/common/data/routes-data.js';
+import {
+	Websocket,
+	WebsocketMiddleware,
+} from '@gaman/common/types/websocket.types.js';
+import {
+	isWebsocket,
+	isWebsocketMiddleware,
+} from '@gaman/common/validation/is.js';
 
 type RouteFactory = (route: RouteBuilder) => void;
 class RouteBuilder {
 	private prefix: string;
 	// ? Pipeline Request Handler
 	private middlewares: Middleware[] = [];
+	private websocketMiddlewares: WebsocketMiddleware[] = [];
 	private routes: Route[] = [];
 
 	constructor(prefix: string = '') {
@@ -33,11 +42,12 @@ class RouteBuilder {
 	private addRoute(
 		method: HttpMethod | HttpMethod[],
 		path: string,
-		handler: RequestHandler | [fn: ControllerFactory, name: string],
+		handler: RequestHandler | Websocket | [fn: ControllerFactory, name: string],
 	): RouteDefinition {
 		const fullPath = normalizePath(`${this.prefix}/${path}`);
 
-		let finalHandler: RequestHandler;
+		let finalHandler: RequestHandler | null = null;
+		let finalWebsocket: Websocket | null = null;
 
 		if (Array.isArray(handler)) {
 			const [fn, name] = handler;
@@ -49,6 +59,8 @@ class RouteBuilder {
 				);
 			}
 			finalHandler = maybeHandler as RequestHandler;
+		} else if (isWebsocket(handler)) {
+			finalWebsocket = handler;
 		} else {
 			finalHandler = handler;
 		}
@@ -57,6 +69,8 @@ class RouteBuilder {
 			path: fullPath,
 			methods: Array.isArray(method) ? method : [method],
 			handler: finalHandler,
+			websocket: finalWebsocket,
+			websocketMiddlewares: [...this.websocketMiddlewares],
 			middlewares: [...this.middlewares],
 			exceptions: [],
 			interceptors: [],
@@ -69,9 +83,19 @@ class RouteBuilder {
 		return {
 			middleware(fn) {
 				if (Array.isArray(fn)) {
-					route.middlewares.push(...fn);
+					for (const mw of fn) {
+						if (isWebsocketMiddleware(mw)) {
+							route.websocketMiddlewares.push(mw);
+						} else {
+							route.middlewares.push(mw);
+						}
+					}
 				} else {
-					route.middlewares.push(fn);
+					if (isWebsocketMiddleware(fn)) {
+						route.websocketMiddlewares.push(fn);
+					} else {
+						route.middlewares.push(fn);
+					}
 				}
 				return this;
 			},
@@ -112,9 +136,19 @@ class RouteBuilder {
 					 * ? Apply group middleware to all
 					 */
 					if (Array.isArray(fn)) {
-						r.middlewares.unshift(...fn);
+						for (const mw of fn) {
+							if (isWebsocketMiddleware(mw)) {
+								r.websocketMiddlewares.push(mw);
+							} else {
+								r.middlewares.push(mw);
+							}
+						}
 					} else {
-						r.middlewares.unshift(fn);
+						if (isWebsocketMiddleware(fn)) {
+							r.websocketMiddlewares.push(fn);
+						} else {
+							r.middlewares.push(fn);
+						}
 					}
 				}
 				return this;
@@ -199,6 +233,12 @@ class RouteBuilder {
 		handler: RequestHandler | [fn: ControllerFactory, name: string],
 	) {
 		return this.addRoute(methods, path, handler);
+	}
+	ws(
+		path: string,
+		websocket: Websocket,
+	): Pick<RouteDefinition, 'middleware' | 'name'> {
+		return this.addRoute([], path, websocket);
 	}
 }
 

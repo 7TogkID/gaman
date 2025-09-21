@@ -10,6 +10,9 @@ export const IS_CONTROLLER = '___is:controller___';
 export const IS_INTERCEPTOR = '___is:interceptor___';
 export const IS_MIDDLEWARE = '___is:middleware___';
 export const IS_EXCEPTION_HANDLER = '___is:exception___';
+export const IS_WEBSOCKET = '___is:websocket___';
+export const IS_WEBSOCKET_HANDLER = '___is:websocket:handler___';
+export const IS_WEBSOCKET_MIDDLEWARE = '___is:websocket:middleware___';
 
 /* -------------------------------------------------------------------------- */
 /*                                   HANDLER                                  */

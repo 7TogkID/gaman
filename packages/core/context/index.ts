@@ -18,7 +18,7 @@ import {
 
 export async function createContext(
 	req: http.IncomingMessage,
-	res: http.ServerResponse,
+	res?: http.ServerResponse,
 ): Promise<Context> {
 	const method = req.method?.toUpperCase() || 'GET';
 	const urlString = req.url || '/';

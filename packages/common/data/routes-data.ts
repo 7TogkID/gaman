@@ -9,17 +9,21 @@ const dynamicRoutes: Array<Route> = [];
 // ? benefitnya gampang di cari proses jadi agak cepat
 const staticRoutes = new Map<string, Map<string, Route>>();
 
+const websocketRoutes = new Map<string, Route>();
+
 function isDynamicPath(path: string): boolean {
 	const parsed = parse(path);
 	const tokens = Array.isArray(parsed) ? parsed : parsed.tokens;
-	return tokens.length > 1; 
-  // ? Kenapa validasinya length > 1 jika di soalnya  kalau statci tuh cuman gini [ { type: 'text', value: '/anu6' } ]
-  // ? nah kalau dinamic banyak [ { type: 'text', value: '/user/' }, { type: 'param', name: 'name' } ]
+	return tokens.length > 1;
+	// ? Kenapa validasinya length > 1 jika di soalnya  kalau statci tuh cuman gini [ { type: 'text', value: '/anu6' } ]
+	// ? nah kalau dinamic banyak [ { type: 'text', value: '/user/' }, { type: 'param', name: 'name' } ]
 }
 
 function register(rts: Routes) {
 	for (const route of rts) {
-		if (isDynamicPath(route.path)) {
+		if (route.websocket) {
+			websocketRoutes.set(route.path, route);
+		} else if (isDynamicPath(route.path)) {
 			dynamicRoutes.push(route);
 		} else {
 			if (!staticRoutes.has(route.path)) {
@@ -67,7 +71,12 @@ function findRoute(
 	return { route: undefined, params: {} };
 }
 
+function findWebsocketRoute(path: string): Route | undefined {
+	return websocketRoutes.get(path);
+}
+
 export default {
 	register,
 	findRoute,
+	findWebsocketRoute,
 };
