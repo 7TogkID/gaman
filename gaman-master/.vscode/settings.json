@@ -1,0 +1,9 @@
+// {
+//   "files.exclude": {
+//     "**/node_modules": true,
+//     "**/dist": true,
+//     "**/.turbo": true,
+//     "**/template": true,
+//     "**/test": true,
+//   }
+// }

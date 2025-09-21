@@ -1,0 +1,29 @@
+{
+  "name": "create-gaman",
+  "version": "1.2.1",
+  "main": "./index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "create-gaman": "./index.js"
+  },
+  "keywords": [],
+  "author": "angga7togk",
+  "repository": {
+    "url": "https://github.com/7TogkID/gaman"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "degit": "^2.8.4",
+    "fs-extra": "^11.3.0",
+    "inquirer": "^12.6.3",
+    "yargs": "^17.7.2"
+  },
+  "gitHead": "cbd5e072caf2d40f49d9bb7b9dc0e1ad3f05af60"
+}

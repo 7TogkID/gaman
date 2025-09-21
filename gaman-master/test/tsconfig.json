@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"outDir": "./dist",
+		"target": "ES2021",
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"esModuleInterop": true,
+		"types": ["./src/index.d.ts", "node"],
+	},
+	"include": ["./src/**/*.ts"],
+	"exclude": ["node_modules", "dist", "**/*test.ts"]
+}
