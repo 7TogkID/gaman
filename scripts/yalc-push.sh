@@ -30,6 +30,9 @@ yalc push
 cd ../nunjucks
 yalc push
 
+cd ../websocket
+yalc push
+
 # Return to the root directory
 cd ../..
 

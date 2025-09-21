@@ -35,7 +35,8 @@
 		"plugins/nunjucks",
 		"plugins/ejs",
 		"plugins/basic-auth",
-		"plugins/static"
+		"plugins/static",
+		"plugins/websocket"
 	],
 	"exclude": ["node_modules", "dist", "**/*.test.*"],
 	"files": [],

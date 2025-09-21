@@ -8,6 +8,8 @@ import AppController from '../controllers/AppController';
 import { InterceptorException } from '@gaman/common';
 import MidController from '../controllers/MidController';
 import { basicAuth } from '@gaman/basic-auth';
+import AppWebsocket from '../AppWebsocket';
+import TesWSMiddleware from '../middlewares/TesWSMiddleware';
 
 export const Pipe = composeInterceptor(async (ctx, next, error) => {
 	ctx.transformParams({
@@ -29,7 +31,7 @@ export const ErrorHandle = composeExceptionHandler((err) => {
 			{ status: err.statusCode },
 		);
 	}
-	console.error(err)
+	console.error(err);
 	return Res.json(
 		{
 			message: 'Internal server error!',
@@ -39,6 +41,8 @@ export const ErrorHandle = composeExceptionHandler((err) => {
 });
 
 export default composeRoutes((r) => {
+	r.ws('/', AppWebsocket).middleware(TesWSMiddleware());
+
 	r.get('/', (ctx) => {
 		return Res.render('index', {
 			title: 'hai',

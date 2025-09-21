@@ -9,11 +9,23 @@
 
 <body>
   <h1 id="h1"></h1>
+  <input id="input" type="text">
 
   <script>
     const h1 = document.getElementById('h1');
+    const input = document.getElementById('input')
 
-    fetch('http://localhost:3431').then(r => console.log(r)).catch(console.log)
+    const socket = new WebSocket('http://localhost:3431')
+
+    socket.onmessage = (event) => {
+      h1.innerText = JSON.parse(event.data).name
+    }
+
+    input.addEventListener('change', (e) => {
+      socket.send(JSON.stringify({
+        name: e.target.value
+      }))
+    })
   </script>
 </body>
 
