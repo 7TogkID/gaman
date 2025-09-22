@@ -80,7 +80,8 @@ export class WebsocketAdapter {
 			Buffer.isBuffer(message) || typeof message === 'string'
 				? message
 				: JSON.stringify(message);
-
+		
+		// @ts-ignore
 		return {
 			...ws,
 			clientId,
