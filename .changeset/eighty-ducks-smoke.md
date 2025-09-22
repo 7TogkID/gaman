@@ -1,0 +1,5 @@
+---
+'@gaman/websocket': patch
+---
+
+refactor
