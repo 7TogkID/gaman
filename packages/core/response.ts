@@ -115,4 +115,139 @@ export class Response {
 			},
 		});
 	}
+
+	/**
+	 * Shorthand method to finish request with "200" status code
+	 */
+	static ok(body: string | object): Response {
+		if (typeof body === 'string') {
+			return this.text(body, { status: 200 });
+		}
+
+		return this.json(body, { status: 200 });
+	}
+	
+	/**
+	 * Shorthand method to finish request with "201" status code
+	 */
+	static created(body?: string | object): Response {
+		if (typeof body === 'string') {
+			return this.html(body, { status: 201 });
+		}
+
+		return this.json(body, { status: 201 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "202" status code
+	 */
+	static accepted(body: string | object): Response {
+		if (typeof body === 'string') {
+			return this.html(body, { status: 202 });
+		}
+
+		return this.json(body, { status: 202 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "203" status code
+	 */
+	static nonAuthoritativeInformation(body: string | object): Response {
+		if (typeof body === 'string') {
+			return this.html(body, { status: 203 });
+		}
+
+		return this.json(body, { status: 203 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "204" status code
+	 */
+	static noContent(): Response {
+		return new Response(null, { status: 204 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "205" status code
+	 */
+	static resetContent(): Response {
+		return new Response(null, { status: 205 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "206" status code
+	 */
+	static partialContent(body: string | object): Response {
+		if (typeof body === 'string') {
+			return this.html(body, { status: 206 });
+		}
+		
+		return this.json(body, { status: 206 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "400" status code
+	 */
+	static badRequest(body?: string | object): Response {
+		if (typeof body === 'string') {
+			return this.html(body, { status: 400 });
+		}
+
+		return this.json(body, { status: 400 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "401" status code
+	 */
+	static unauthorized(body?: string | object): Response {
+		if (typeof body === 'string') {
+			return this.html(body, { status: 401 });
+		}
+
+		return this.json(body, { status: 401 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "403" status code
+	 */
+	static forbidden(body?: string | object): Response {
+		if (typeof body === 'string') {
+			return this.html(body, { status: 403 });
+		}
+
+		return this.json(body, { status: 403 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "404" status code
+	 */
+	static notFound(body?: string | object): Response {
+		if (typeof body === 'string') {
+			return this.html(body, { status: 404 });
+		}
+
+		return this.json(body, { status: 404 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "500" status code
+	 */
+	static internalServerError(body?: string | object): Response {
+		if (typeof body === 'string') {
+			return this.html(body, { status: 500 });
+		}
+
+		return this.json(body, { status: 500 });
+	}
+
+	/**
+	 * Shorthand method to finish request with "503" status code
+	 */
+	static serviceUnavailable(body?: string | object): Response {
+		if (typeof body === 'string') {
+			return this.html(body, { status: 503 });
+		}
+
+		return this.json(body, { status: 503 });
+	}
 }
