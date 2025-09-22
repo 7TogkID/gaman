@@ -43,31 +43,6 @@ export interface SessionOptions
 	crossSite?: boolean;
 }
 
-function detectCookieOptions(
-	ctx: Context,
-	base: SessionOptions,
-): SessionOptions {
-	const origin = ctx.headers.get('origin') || '';
-	const host = ctx.headers.get('host') || '';
-	const isCrossSite = origin && !origin.includes(host);
-
-	if (isCrossSite) {
-		// ! Cross origin → wajib None + Secure
-		return {
-			sameSite: 'none',
-			secure: true,
-			...base,
-		};
-	} else {
-		// ! Same origin → boleh default Lax
-		return {
-			sameSite: base.sameSite ?? 'lax',
-			secure: process.env.NODE_ENV === 'production',
-			...base,
-		};
-	}
-}
-
 /**
  * GamanJS session integration handler.
  *
@@ -94,10 +69,8 @@ export function session(options: SessionOptions = {}) {
   };
 
 	const middleware = composeMiddleware((ctx, next) => {
-		const dynamicOps = detectCookieOptions(ctx, ops);
-
 		Object.defineProperty(ctx, 'session', {
-			value: new Session(ctx, dynamicOps),
+			value: new Session(ctx, ops),
 			writable: false,
 		});
 		return next();

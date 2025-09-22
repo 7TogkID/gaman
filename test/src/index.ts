@@ -19,10 +19,11 @@ defineBootstrap(async (app) => {
 		staticServe(),
 		AppMiddleware(),
 	);
+
 	const sessionData: Record<string, any> = {};
 	app.mount(
 		session({
-			secure: true,
+			crossSite: true,
 			store: {
 				async delete(data) {
 					delete sessionData[data.sid];
