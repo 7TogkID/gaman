@@ -1,7 +1,7 @@
 import { composeController } from '@gaman/core';
 
 export default composeController(() => ({
-	Home(ctx) {
+	async Home(ctx) {
 		return Res.json({
 			message: ctx.param('name'),
 		});

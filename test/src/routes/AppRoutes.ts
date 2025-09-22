@@ -53,6 +53,18 @@ export default composeRoutes((r) => {
 			password: 'abogoboga',
 		}),
 	);
+
+	r.get('session', async (ctx) => {
+		const value = await ctx.session.get();
+		if (value) {
+			console.log('ada', value.userId);
+		} else {
+			await ctx.session.set({ userId: 'abogoboga' });
+		}
+
+		return Res.json({ message: 'OK!' });
+	});
+
 	r.get('/anu', [MidController, 'Index']);
 	r.get('/anu2', [MidController, 'Index']);
 	r.get('/anu3', [MidController, 'Index']);

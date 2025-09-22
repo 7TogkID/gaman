@@ -1,39 +1,33 @@
 import * as crypto from 'node:crypto';
-import { base64UrlEncode, base64UrlDecode } from '@gaman/common/utils/encode.js';
+import { base64UrlEncode, base64UrlDecode } from "@gaman/common/utils/encode.js";
 
-/**
- * Sign a payload using HMAC SHA256 (HS256)
- */
-export function sign(payload: object | string | Buffer, secret: crypto.BinaryLike): string {
-	const json =
-		typeof payload === 'string' || Buffer.isBuffer(payload)
-			? payload.toString()
-			: JSON.stringify(payload);
+export function sign(payload: object, secret: string, ttl: number): string {
+	const exp = Math.floor(Date.now() / 1000) + ttl;
+	const data = JSON.stringify({ ...payload, exp });
+	const encoded = base64UrlEncode(data);
 
-	const encodedPayload = base64UrlEncode(json);
+	const sig = crypto.createHmac("sha256", secret)
+		.update(encoded)
+		.digest("base64");
+	const encodedSig = base64UrlEncode(sig);
 
-	const signature = crypto.createHmac('sha256', secret).update(encodedPayload).digest('base64');
-
-	const encodedSignature = base64UrlEncode(signature);
-
-	return `${encodedPayload}.${encodedSignature}`;
+	return `${encoded}.${encodedSig}`;
 }
 
-/**
- * Verify the token and return payload if valid, or null if invalid
- */
-export function verify(token: string, secret: crypto.BinaryLike): string | null {
-	const [encodedPayload, signature] = token.split('.');
-	if (!encodedPayload || !signature) return null;
+export function verify<T = any>(token: string, secret: string): T | null {
+	const [encoded, sig] = token.split(".");
+	if (!encoded || !sig) return null;
 
-	const expectedSignature = crypto
-		.createHmac('sha256', secret)
-		.update(encodedPayload)
-		.digest('base64');
+	const expected = crypto.createHmac("sha256", secret)
+		.update(encoded)
+		.digest("base64");
+	if (base64UrlEncode(expected) !== sig) return null;
 
-	const valid = base64UrlEncode(expectedSignature) === signature;
-	if (!valid) return null;
+	const json = base64UrlDecode(encoded);
+	const data = JSON.parse(json);
 
-	const payload = base64UrlDecode(encodedPayload);
-	return payload;
+	// cek expired
+	if (data.exp && Date.now() / 1000 > data.exp) return null;
+
+	return data;
 }

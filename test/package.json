@@ -19,6 +19,7 @@
     "@gaman/cors": "file:.yalc/@gaman/cors",
     "@gaman/ejs": "file:.yalc/@gaman/ejs",
     "@gaman/nunjucks": "file:.yalc/@gaman/nunjucks",
+    "@gaman/session": "file:.yalc/@gaman/session",
     "@gaman/static": "file:.yalc/@gaman/static",
     "@gaman/websocket": "file:.yalc/@gaman/websocket"
   },
