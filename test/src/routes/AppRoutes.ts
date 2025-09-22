@@ -44,15 +44,8 @@ export default composeRoutes((r) => {
 	r.ws('/', AppWebsocket).middleware(TesWSMiddleware());
 
 	r.get('/', (ctx) => {
-		return Res.render('index', {
-			title: 'hai',
-		});
-	}).middleware(
-		basicAuth({
-			username: 'admin',
-			password: 'abogoboga',
-		}),
-	);
+		return Res.json({ message: ' ADUH' }, 403);
+	});
 
 	r.get('session', async (ctx) => {
 		const value = await ctx.session.get();

@@ -28,7 +28,6 @@ export class ViewResponse {
 	}
 }
 
-
 export interface IResponseOptions {
 	status?: number;
 	statusText?: string;
@@ -41,42 +40,48 @@ export class Response {
 	public status: number;
 	public statusText: string;
 	public body?: any;
-	constructor(
-		body?: any,
-		options: IResponseOptions = {},
-	) {
+	constructor(body?: any, options: IResponseOptions = {}) {
 		this.body = body;
 		this.headers = new GamanHeader(options.headers || {});
 		this.status = options.status || 200;
 		this.statusText = options.statusText || '';
 	}
 
-	static json(data: any, init: IResponseOptions = {}): Response {
+	static json(data: any, init: IResponseOptions | number = {}): Response {
+		const ops: IResponseOptions =
+			typeof init === 'number' ? { status: init } : init;
+
 		return new Response(JSON.stringify(data, null, 2), {
-			...init,
+			...ops,
 			headers: {
 				'Content-Type': 'application/json',
-				...(init.headers || {}),
+				...(ops.headers || {}),
 			},
 		});
 	}
 
-	static text(message: string, init: IResponseOptions = {}): Response {
+	static text(message: string, init: IResponseOptions | number = {}): Response {
+		const ops: IResponseOptions =
+			typeof init === 'number' ? { status: init } : init;
+
 		return new Response(message, {
-			...init,
+			...ops,
 			headers: {
 				'Content-Type': 'text/plain',
-				...(init.headers || {}),
+				...(ops.headers || {}),
 			},
 		});
 	}
 
-	static html(body: string, init: IResponseOptions = {}): Response {
+	static html(body: string, init: IResponseOptions | number = {}): Response {
+		const ops: IResponseOptions =
+			typeof init === 'number' ? { status: init } : init;
+
 		return new Response(body, {
-			...init,
+			...ops,
 			headers: {
 				'Content-Type': 'text/html',
-				...(init.headers || {}),
+				...(ops.headers || {}),
 			},
 		});
 	}
@@ -93,16 +98,22 @@ export class Response {
 				...(init.headers || {}),
 			},
 		});
-		res.view =  new ViewResponse(viewName, viewData, init);
+		res.view = new ViewResponse(viewName, viewData, init);
 		return res;
 	}
 
-	static stream(readableStream: NodeJS.ReadableStream, init: IResponseOptions = {}): Response {
+	static stream(
+		readableStream: NodeJS.ReadableStream,
+		init: IResponseOptions | number = {},
+	): Response {
+		const ops: IResponseOptions =
+			typeof init === 'number' ? { status: init } : init;
+
 		return new Response(readableStream, {
-			...init,
+			...ops,
 			headers: {
 				'Content-Type': 'application/octet-stream',
-				...(init.headers || {}),
+				...(ops.headers || {}),
 			},
 		});
 	}
@@ -126,7 +137,7 @@ export class Response {
 
 		return this.json(body, { status: 200 });
 	}
-	
+
 	/**
 	 * Shorthand method to finish request with "201" status code
 	 */
@@ -181,7 +192,7 @@ export class Response {
 		if (typeof body === 'string') {
 			return this.html(body, { status: 206 });
 		}
-		
+
 		return this.json(body, { status: 206 });
 	}
 
