@@ -1,5 +1,11 @@
 # @gaman/cli
 
+## 1.2.3
+
+### Patch Changes
+
+- cd62fe9: add response shortcut
+
 ## 1.2.2
 
 ## 1.2.1
