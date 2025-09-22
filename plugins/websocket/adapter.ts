@@ -30,6 +30,7 @@ export class WebsocketAdapter {
 		this.setupUpgrade();
 	}
 
+	// todo : Upgrade request ke WebSocket
 	private setupUpgrade() {
 		this.server.on('upgrade', (req, socket, head) => {
 			this.wss.handleUpgrade(req, socket, head, async (ws) => {
@@ -39,51 +40,60 @@ export class WebsocketAdapter {
 		});
 	}
 
+	// todo : Setup tiap client baru
 	private async setupClient(request: Request, socket: Stream.Duplex, ws: WS) {
 		const url = new URL(request.url);
 		const clientId = randomUUID();
 
-		const { send, close, ...otherWs } = ws;
+		// todo :  Buat context WebSocket
+		const ctx = this.createWebsocketContext(clientId, request, socket, ws);
 
-		const ctx: WebsocketContext = {
-			...otherWs,
-			ping: ws.ping,
-			pong: ws.pong,
-			terminate: ws.terminate,
-			pause: ws.pause,
-			resume: ws.resume,
-			addEventListener: ws.addEventListener,
-			removeEventListener: ws.removeEventListener,
-			on: ws.on,
-			once: ws.once,
-			off: ws.off,
-			addListener: ws.addListener,
-			removeListener: ws.removeListener,
+		// todo : Simpan client
+		this.clients.set(clientId, ctx);
+
+		// todo : Cari route
+		const route = routesData.findWebsocketRoute(url.pathname);
+		if (!route) return ws.close();
+
+		// todo : Sort middleware
+		const middlewares = sortArrayByPriority(
+			route.websocketMiddlewares,
+			(mw) => mw.config?.priority || Priority.NORMAL,
+		);
+
+		// todo : Event binding
+		const event = this.createWebsocketEvent(ws, ctx, middlewares);
+		this.attachCleanup(ws, clientId);
+
+		// todo : Panggil factory route
+		route.websocket?.factory(Object.assign(ctx, event));
+	}
+
+	// todo :  Buat context untuk tiap client
+	private createWebsocketContext(
+		clientId: string,
+		request: Request,
+		socket: Stream.Duplex,
+		ws: WS,
+	): WebsocketContext {
+		const serializeMessage = (message: any) =>
+			Buffer.isBuffer(message) || typeof message === 'string'
+				? message
+				: JSON.stringify(message);
+
+		return {
+			...ws,
 			clientId,
 			request,
 			socket,
 			clients: Array.from(this.clients.values()),
 
 			send: (message) => {
-				if (ws.readyState === WS.OPEN) {
-					if (Buffer.isBuffer(message)) {
-						ws.send(message);
-					} else if (typeof message === 'string') {
-						ws.send(message);
-					} else {
-						ws.send(JSON.stringify(message));
-					}
-				}
+				if (ws.readyState === WS.OPEN) ws.send(serializeMessage(message));
 			},
 
-			close(code, message) {
-				if (Buffer.isBuffer(message)) {
-					ws.close(code, message);
-				} else if (typeof message === 'string') {
-					ws.close(code, message);
-				} else {
-					ws.close(code, JSON.stringify(message));
-				}
+			close: (code?: number, message?: any) => {
+				ws.close(code, message ? serializeMessage(message) : undefined);
 			},
 
 			broadcast: (message, withoutMe = false) => {
@@ -97,48 +107,38 @@ export class WebsocketAdapter {
 				});
 			},
 		};
+	}
 
-		this.clients.set(clientId, ctx);
-		const route = routesData.findWebsocketRoute(url.pathname);
-		if (!route) {
-			ws.close();
-			return;
-		}
-
-		const middlewares = sortArrayByPriority(
-			route.websocketMiddlewares,
-			(mw) => mw.config?.priority || Priority.NORMAL,
-		);
-		const runMiddlewares = this.runMiddlewares;
-
-		const event: WebsocketEvent = {
-			onDisconnect(callback) {
-				ws.on('close', callback);
-			},
-			onMessage(callback) {
+	// todo : Event wrapper (onMessage, onError, dll)
+	private createWebsocketEvent(
+		ws: WS,
+		ctx: WebsocketContext,
+		middlewares: WebsocketMiddleware[],
+	): WebsocketEvent {
+		return {
+			onDisconnect: (cb) => ws.on('close', cb),
+			onMessage: (cb) => {
 				ws.on('message', async (data) => {
 					const message = decodeMessage(data);
 					const _ctx = { ...ctx, message };
-					await runMiddlewares(_ctx, middlewares);
-					callback(message);
+					await this.runMiddlewares(_ctx, middlewares);
+					cb(message);
 				});
 			},
-			onError(callback) {
-				ws.on('error', callback);
-			},
-			onPing(callback) {
-				ws.on('ping', callback);
-			},
-			onPong(callback) {
-				ws.on('pong', callback);
-			},
+			onError: (cb) => ws.on('error', cb),
+			onPing: (cb) => ws.on('ping', cb),
+			onPong: (cb) => ws.on('pong', cb),
 		};
-
-		ws.on('close', () => this.clients.delete(clientId));
-		ws.on('error', () => this.clients.delete(clientId));
-		route.websocket?.factory(Object.assign(ctx, event));
 	}
 
+	// todo :  Cleanup client ketika error atau close
+	private attachCleanup(ws: WS, clientId: string) {
+		const cleanup = () => this.clients.delete(clientId);
+		ws.on('close', cleanup);
+		ws.on('error', cleanup);
+	}
+
+	// todo : Middleware runner
 	private async runMiddlewares(
 		ctx: WebsocketContext & { message: any },
 		middlewares: WebsocketMiddleware[],
