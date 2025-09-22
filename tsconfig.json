@@ -36,7 +36,8 @@
 		"plugins/ejs",
 		"plugins/basic-auth",
 		"plugins/static",
-		"plugins/websocket"
+		"plugins/websocket",
+		"plugins/session"
 	],
 	"exclude": ["node_modules", "dist", "**/*.test.*"],
 	"files": [],

@@ -12,19 +12,8 @@
   <input id="input" type="text">
 
   <script>
-    const h1 = document.getElementById('h1');
-    const input = document.getElementById('input')
-
-    const socket = new WebSocket('http://localhost:3431')
-
-    socket.onmessage = (event) => {
-      h1.innerText = JSON.parse(event.data).name
-    }
-
-    input.addEventListener('change', (e) => {
-      socket.send(JSON.stringify({
-        name: e.target.value
-      }))
+    fetch('http://localhost:3431/session', {
+      credentials: 'include'
     })
   </script>
 </body>

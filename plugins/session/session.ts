@@ -1,111 +1,94 @@
-import { GamanApp } from '@gaman/core/gaman-app';
-import { Request } from '@gaman/common/types';
-import { sign, verify } from '@gaman/common/utils/signature';
-import {
-	GamanCookies,
-	GamanCookieSetOptions,
-} from '@gaman/core/context/cookies';
-import { IGamanSessionOptions } from '.';
-import { IGamanSessionStore } from './store';
+import * as crypto from 'node:crypto';
+import { Context, sign, verify } from '@gaman/common';
+import { SessionOptions } from './index.js';
 
-const SESSION_OPTIONS_SYMBOL = Symbol.for('gaman.sessionOptions');
-const SESSION_STORE_SYMBOL = Symbol.for('gaman.sessionStore');
+export class Session {
+	constructor(private ctx: Context, private options: SessionOptions) {}
 
-export interface IGamanSession {
-	set(name: string, payload: string | object | Buffer): Promise<void>;
-	get<T = any>(name: string): Promise<T | null>;
-	has(name: string): Promise<boolean>;
-	delete(name: string): Promise<void>;
-}
-
-export class GamanSession implements IGamanSession {
-	#cookies: GamanCookies;
-	#request: Request;
-	#secret: string;
-	#app: GamanApp;
-	#options: IGamanSessionOptions;
-	#store?: IGamanSessionStore;
-
-	constructor(app: GamanApp, cookies: GamanCookies, request: Request) {
-		this.#app = app;
-		this.#cookies = cookies;
-		this.#request = request;
-		this.#options = (this.#app as any)[SESSION_OPTIONS_SYMBOL] || {
-			secret: process.env.GAMAN_KEY || '',
-			driver: { type: 'cookies' },
-			maxAge: 86400,
-			secure: true,
-			rolling: true,
-		};
-		this.#secret = this.#options.secret || process.env.GAMAN_KEY || '';
-
-		// @ts-ignore
-		this.#store = this.#options.driver[SESSION_STORE_SYMBOL];
+	private get cookieName() {
+		return this.options.defaultName
+			? `gaman-session-${this.options.defaultName}`
+			: 'gaman-session-sid';
 	}
 
-	async set(name: string, payload: string | object | Buffer): Promise<void> {
-		const sessionId = crypto.randomUUID();
-		const cookieOpts: GamanCookieSetOptions = {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'lax',
-			secure: this.#options.secure ?? this.#request.url.startsWith('https://'),
-			maxAge: this.#options.maxAge,
-		};
+	private resolveCookieName(name?: string) {
+		return name ? `gaman-session-${name}` : this.cookieName;
+	}
 
-		if (this.#options.driver?.type === 'cookies') {
-			const token = sign(payload, this.#secret);
-			this.#cookies.set(name, token, cookieOpts);
+	/**
+	 * ? Set session data
+	 */
+	async set(payload: any, name?: string, maxAge?: number): Promise<void> {
+		const cookieName = this.resolveCookieName(name);
+		name = name || 'sid';
+
+		const ttl = maxAge || this.options.maxAge || 86400;
+
+		if (this.options.store) {
+			const sid = crypto.randomBytes(32).toString('hex');
+			await this.options.store.set({
+				sid,
+				name,
+				cookieName,
+				maxAge: ttl,
+				payload,
+			});
+			this.ctx.cookies.set(cookieName, sid, {
+				...this.options,
+				maxAge: ttl,
+			});
 		} else {
-			const data =
-				typeof payload === 'string' ? payload : JSON.stringify(payload);
-			await this.#store?.set(sessionId, data, this.#options.maxAge);
-			this.#cookies.set(name, sessionId, cookieOpts);
+			if (!this.options.secret) {
+				throw new Error('Session secret required in stateless mode');
+			}
+			const token = sign(payload, this.options.secret, ttl);
+			this.ctx.cookies.set(cookieName, token, {
+				...this.options,
+				maxAge: ttl,
+			});
 		}
 	}
 
-	async get<T = any>(name: string): Promise<T | null> {
-		const tokenOrId = this.#cookies.get(name)?.value;
-		if (!tokenOrId) return null;
+	/**
+	 * ? Get session data
+	 */
+	async get<T = any>(name?: string): Promise<T | null> {
+		const cookieName = this.resolveCookieName(name);
+		name = name || 'sid';
 
-		if (this.#options.driver?.type === 'cookies') {
-			const raw = verify(tokenOrId, this.#secret);
-			if (!raw) return null;
-			try {
-				return JSON.parse(raw) as T;
-			} catch {
-				return raw as unknown as T;
-			}
+		const value = this.ctx.cookies.get(cookieName)?.value;
+		if (!value) return null;
+
+		if (this.options.store) {
+			return (
+				(await this.options.store.get({
+					cookieName,
+					name,
+					sid: value,
+				})) ?? null
+			);
 		} else {
-			const raw = await this.#store?.get(tokenOrId);
-			if (!raw) return null;
-			try {
-				return JSON.parse(raw) as T;
-			} catch {
-				return raw as unknown as T;
-			}
+			if (!this.options.secret) return null;
+			return verify<T>(value, this.options.secret) ?? null;
 		}
 	}
 
-	async has(name: string): Promise<boolean> {
-		const tokenOrId = this.#cookies.get(name)?.value;
-		if (!tokenOrId) return false;
+	/**
+	 * ? Delete session
+	 */
+	async delete(name?: string): Promise<void> {
+		const cookieName = this.resolveCookieName(name);
+		name = name || 'sid';
 
-		if (this.#options.driver?.type === 'cookies') {
-			return Boolean(verify(tokenOrId, this.#secret));
-		}
-		if (!this.#store) {
-			return false;
-		}
+		const value = this.ctx.cookies.get(cookieName)?.value;
+		this.ctx.cookies.delete(cookieName, this.options);
 
-		return await this.#store?.has(tokenOrId);
-	}
-
-	async delete(name: string): Promise<void> {
-		const tokenOrId = this.#cookies.get(name)?.value;
-		this.#cookies.delete(name);
-		if (tokenOrId && this.#options.driver?.type !== 'cookies') {
-			await this.#store?.delete(tokenOrId);
+		if (this.options.store && value) {
+			await this.options.store.delete({
+				cookieName,
+				name,
+				sid: value,
+			});
 		}
 	}
 }

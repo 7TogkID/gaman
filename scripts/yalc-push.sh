@@ -33,6 +33,9 @@ yalc push
 cd ../websocket
 yalc push
 
+cd ../session
+yalc push
+
 # Return to the root directory
 cd ../..
 
