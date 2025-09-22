@@ -1,5 +1,11 @@
 # @gaman/websocket
 
+## 1.0.2
+
+### Patch Changes
+
+- 8cfcab1: refactor
+
 ## 1.0.1
 
 ### Patch Changes
