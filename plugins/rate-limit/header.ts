@@ -3,16 +3,16 @@
  * https://github.com/express-rate-limit/express-rate-limit/blob/main/source/headers.ts
  */
 
-import { Buffer } from 'node:buffer'
-import { createHash } from 'node:crypto'
-import { RateLimitInfo } from './types'
-import { Response } from '@gaman/core/response'
+import { Buffer } from 'node:buffer';
+import { createHash } from 'node:crypto';
+import { RateLimitInfo } from './types';
+import { Response } from '@gaman/core/response';
 
 export const SUPPORTED_DRAFT_VERSIONS = [
 	'draft-6',
 	'draft-7',
 	'draft-8',
-] as const
+] as const;
 
 /**
  * Returns the number of seconds left for the window to reset. Uses `windowMs`
@@ -22,19 +22,19 @@ export const SUPPORTED_DRAFT_VERSIONS = [
  * @param resetTime {Date | undefined} - The timestamp at which the store window resets.
  */
 const getResetSeconds = (windowMs: number, resetTime?: Date): number => {
-	let resetSeconds: number
+	let resetSeconds: number;
 	if (resetTime) {
-		const deltaSeconds = Math.ceil((resetTime.getTime() - Date.now()) / 1000)
-		resetSeconds = Math.max(0, deltaSeconds)
+		const deltaSeconds = Math.ceil((resetTime.getTime() - Date.now()) / 1000);
+		resetSeconds = Math.max(0, deltaSeconds);
 	} else {
 		// This isn't really correct, but the field is required by the spec in `draft-7`,
 		// so this is the best we can do. The validator should have already logged a
 		// warning by this point.
-		resetSeconds = Math.ceil(windowMs / 1000)
+		resetSeconds = Math.ceil(windowMs / 1000);
 	}
 
-	return resetSeconds
-}
+	return resetSeconds;
+};
 
 /**
  * Returns the hash of the identifier, truncated to 12 bytes, and then converted
@@ -44,34 +44,30 @@ const getResetSeconds = (windowMs: number, resetTime?: Date): number => {
  * @param key {string} - The identifier to hash.
  */
 const getPartitionKey = (key: string): string => {
-	const hash = createHash('sha256')
-	hash.update(key)
+	const hash = createHash('sha256');
+	hash.update(key);
 
-	const partitionKey = hash.digest('hex').slice(0, 12)
-	return Buffer.from(partitionKey).toString('base64')
-}
+	const partitionKey = hash.digest('hex').slice(0, 12);
+	return Buffer.from(partitionKey).toString('base64');
+};
 
 /**
  * Sets `X-RateLimit-*` headers on a response.
  */
-export const setLegacyHeaders = (
-	res: Response,
-	info: RateLimitInfo,
-): void => {
-  
-	res.headers.set('X-RateLimit-Limit', info.limit.toString())
-	res.headers.set('X-RateLimit-Remaining', info.remaining.toString())
+export const setLegacyHeaders = (res: Response, info: RateLimitInfo): void => {
+	res.headers.set('X-RateLimit-Limit', info.limit.toString());
+	res.headers.set('X-RateLimit-Remaining', info.remaining.toString());
 
 	// If we have a resetTime, also provide the current date to help avoid
 	// issues with incorrect clocks.
 	if (info.reset instanceof Date) {
-		res.headers.set('Date', new Date().toUTCString())
+		res.headers.set('Date', new Date().toUTCString());
 		res.headers.set(
 			'X-RateLimit-Reset',
 			Math.ceil(info.reset.getTime() / 1000).toString(),
-		)
+		);
 	}
-}
+};
 
 /**
  * Sets `RateLimit-*`` headers based on the sixth draft of the IETF specification.
@@ -86,18 +82,16 @@ export const setDraft6Headers = (
 	info: RateLimitInfo,
 	windowMs: number,
 ): void => {
+	const windowSeconds = Math.ceil(windowMs / 1000);
+	const resetSeconds = getResetSeconds(windowMs, info.reset);
 
-	const windowSeconds = Math.ceil(windowMs / 1000)
-	const resetSeconds = getResetSeconds(windowMs, info.reset)
-
-	res.headers.set('RateLimit-Policy', `${info.limit};w=${windowSeconds}`)
-	res.headers.set('RateLimit-Limit', info.limit.toString())
-	res.headers.set('RateLimit-Remaining', info.remaining.toString())
+	res.headers.set('RateLimit-Policy', `${info.limit};w=${windowSeconds}`);
+	res.headers.set('RateLimit-Limit', info.limit.toString());
+	res.headers.set('RateLimit-Remaining', info.remaining.toString());
 
 	// Set this header only if the store returns a `resetTime`.
-	if (resetSeconds)
-		res.headers.set('RateLimit-Reset', resetSeconds.toString())
-}
+	res.headers.set('RateLimit-Reset', resetSeconds.toString());
+};
 
 /**
  * Sets `RateLimit` & `RateLimit-Policy` headers based on the seventh draft of the spec.
@@ -112,16 +106,15 @@ export const setDraft7Headers = (
 	info: RateLimitInfo,
 	windowMs: number,
 ): void => {
+	const windowSeconds = Math.ceil(windowMs / 1000);
+	const resetSeconds = getResetSeconds(windowMs, info.reset);
 
-	const windowSeconds = Math.ceil(windowMs / 1000)
-	const resetSeconds = getResetSeconds(windowMs, info.reset)
-
-	res.headers.set('RateLimit-Policy', `${info.limit};w=${windowSeconds}`)
+	res.headers.set('RateLimit-Policy', `${info.limit};w=${windowSeconds}`);
 	res.headers.set(
 		'RateLimit',
 		`limit=${info.limit}, remaining=${info.remaining}, reset=${resetSeconds}`,
-	)
-}
+	);
+};
 
 /**
  * Sets `RateLimit` & `RateLimit-Policy` headers based on the eighth draft of the spec.
@@ -140,17 +133,16 @@ export const setDraft8Headers = (
 	name: string,
 	key: string,
 ): void => {
+	const windowSeconds = Math.ceil(windowMs / 1000);
+	const resetSeconds = getResetSeconds(windowMs, info.reset);
+	const partitionKey = getPartitionKey(key);
 
-	const windowSeconds = Math.ceil(windowMs / 1000)
-	const resetSeconds = getResetSeconds(windowMs, info.reset)
-	const partitionKey = getPartitionKey(key)
+	const header = `r=${info.remaining}; t=${resetSeconds}`;
+	const policy = `q=${info.limit}; w=${windowSeconds}; pk=:${partitionKey}:`;
 
-	const header = `r=${info.remaining}; t=${resetSeconds}`
-	const policy = `q=${info.limit}; w=${windowSeconds}; pk=:${partitionKey}:`
-  
-	res.append('RateLimit', `"${name}"; ${header}`)
-	res.append('RateLimit-Policy', `"${name}"; ${policy}`)
-}
+	res.headers.set('RateLimit', `"${name}"; ${header}`);
+	res.headers.set('RateLimit-Policy', `"${name}"; ${policy}`);
+};
 
 /**
  * Sets the `Retry-After` header.
@@ -164,7 +156,6 @@ export const setRetryAfterHeader = (
 	info: RateLimitInfo,
 	windowMs: number,
 ): void => {
-
-	const resetSeconds = getResetSeconds(windowMs, info.reset)
-	res.headers.set('Retry-After', resetSeconds.toString())
-}
+	const resetSeconds = getResetSeconds(windowMs, info.reset);
+	res.headers.set('Retry-After', resetSeconds.toString());
+};
