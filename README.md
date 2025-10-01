@@ -33,6 +33,9 @@ visit our [official documentation](https://gaman.7togk.id)
 
 **New Contributing welcome!** Check out our [Contributing Guide](CONTRIBUTING.md) for help getting started.
 
+## Donate
+- [Saweria](https://saweria.co/angga7togkk1)
+
 ## Links
 - [License (MIT)](https://github.com/7togkid/gaman/blob/main/LICENSE)
 - [Official Website](https://gaman.7togk.id)
