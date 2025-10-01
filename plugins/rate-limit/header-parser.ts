@@ -2,8 +2,7 @@
  * Reference code
  * https://github.com/express-rate-limit/ratelimit-header-parser/blob/main/source/ratelimit-header-parser.ts
  */
-
-import { Context } from '@gaman/core/types';
+import { Context } from '@gaman/common';
 import { ParseRateLimitOptions, RateLimitInfo } from './types';
 
 export function parseRateLimit(
