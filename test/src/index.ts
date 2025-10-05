@@ -20,11 +20,14 @@ defineBootstrap(async (app) => {
 		staticServe(),
 		AppMiddleware(),
 		rateLimit({
-			priority: Priority.MONITOR,
 			standardHeaders: true,
 			draft: 'draft-6',
-			limit: 2,
-		})
+			limit: 5,
+			ttl: 30_000,
+			onReceive(info, ctx) {
+				console.log(info);
+			},
+		}),
 	);
 
 	const sessionData: Record<string, any> = {};
