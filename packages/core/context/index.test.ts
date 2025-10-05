@@ -53,7 +53,7 @@ describe('createContext(app, )', () => {
 		app = new GamanApp();
 	});
 
-	it('parses query and headers', async () => {
+	it('parses query, headers and socket ip', async () => {
 		const req = mockRequest({
 			url: '/?name=joni',
 			headers: {
@@ -67,7 +67,7 @@ describe('createContext(app, )', () => {
 
 		expect(ctx.query('name')).toBe('joni');
 		expect(ctx.header('x-forwarded-for')).toBe('1.2.3.4');
-		expect(ctx.request.ip).toBe('1.2.3.4');
+		expect(ctx.request.ip).toBe('127.0.0.1');
 	});
 
 	it('parses JSON body', async () => {
