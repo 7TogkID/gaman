@@ -118,7 +118,7 @@ export async function createContext(
 				s.asFile(),
 			),
 
-		ip: getClientIP(req),
+		ip: req.socket.remoteAddress || '',
 	};
 	const cookies = new GamanCookies(gamanRequest);
 	const ctx: Context = {
@@ -185,26 +185,6 @@ export async function createContext(
 		[HTTP_RESPONSE_METADATA]: res,
 	};
 	return ctx;
-}
-
-// * sementara gini dulu ntar saya tambahin @gaman/trust-proxy
-const TRUST_PROXY_IPS = ['127.0.0.1', '::1']; // atau IP proxy kamu
-
-function getClientIP(req: http.IncomingMessage): string {
-	const remoteIP = req.socket.remoteAddress || '';
-
-	// ? Cek apakah request datang dari proxy yang kita percaya
-	const isTrustedProxy = TRUST_PROXY_IPS.includes(remoteIP);
-
-	if (isTrustedProxy) {
-		const xff = req.headers['x-forwarded-for'];
-		if (typeof xff === 'string') {
-			const ips = xff.split(',').map((ip) => ip.trim());
-			return ips[0]; // Ambil IP paling awal (IP client asli)
-		}
-	}
-
-	return remoteIP;
 }
 
 async function getBody(req: http.IncomingMessage): Promise<Buffer> {
