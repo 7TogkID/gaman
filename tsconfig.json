@@ -37,7 +37,8 @@
 		"plugins/basic-auth",
 		"plugins/static",
 		"plugins/websocket",
-		"plugins/session"
+		"plugins/session",
+		"plugins/rate-limit"
 	],
 	"exclude": ["node_modules", "dist", "**/*.test.*"],
 	"files": [],

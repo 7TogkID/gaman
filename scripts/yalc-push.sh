@@ -36,6 +36,9 @@ yalc push
 cd ../session
 yalc push
 
+cd ../rate-limit
+yalc push
+
 # Return to the root directory
 cd ../..
 

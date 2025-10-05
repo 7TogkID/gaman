@@ -1,4 +1,4 @@
-import { TextFormat } from '@gaman/common';
+import { Priority, TextFormat } from '@gaman/common';
 import { defineBootstrap } from '@gaman/core';
 import AppRoutes from './routes/AppRoutes';
 import { staticServe } from '@gaman/static';
@@ -7,6 +7,7 @@ import { cors } from '@gaman/cors';
 import { WebsocketGateway } from '@gaman/websocket';
 import { session } from '@gaman/session';
 import { nunjucks } from '@gaman/nunjucks';
+import { rateLimit } from '@gaman/rate-limit';
 
 defineBootstrap(async (app) => {
 	app.mount(
@@ -18,6 +19,12 @@ defineBootstrap(async (app) => {
 		}),
 		staticServe(),
 		AppMiddleware(),
+		rateLimit({
+			priority: Priority.MONITOR,
+			standardHeaders: true,
+			draft: 'draft-6',
+			limit: 2,
+		})
 	);
 
 	const sessionData: Record<string, any> = {};
