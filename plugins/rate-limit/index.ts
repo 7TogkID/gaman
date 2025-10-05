@@ -1,5 +1,10 @@
-import { composeMiddleware, Response } from '@gaman/core';
-import { Context, DefaultMiddlewareOptions, Priority } from '@gaman/common';
+import { composeMiddleware, composeStore, Response } from '@gaman/core';
+import {
+	Context,
+	DefaultMiddlewareOptions,
+	Priority,
+	Store,
+} from '@gaman/common';
 import { RateLimitInfo, RateLimitOptions, RateMemoryEntry } from './types.js';
 import { ipKeyGenerator } from './helper.js';
 import {
@@ -10,7 +15,7 @@ import {
 	setRetryAfterHeader,
 } from './header.js';
 
-const defaultOptions: Required<RateLimitOptions> = {
+const defaultOptions: Required<Omit<RateLimitOptions, 'store'>> = {
 	ttl: 60000,
 	limit: 5,
 	errorMessage: () =>
@@ -28,15 +33,35 @@ const defaultOptions: Required<RateLimitOptions> = {
 	standardHeaders: true,
 	legacyHeaders: false,
 	ipv6Subnet: 56,
-	onLimitReached: async () => {},
 	trustProxy: false,
+	onLimitReached: async () => {},
+	onReceive: async () => {},
 };
 
 export const rateLimit = (
 	ops?: RateLimitOptions & DefaultMiddlewareOptions,
 ) => {
 	const options = Object.assign({}, defaultOptions, ops);
-	const store = new Map<string, RateMemoryEntry>();
+
+	const store: Store<string, RateMemoryEntry> =
+		options.store ??
+		composeStore(() => {
+			const memoryStore = new Map<string, RateMemoryEntry>();
+			return {
+				async get(key) {
+					return memoryStore.get(key);
+				},
+				async set(key, value) {
+					memoryStore.set(key, value);
+				},
+				async has(key) {
+					return memoryStore.has(key);
+				},
+				async delete(key) {
+					memoryStore.delete(key);
+				},
+			};
+		})();
 
 	const middleware = composeMiddleware(async (ctx: Context, next) => {
 		const key =
@@ -47,7 +72,7 @@ export const rateLimit = (
 		const ttl = options.ttl || 60_600;
 		const limit = options.limit || 5;
 
-		let entry = store.get(key);
+		let entry = await store.get(key);
 		if (!entry || entry.resetTime <= now) {
 			entry = { count: 0, resetTime: now + ttl };
 			store.set(key, entry);
@@ -61,6 +86,7 @@ export const rateLimit = (
 			reset: new Date(entry.resetTime),
 			key,
 		};
+		options.onReceive?.(info, ctx);
 
 		/**
 		 * todo: set Retry header

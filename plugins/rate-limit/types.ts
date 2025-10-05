@@ -1,4 +1,4 @@
-import { Context } from '@gaman/common';
+import { Context, Store } from '@gaman/common';
 import { Response } from '@gaman/core';
 
 export interface RateLimitInfo {
@@ -91,15 +91,21 @@ export interface RateLimitOptions {
 	onLimitReached?: (info: RateLimitInfo, ctx: Context) => void | Promise<void>;
 
 	/**
+	 * @ID Callback opsional kalau ada request (biar bisa logging / metrics).
+	 * @EN Optional callback if there is a request (so that logging / metrics can be done).
+	 */
+	onReceive?: (info: RateLimitInfo, ctx: Context) => void | Promise<void>;
+
+	/**
 	 * @ID Menerima ip klien di header `X-Forwarded-For` dari proxy seperti apache, nginx dll, (default: false)
 	 * @EN Receive client ip in `X-Forwarded-For` header from proxies like apache, nginx etc, (default: false)
 	 */
 	trustProxy?: boolean;
 	/**
-	 * Store backend (default: memory store).
-	 * Bisa diganti Redis, Memcached, dll.
+	 * @ID Store backend seperti Redis, Memcached, dll.
+	 * @EN Store backends like Redis, Memcached, etc.
 	 */
-	// store?: RateLimitStore;
+	store?: Store<string, RateMemoryEntry>;
 }
 
 export interface RateMemoryEntry {
