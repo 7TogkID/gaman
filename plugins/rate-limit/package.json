@@ -1,6 +1,6 @@
 {
 	"name": "@gaman/rate-limit",
-	"version": "1.0.1-alpha.0",
+	"version": "1.0.1",
 	"type": "module",
 	"main": "index.js",
 	"author": "angga7togk",

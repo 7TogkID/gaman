@@ -1,5 +1,11 @@
 # @gaman/common
 
+## 1.2.4
+
+### Patch Changes
+
+- 1408d98: add composeStore and rate-limit plugins
+
 ## 1.2.3
 
 ### Patch Changes
