@@ -14,6 +14,10 @@
   <script>
     fetch('http://localhost:3431/session', {
       credentials: 'include'
+    }).then(res => {
+      for(const[key, value] of res.headers.entries()){
+        console.log(key, value)
+      }
     })
   </script>
 </body>

@@ -1,72 +1,108 @@
-/**
- * @module
- * Rate Limit Integration for GamanJS.
- *
- * Inspired by https://github.com/express-rate-limit/ratelimit-header-parser
- */
-
-import { defineIntegration } from '@gaman/core/integration';
-import { Context } from '@gaman/core/types';
-
-export interface RateLimitOptions {
-  windowMs?: number;     // Waktu jendela dalam milidetik (default: 60 detik)
-  max?: number;          // Maksimum request per IP dalam jendela
-  message?: string;      // Pesan error jika limit terlampaui
-  keyGenerator?: (ctx: Context) => string; // Kustom IP key
-}
-
-interface RateMemoryEntry {
-  count: number;
-  resetTime: number;
-}
+import { composeMiddleware, Response } from '@gaman/core';
+import { Context, DefaultMiddlewareOptions, Priority } from '@gaman/common';
+import { RateLimitInfo, RateLimitOptions, RateMemoryEntry } from './types.js';
+import { ipKeyGenerator } from './helper.js';
+import {
+	setLegacyHeaders,
+	setDraft6Headers,
+	setDraft7Headers,
+	setDraft8Headers,
+	setRetryAfterHeader,
+} from './header.js';
 
 const defaultOptions: Required<RateLimitOptions> = {
-  windowMs: 60_000,
-  max: 60,
-  message: 'Too many requests, please try again later.',
-  keyGenerator: (ctx) =>
-    ctx.req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
-    ctx.req.socket.remoteAddress ||
-    'unknown',
+	ttl: 60000,
+	limit: 5,
+	errorMessage: () =>
+		Response.tooManyRequests({
+			message: 'Too many requests, please try again later.',
+		}),
+	keyGenerator: (_, ctx) => {
+		const ip = defaultOptions.trustProxy
+			? ctx.header('x-forwarded-for')?.toString().split(',')[0].trim() ||
+			  ctx.request.ip
+			: ctx.request.ip;
+		return ipKeyGenerator(ip, defaultOptions.ipv6Subnet);
+	},
+	draft: 'legacy',
+	standardHeaders: true,
+	legacyHeaders: false,
+	ipv6Subnet: 56,
+	onLimitReached: async () => {},
+	trustProxy: false,
 };
 
-export const rateLimit = (opts?: RateLimitOptions) => {
-  const options = { ...defaultOptions, ...opts };
-  const memoryStore = new Map<string, RateMemoryEntry>();
+export const rateLimit = (
+	ops?: RateLimitOptions & DefaultMiddlewareOptions,
+) => {
+	const options = Object.assign({}, defaultOptions, ops);
+	const store = new Map<string, RateMemoryEntry>();
 
-  return defineIntegration((app) => ({
-    name: 'rate-limit',
-    priority: 'high',
+	const middleware = composeMiddleware(async (ctx: Context, next) => {
+		const key =
+			(await options.keyGenerator(options, ctx)) ??
+			(await defaultOptions.keyGenerator(options, ctx));
 
-    async onRequest(ctx) {
-      const key = options.keyGenerator(ctx);
-      const now = Date.now();
+		const now = Date.now();
+		const ttl = options.ttl || 60_600;
+		const limit = options.limit || 5;
 
-      let entry = memoryStore.get(key);
+		let entry = store.get(key);
+		if (!entry || entry.resetTime <= now) {
+			entry = { count: 0, resetTime: now + ttl };
+			store.set(key, entry);
+		}
+		entry.count++;
 
-      if (!entry || entry.resetTime < now) {
-        entry = {
-          count: 1,
-          resetTime: now + options.windowMs,
-        };
-        memoryStore.set(key, entry);
-      } else {
-        entry.count += 1;
-      }
+		const info: RateLimitInfo = {
+			limit,
+			used: entry.count,
+			remaining: Math.max(0, limit - entry.count),
+			reset: new Date(entry.resetTime),
+			key,
+		};
 
-      const remaining = options.max - entry.count;
+		/**
+		 * todo: set Retry header
+		 * ? biar client tau kapan bisa request lagi
+		 */
+		setRetryAfterHeader(ctx.headers, info, ttl);
 
-      // Set Draft IETF-style RateLimit headers
-      ctx.res.setHeader(
-        'RateLimit',
-        `${options.max};window=${Math.floor(options.windowMs / 1000)}`
-      );
-      ctx.res.setHeader('RateLimit-Remaining', Math.max(0, remaining).toString());
-      ctx.res.setHeader('RateLimit-Reset', Math.floor(entry.resetTime / 1000).toString());
+		// todo: set draft header biar tau data rate-limit sperti limit, ttl dll
+		if (options.legacyHeaders) setLegacyHeaders(ctx.headers, info);
+		if (options.standardHeaders) {
+			switch (options.draft) {
+				case 'draft-6':
+					setDraft6Headers(ctx.headers, info, ttl);
+					break;
+				case 'draft-7':
+					setDraft7Headers(ctx.headers, info, ttl);
+					break;
+				case 'draft-8':
+					setDraft8Headers(ctx.headers, info, ttl, 'ratelimit', key);
+					break;
+			}
+		}
 
-      if (entry.count > options.max) {
-        return ctx.res.status(429).text(options.message);
-      }
-    },
-  }));
+		// todo: Jika kena request dah lebih di atas limit yang di atur maka kirim respon error
+		if (entry.count > limit) {
+			await options.onLimitReached(info, ctx);
+			return typeof options.errorMessage === 'function'
+				? await options.errorMessage(ctx)
+				: Response.tooManyRequests({
+						message:
+							typeof options.errorMessage === 'string'
+								? options.errorMessage
+								: 'Too many requests, please try again later.',
+				  });
+		}
+
+		return await next();
+	});
+
+	return middleware({
+		priority: Priority.MONITOR,
+		includes: options.includes,
+		excludes: options.excludes,
+	});
 };

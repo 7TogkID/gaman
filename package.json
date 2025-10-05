@@ -23,7 +23,8 @@
 		"plugins/basic-auth",
 		"plugins/static",
 		"plugins/websocket",
-		"plugins/session"
+		"plugins/session",
+		"plugins/rate-limit"
 	],
 	"author": "angga7togk",
 	"license": "MIT",
@@ -42,6 +43,7 @@
 		"esbuild": "^0.25.8",
 		"esbuild-plugin-file-path-extensions": "^2.1.4",
 		"install": "^0.13.0",
+		"ip-address": "^10.0.1",
 		"jsonwebtoken": "^9.0.2",
 		"npm": "^11.5.2",
 		"path-to-regexp": "^8.3.0",
