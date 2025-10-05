@@ -1,7 +1,7 @@
-import { Store } from "@gaman/common/index.js";
+import { Store } from '@gaman/common/index.js';
 
-export function composeStore<K = string, V = any>(
-	store: Store<K, V>,
-): Store<K, V> {
-	return store;
+export function composeStore<A extends any[], K = string, V = any>(
+	storeHandle: (...args: A) => Store<K, V>,
+): (...args: A) => Store<K, V> {
+	return (...args: A) => storeHandle(...args);
 }
