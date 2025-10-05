@@ -18,9 +18,10 @@ const defaultOptions: Required<RateLimitOptions> = {
 			message: 'Too many requests, please try again later.',
 		}),
 	keyGenerator: (_, ctx) => {
-		const ip =
-			ctx.header('x-forwarded-for')?.toString().split(',')[0].trim() ||
-			ctx.request.ip;
+		const ip = defaultOptions.trustProxy
+			? ctx.header('x-forwarded-for')?.toString().split(',')[0].trim() ||
+			  ctx.request.ip
+			: ctx.request.ip;
 		return ipKeyGenerator(ip, defaultOptions.ipv6Subnet);
 	},
 	draft: 'legacy',
@@ -28,6 +29,7 @@ const defaultOptions: Required<RateLimitOptions> = {
 	legacyHeaders: false,
 	ipv6Subnet: 56,
 	onLimitReached: async () => {},
+	trustProxy: false,
 };
 
 export const rateLimit = (
@@ -60,7 +62,13 @@ export const rateLimit = (
 			key,
 		};
 
+		/**
+		 * todo: set Retry header
+		 * ? biar client tau kapan bisa request lagi
+		 */
 		setRetryAfterHeader(ctx.headers, info, ttl);
+
+		// todo: set draft header biar tau data rate-limit sperti limit, ttl dll
 		if (options.legacyHeaders) setLegacyHeaders(ctx.headers, info);
 		if (options.standardHeaders) {
 			switch (options.draft) {
@@ -77,7 +85,7 @@ export const rateLimit = (
 		}
 
 		// todo: Jika kena request dah lebih di atas limit yang di atur maka kirim respon error
-		if (entry.count >= limit) {
+		if (entry.count > limit) {
 			await options.onLimitReached(info, ctx);
 			return typeof options.errorMessage === 'function'
 				? await options.errorMessage(ctx)

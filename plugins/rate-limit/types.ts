@@ -91,6 +91,11 @@ export interface RateLimitOptions {
 	onLimitReached?: (info: RateLimitInfo, ctx: Context) => void | Promise<void>;
 
 	/**
+	 * @ID Menerima ip klien di header `X-Forwarded-For` dari proxy seperti apache, nginx dll, (default: false)
+	 * @EN Receive client ip in `X-Forwarded-For` header from proxies like apache, nginx etc, (default: false)
+	 */
+	trustProxy?: boolean;
+	/**
 	 * Store backend (default: memory store).
 	 * Bisa diganti Redis, Memcached, dll.
 	 */
