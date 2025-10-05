@@ -10,6 +10,7 @@ export * from '@gaman/core/interceptor/index.js';
 export * from '@gaman/core/integration/index.js';
 export * from '@gaman/core/middleware/index.js';
 export * from '@gaman/core/exception/index.js';
+export * from '@gaman/core/store/index.js';
 
 export * from '@gaman/core/config/index.js';
 export * from '@gaman/core/response.js';
