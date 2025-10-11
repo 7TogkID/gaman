@@ -4,6 +4,6 @@
 		"module": "nodenext",
     "composite": true,
 		"declaration": true,
-    "declarationMap": false
+    "declarationMap": false,
 	},
 }

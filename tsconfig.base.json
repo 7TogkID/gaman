@@ -23,8 +23,6 @@
 		"forceConsistentCasingInFileNames": true,
 		"strictPropertyInitialization": false,
 		"types": ["node"],
-		"baseUrl": ".",
-		"rootDir": ".",
 		"paths": {
 			"@gaman/core": ["packages/core"],
 			"@gaman/core/*": ["packages/core/*"],

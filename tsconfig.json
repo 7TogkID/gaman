@@ -21,8 +21,7 @@
 		"strictNullChecks": true,
 		"forceConsistentCasingInFileNames": true,
 		"strictPropertyInitialization": false,
-		"types": ["node"],
-		"baseUrl": "."
+		"types": ["node"]
 	},
 	"jest": {},
 	"tsc-alias": {
