@@ -23,12 +23,6 @@
 		"forceConsistentCasingInFileNames": true,
 		"strictPropertyInitialization": false,
 		"types": ["node"],
-		"paths": {
-			"@gaman/core": ["packages/core"],
-			"@gaman/core/*": ["packages/core/*"],
-			"@gaman/common": ["packages/common"],
-			"@gaman/common/*": ["packages/common/*"]
-		}
 	},
 	"jest": {},
 	"tsc-alias": {

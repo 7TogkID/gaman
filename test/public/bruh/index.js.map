@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["index.js"],
+  "sourcesContent": ["console.log('hash')"],
+  "mappings": "AAAA,QAAQ,IAAI,MAAM;",
+  "names": []
+}

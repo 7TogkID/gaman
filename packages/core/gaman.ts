@@ -3,6 +3,7 @@ import { loadEnv } from '@gaman/common/utils/load-env.js';
 import * as path from 'path';
 import * as fs from 'fs';
 import { pathToFileURL } from 'url';
+import { getGamanConfig } from '@gaman/common';
 
 const ROUTE_DIRS = ['routes', 'router'];
 const MIDDLEWARE_DIRS = ['middlewares', 'middleware'];
@@ -39,18 +40,19 @@ async function importDirIfExists(dirs: string[]) {
 export async function defineBootstrap(cb: (app: GamanApp) => any) {
 	loadEnv();
 	const app = new GamanApp();
+	const config = await getGamanConfig();
 
 	// *** ROUTES ***
-	await importDirIfExists(ROUTE_DIRS);
+	await importDirIfExists(config.build?.autoComposeDirs?.routes ?? ROUTE_DIRS);
 
 	// *** MIDDLEWARES ***
-	await importDirIfExists(MIDDLEWARE_DIRS);
+	await importDirIfExists(config.build?.autoComposeDirs?.middlewares ?? MIDDLEWARE_DIRS);
 
 	// *** INTERCEPTORS ***
-	await importDirIfExists(INTERCEPTOR_DIRS);
+	await importDirIfExists(config.build?.autoComposeDirs?.interceptors ?? INTERCEPTOR_DIRS);
 
 	// *** EXCEPTIONS ***
-	await importDirIfExists(EXCEPTION_DIRS);
+	await importDirIfExists(config.build?.autoComposeDirs?.exceptions ?? EXCEPTION_DIRS);
 
 	cb(app);
 }

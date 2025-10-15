@@ -7,7 +7,6 @@ import {
 import AppController from '../controllers/AppController';
 import { InterceptorException } from '@gaman/common';
 import MidController from '../controllers/MidController';
-import { basicAuth } from '@gaman/basic-auth';
 import AppWebsocket from '../AppWebsocket';
 import TesWSMiddleware from '../middlewares/TesWSMiddleware';
 

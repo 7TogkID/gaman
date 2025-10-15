@@ -1,1 +1,2 @@
-console.log('hash')
+console.log("hash");
+//# sourceMappingURL=index.js.map

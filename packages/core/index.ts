@@ -1,4 +1,5 @@
 import '@gaman/core/global.js';
+import 'source-map-support/register.js';
 
 export * from '@gaman/core/gaman-app.js';
 export * from '@gaman/core/router/handler.js';
@@ -11,6 +12,7 @@ export * from '@gaman/core/integration/index.js';
 export * from '@gaman/core/middleware/index.js';
 export * from '@gaman/core/exception/index.js';
 export * from '@gaman/core/store/index.js';
+export * from "@gaman/core/service/index.js";
 
 export * from '@gaman/core/config/index.js';
 export * from '@gaman/core/response.js';
