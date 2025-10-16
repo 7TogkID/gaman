@@ -8,26 +8,21 @@ import { WebsocketGateway } from '@gaman/websocket';
 import { session } from '@gaman/session';
 import { nunjucks } from '@gaman/nunjucks';
 import { rateLimit } from '@gaman/rate-limit';
+import { edge } from '@gaman/edge';
+import EdgeHandler from './EdgeHandler';
 
 defineBootstrap(async (app) => {
 	app.mount(
 		AppRoutes,
-		nunjucks(),
+		edge({
+			handler: EdgeHandler,
+		}),
 		cors({
 			origin: ['http://127.0.0.1:5500'],
 			credentials: true,
 		}),
 		staticServe(),
 		AppMiddleware(),
-		rateLimit({
-			standardHeaders: true,
-			draft: 'draft-6',
-			limit: 5,
-			ttl: 30_000,
-			onReceive(info, ctx) {
-				console.log(info);
-			},
-		}),
 	);
 
 	const sessionData: Record<string, any> = {};

@@ -2,9 +2,6 @@
 	"files.exclude": {
 		"**/node_modules": true,
 		// "**/dist": true,
-		"**/plugins": true,
-		"**/sample": true,
-		"**/scripts": true,
-		"**/template": true,
+		// "**/plugins": true,
 	}
 }

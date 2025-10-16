@@ -5,8 +5,6 @@ type Params = [AppServiceType];
 
 export default composeController<Params>((ser = AppService('asda')) => ({
 	async Home(ctx) {
-		return Res.json({
-			message: ser.Welcome(),
-		});
+		return Res.render('index', { username: 'Angga' });
 	},
 }));

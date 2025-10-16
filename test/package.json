@@ -17,6 +17,7 @@
     "@gaman/common": "file:.yalc/@gaman/common",
     "@gaman/core": "file:.yalc/@gaman/core",
     "@gaman/cors": "file:.yalc/@gaman/cors",
+    "@gaman/edge": "file:.yalc/@gaman/edge",
     "@gaman/ejs": "file:.yalc/@gaman/ejs",
     "@gaman/nunjucks": "file:.yalc/@gaman/nunjucks",
     "@gaman/rate-limit": "file:.yalc/@gaman/rate-limit",

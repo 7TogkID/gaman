@@ -38,7 +38,8 @@
 		"plugins/static",
 		"plugins/websocket",
 		"plugins/session",
-		"plugins/rate-limit"
+		"plugins/rate-limit",
+		"plugins/edge",
 	],
 	"exclude": ["node_modules", "dist", "**/*.test.*"]
 }
