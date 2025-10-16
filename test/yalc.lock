@@ -2,11 +2,11 @@
   "version": "v1",
   "packages": {
     "@gaman/core": {
-      "signature": "fffc72dcccd4fb944575de11356f8489",
+      "signature": "9998217f2b24e37980a83a313c562903",
       "file": true
     },
     "@gaman/common": {
-      "signature": "00db9bb209c197aefd2a1b034bcaf346",
+      "signature": "ba0d66e4ddd7ec6229e6db3b2f0817d8",
       "file": true
     },
     "@gaman/cli": {

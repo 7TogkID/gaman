@@ -1,11 +1,12 @@
 import { composeController } from '@gaman/core';
-import { service, type AppServiceType } from '../service/AppService';
+import { AppService, type AppServiceType } from '../service/AppService';
 
-export default composeController(() => ({
+type Params = [AppServiceType];
+
+export default composeController<Params>((ser = AppService('asda')) => ({
 	async Home(ctx) {
 		return Res.json({
-			message: ctx.param('name'),
+			message: ser.Welcome(),
 		});
 	},
-	
 }));

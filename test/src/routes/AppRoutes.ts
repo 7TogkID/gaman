@@ -1,5 +1,4 @@
 import {
-	autoComposeRoutes,
 	composeInterceptor,
 	composeExceptionHandler,
 	composeRoutes,
@@ -42,9 +41,7 @@ export const ErrorHandle = composeExceptionHandler((err) => {
 export default composeRoutes((r) => {
 	r.ws('/', AppWebsocket).middleware(TesWSMiddleware());
 
-	r.get('/', (ctx) => {
-		return Res.json({ message: ' ADUH' }, 403);
-	});
+	r.get('/', [AppController, 'Home']);
 
 	r.get('session', async (ctx) => {
 		const value = await ctx.session.get();

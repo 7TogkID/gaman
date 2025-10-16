@@ -1,8 +1,8 @@
-import { Fn, ServiceFactory } from '@gaman/common';
+import { ServiceFn, ServiceFactory } from '@gaman/common';
 
 export function composeService<
-	TDeps extends object,
-	TReturn extends Record<string, Fn>,
->(factory: ServiceFactory<TDeps, TReturn>): ServiceFactory<TDeps, TReturn> {
+	TReturn extends Record<string, ServiceFn>,
+	Args extends any[] = any[],
+>(factory: ServiceFactory<TReturn, Args>): ServiceFactory<TReturn, Args> {
 	return factory;
 }
