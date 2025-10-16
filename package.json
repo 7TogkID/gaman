@@ -24,7 +24,8 @@
 		"plugins/static",
 		"plugins/websocket",
 		"plugins/session",
-		"plugins/rate-limit"
+		"plugins/rate-limit",
+		"plugins/edge"
 	],
 	"author": "angga7togk",
 	"license": "MIT",
@@ -40,6 +41,7 @@
 		"@types/ws": "^8.18.1",
 		"chokidar": "^3.6.0",
 		"cookie": "^1.0.2",
+		"edge.js": "^6.3.0",
 		"esbuild": "^0.25.8",
 		"esbuild-plugin-file-path-extensions": "^2.1.4",
 		"install": "^0.13.0",

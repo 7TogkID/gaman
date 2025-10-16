@@ -39,6 +39,9 @@ yalc push
 cd ../rate-limit
 yalc push
 
+cd ../edge
+yalc push
+
 # Return to the root directory
 cd ../..
 
