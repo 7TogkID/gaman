@@ -37,7 +37,8 @@
 		"plugins/static",
 		"plugins/websocket",
 		"plugins/session",
-		"plugins/rate-limit"
+		"plugins/rate-limit",
+		"plugins/jwt"
 	],
 	"exclude": ["node_modules", "dist", "**/*.test.*"],
 	"files": [],
