@@ -1,5 +1,11 @@
 # @gaman/common
 
+## 1.2.5
+
+### Patch Changes
+
+- 3f5e29c: new
+
 ## 1.2.4
 
 ### Patch Changes
