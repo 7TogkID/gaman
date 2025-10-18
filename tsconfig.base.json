@@ -40,6 +40,7 @@
 		"plugins/session",
 		"plugins/rate-limit",
 		"plugins/edge",
+		"plugins/jwt"
 	],
 	"exclude": ["node_modules", "dist", "**/*.test.*"]
 }
