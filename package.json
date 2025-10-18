@@ -25,7 +25,8 @@
 		"plugins/websocket",
 		"plugins/session",
 		"plugins/rate-limit",
-		"plugins/edge"
+		"plugins/edge",
+		"plugins/jwt"
 	],
 	"author": "angga7togk",
 	"license": "MIT",
@@ -69,6 +70,7 @@
 		"globals": "^16.3.0",
 		"k6": "^0.0.0",
 		"mongodb": "^6.17.0",
+		"node-mocks-http": "^1.17.2",
 		"nunjucks": "^3.2.4",
 		"redis": "^5.6.1",
 		"sqlite": "^5.1.1",
@@ -79,6 +81,7 @@
 		"tsx": "^4.20.3",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.36.0",
-		"vitest": "^3.2.4"
+		"vitest": "^3.2.4",
+		"yalc": "^1.0.0-pre.53"
 	}
 }

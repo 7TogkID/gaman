@@ -10,6 +10,9 @@ import { nunjucks } from '@gaman/nunjucks';
 import { rateLimit } from '@gaman/rate-limit';
 import { edge } from '@gaman/edge';
 import EdgeHandler from './EdgeHandler';
+import { jwt } from '@gaman/jwt';
+import JwtRoutes from './routes/JwtRoutes';
+import { jwtAuthMiddleware } from './middlewares/JwtAuthMiddleware';
 
 defineBootstrap(async (app) => {
 	app.mount(
@@ -23,6 +26,7 @@ defineBootstrap(async (app) => {
 		}),
 		staticServe(),
 		AppMiddleware(),
+		jwtAuthMiddleware(),
 	);
 
 	const sessionData: Record<string, any> = {};
@@ -42,6 +46,24 @@ defineBootstrap(async (app) => {
 			},
 		}),
 	);
+
+	app.mount(
+		jwt({
+			secret: 'secret',
+			header: 'Authorization',
+			required: false,
+			includes: ['/jwt/unprotected', '/jwt/token'],
+		}),
+		jwt({
+			secret: 'secret',
+			header: 'Authorization',
+			required: true,
+			includes: ['/jwt/protected'],
+			excludes: ['/jwt/unprotected', '/jwt/token'],
+		}),
+	);
+
+	app.mount(JwtRoutes);
 
 	const server = await app.mountServer(':3431');
 	WebsocketGateway.upgrade(server);

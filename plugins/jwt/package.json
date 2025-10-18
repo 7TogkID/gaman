@@ -1,0 +1,20 @@
+{
+	"name": "@gaman/jwt",
+	"version": "1.0.0",
+	"type": "module",
+	"main": "index.js",
+	"author": "7TogkID",
+	"license": "MIT",
+	"repository": {
+		"url": "git+https://github.com/7TogkID/gaman.git",
+		"directory": "plugins/jwt"
+	},
+	"bugs": {
+		"url": "https://github.com/7TogkID/gaman/issues"
+	},
+	"homepage": "https://gaman.7togk.id",
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org"
+	}
+}
