@@ -4,7 +4,7 @@ import { Logger } from '@gaman/common/utils/logger.js';
 import { Command } from './command.js';
 import { getGamanConfig, TextFormat } from '@gaman/common/index.js';
 import path from 'path';
-import { isDevelopment } from '../utils/esbuild.js';
+import { isDevelopment } from '../builder/helper.js';
 
 // Versi sebagai Command
 export class StartCommand extends Command {
@@ -19,7 +19,7 @@ export class StartCommand extends Command {
 
 	async execute(): Promise<void> {
 		const config = await getGamanConfig();
-		const outdir = config.build?.outdir || 'dist';
+		const outdir = `${config.build?.outdir || 'dist'}/server`;
 		const entryFile = path.join(outdir, 'index.js');
 
 		if (isDevelopment(outdir)) {
@@ -36,14 +36,12 @@ export class StartCommand extends Command {
 			process.exit(1);
 		}
 
-		const child = spawn(
-			process.execPath,
-			[entryFile, ...process.argv.slice(3)],
-			{
-				stdio: 'inherit',
-				env: process.env,
-			},
-		);
+		const devIndex = process.argv.indexOf('start');
+		const extraArgs = devIndex >= 0 ? process.argv.slice(devIndex + 1) : [];
+		const child = spawn(process.execPath, [entryFile, ...extraArgs], {
+			stdio: 'inherit',
+			env: process.env,
+		});
 
 		child.on('exit', (code) => {
 			Logger.error(`Process exited with code: ${code}`);

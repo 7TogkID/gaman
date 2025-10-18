@@ -5,7 +5,7 @@ import { Logger } from '@gaman/common/utils/logger.js';
 import chokidar from 'chokidar';
 import path from 'path';
 import { getGamanConfig } from '@gaman/common/index.js';
-import { buildAll, buildFile } from '../utils/esbuild.js';
+import { buildAll, buildFile } from '../builder/index.js';
 
 export class DevCommand extends Command {
 	constructor() {
@@ -14,7 +14,7 @@ export class DevCommand extends Command {
 
 	async execute(): Promise<void> {
 		const config = await getGamanConfig();
-		const outdir = config.build?.outdir || 'dist';
+		const outdir = `${config.build?.outdir || 'dist'}/server`;
 		const verbose = config.verbose;
 		const rootdir = config.build?.rootdir || 'src';
 		const entryFile = path.join(outdir, 'index.js');
@@ -27,13 +27,13 @@ export class DevCommand extends Command {
 				Logger.log('Restarting application...');
 				child.kill();
 			}
-			child = spawn(
-				process.execPath,
-				[entryFile, ...process.argv.slice(3)],
-				{
-					stdio: 'inherit',
-				},
-			);
+			const devIndex = process.argv.indexOf('dev');
+			const extraArgs = devIndex >= 0 ? process.argv.slice(devIndex + 1) : [];
+			child = spawn(process.execPath, [entryFile, ...extraArgs], {
+				stdio: 'inherit',
+				env: process.env,
+			});
+			console.log("Forwarded args:", extraArgs);
 		};
 
 		restart();
