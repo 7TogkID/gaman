@@ -21,8 +21,7 @@
 		"strict": true,
 		"strictNullChecks": true,
 		"forceConsistentCasingInFileNames": true,
-		"strictPropertyInitialization": false,
-		"types": ["node"],
+		"strictPropertyInitialization": false
 	},
 	"jest": {},
 	"tsc-alias": {
@@ -40,6 +39,7 @@
 		"plugins/session",
 		"plugins/rate-limit",
 		"plugins/edge",
+		"plugins/orm"
 	],
 	"exclude": ["node_modules", "dist", "**/*.test.*"]
 }

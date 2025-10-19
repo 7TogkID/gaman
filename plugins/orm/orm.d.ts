@@ -1,4 +1,4 @@
-import { GamanProvider } from './provider/base';
+import { GamanProvider } from './provider/base.js';
 export declare class GamanORM {
     private provider;
     constructor(provider: GamanProvider);

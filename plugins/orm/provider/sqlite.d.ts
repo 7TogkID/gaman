@@ -1,5 +1,5 @@
 import { Database } from 'sqlite';
-import { GamanProvider } from './base';
+import { GamanProvider } from './base.js';
 export declare class SQLiteProvider implements GamanProvider {
     db: Database;
     connect(): Promise<void>;

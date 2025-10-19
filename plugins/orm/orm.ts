@@ -1,5 +1,5 @@
 // orm.ts
-import { GamanProvider } from './provider/base';
+import { GamanProvider } from './provider/base.js';
 
 export class GamanORM {
 	constructor(private provider: GamanProvider) {}

@@ -1,6 +1,6 @@
 import sqlite3 from 'sqlite3';
 import { open, Database } from 'sqlite';
-import { GamanProvider } from './base';
+import { GamanProvider } from './base.js';
 
 export class SQLiteProvider implements GamanProvider {
 	db!: Database;
