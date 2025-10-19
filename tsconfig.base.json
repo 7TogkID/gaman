@@ -39,7 +39,8 @@
 		"plugins/session",
 		"plugins/rate-limit",
 		"plugins/edge",
-		"plugins/orm"
+		"plugins/orm",
+		"plugins/jwt"
 	],
 	"exclude": ["node_modules", "dist", "**/*.test.*"]
 }

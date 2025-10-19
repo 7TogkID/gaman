@@ -45,7 +45,7 @@ declare global {
 		interface Context {
 			jwt: {
 				sign: (payload: object, expiresIn?: string | number) => string;
-				verify: <T>(token: string) => T | null;
+				verify: <T = any>(token: string) => T | null;
 				user: any;
 			};
 		}
