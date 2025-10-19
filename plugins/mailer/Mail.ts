@@ -5,7 +5,7 @@ export default class Mail {
 	to: string;
 	subject: string;
 	text: string;
-	body: string | Response;
+	body: string;
 
 	async create(mail: LikeMail) {
 		this.from = mail.from;

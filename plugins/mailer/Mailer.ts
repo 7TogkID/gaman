@@ -60,7 +60,7 @@ export default class Mailer {
 					to: mail.to,
 					subject: mail.subject,
 					text: mail.text,
-					html: mail.body,
+					html: mail.body as string,
 				},
 				(error, info) => {
 					if (error) {
