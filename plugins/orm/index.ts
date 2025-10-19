@@ -1,107 +1,42 @@
 /**
- * @module
- * CORS Middleware for Gaman.
- * Implements Cross-Origin Resource Sharing (CORS) with customizable options.
+ * @fileoverview Gaman ORM Plugin
+ *
+ * This module provides a lightweight Object-Relational Mapping (ORM) system for Gaman applications.
+ * It supports basic CRUD operations, data casting, and model relations through a provider-based architecture.
+ *
+ * Key features:
+ * - Database-agnostic via providers (e.g., SQLite)
+ * - Automatic data type casting
+ * - Model-based relations (hasMany, belongsTo, hasOne)
+ * - Simple query interface
+ *
+ * @example
+ * ```typescript
+ * import { GamanORM, BaseModel, SQLiteProvider } from '@gaman/orm';
+ *
+ * const orm = new GamanORM(new SQLiteProvider());
+ * class User extends BaseModel<User> {
+ *   // Define model options
+ * }
+ * ```
  */
-
-import { next } from "@gaman/core/next";
-import { AppConfig, Context, Handler } from "@gaman/core/types";
 
 /**
- * CORS middleware options.
+ * The main ORM class that handles database connections and operations.
  */
-export type CorsOptions = {
-  /** Allowed origin(s) for the request. */
-  origin?: string | string[] | null;
-  /** HTTP methods allowed for the request. Default: `["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"]` */
-  allowMethods?: string[];
-  /** Headers allowed in the request. Default: `["Content-Type", "Authorization"]` */
-  allowHeaders?: string[];
-  /** Maximum cache age for preflight requests (in seconds). */
-  maxAge?: number;
-  /** Whether to include credentials (cookies, HTTP auth, etc.) in the request. */
-  credentials?: boolean;
-  /** Headers exposed to the client in the response. */
-  exposeHeaders?: string[];
-};
+export { GamanORM } from './orm.js';
 
 /**
- * Middleware for handling Cross-Origin Resource Sharing (CORS).
- * @param options - The options for configuring CORS behavior.
- * @returns Middleware function for handling CORS.
+ * Base model class for defining database models with casting and relations.
  */
+export { BaseModel, BaseModelOptions } from './model/base.js';
 
+/**
+ * Interface for database providers that implement the actual database interactions.
+ */
+export { GamanProvider } from './provider/base.js';
 
-
-export const cors = (options: CorsOptions): Handler<AppConfig> => {
-  const {
-    origin = "*",
-    allowMethods = ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowHeaders = [],
-    maxAge,
-    credentials,
-    exposeHeaders,
-  } = options;
-
-  return async (ctx: Context) => {
-    const requestOrigin = ctx.header("Origin");
-    // Determine allowed origin
-    let allowedOrigin: string | undefined = "*";
-
-    if (typeof origin === "string") {
-      allowedOrigin = origin;
-    } else if (Array.isArray(origin) && origin.includes(requestOrigin || '')) {
-      allowedOrigin = requestOrigin;
-    } else {
-      allowedOrigin = undefined;
-    }
-
-    // Set CORS headers
-    const headers: Record<string, string> = {};
-
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
-    if (allowedOrigin !== "*") {
-      const existingVary = ctx.header("Vary");
-      if (existingVary) {
-        ctx.headers.set("Vary", existingVary);
-      } else {
-        ctx.headers.set("Vary", "Origin");
-      }
-    }
-
-    if (allowedOrigin) {
-      headers["Access-Control-Allow-Origin"] = allowedOrigin;
-    }
-
-    if (allowMethods.length) {
-      headers["Access-Control-Allow-Methods"] = allowMethods.join(", ");
-    }
-
-    if (allowHeaders.length) {
-      headers["Access-Control-Allow-Headers"] = allowHeaders.join(", ");
-    }
-    if (maxAge) {
-      headers["Access-Control-Max-Age"] = maxAge.toString();
-    }
-    if (credentials) {
-      headers["Access-Control-Allow-Credentials"] = "true";
-    }
-    if (exposeHeaders?.length) {
-      headers["Access-Control-Expose-Headers"] = exposeHeaders.join(", ");
-    }
-
-    // Handle preflight request
-    if (ctx.request.method === "OPTIONS" && requestOrigin) {
-      return new Response(null, { status: 204, headers });
-    }
-
-    // Add headers to the response and proceed to the next middleware
-    Object.entries(headers).forEach(([key, value]) => {
-      if (!ctx.headers.has(key)) {
-        ctx.headers.set(key, value);
-      }
-    });
-
-    return await next();
-  };
-};
+/**
+ * SQLite implementation of the GamanProvider interface.
+ */
+export { SQLiteProvider } from './provider/sqlite.js';

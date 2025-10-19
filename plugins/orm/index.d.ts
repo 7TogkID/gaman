@@ -1,29 +1,38 @@
 /**
- * @module
- * CORS Middleware for Gaman.
- * Implements Cross-Origin Resource Sharing (CORS) with customizable options.
+ * @fileoverview Gaman ORM Plugin
+ *
+ * This module provides a lightweight Object-Relational Mapping (ORM) system for Gaman applications.
+ * It supports basic CRUD operations, data casting, and model relations through a provider-based architecture.
+ *
+ * Key features:
+ * - Database-agnostic via providers (e.g., SQLite)
+ * - Automatic data type casting
+ * - Model-based relations (hasMany, belongsTo, hasOne)
+ * - Simple query interface
+ *
+ * @example
+ * ```typescript
+ * import { GamanORM, BaseModel, SQLiteProvider } from '@gaman/orm';
+ *
+ * const orm = new GamanORM(new SQLiteProvider());
+ * class User extends BaseModel<User> {
+ *   // Define model options
+ * }
+ * ```
  */
-import { AppConfig, Handler } from "@gaman/core/types";
 /**
- * CORS middleware options.
+ * The main ORM class that handles database connections and operations.
  */
-export type CorsOptions = {
-    /** Allowed origin(s) for the request. */
-    origin?: string | string[] | null;
-    /** HTTP methods allowed for the request. Default: `["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"]` */
-    allowMethods?: string[];
-    /** Headers allowed in the request. Default: `["Content-Type", "Authorization"]` */
-    allowHeaders?: string[];
-    /** Maximum cache age for preflight requests (in seconds). */
-    maxAge?: number;
-    /** Whether to include credentials (cookies, HTTP auth, etc.) in the request. */
-    credentials?: boolean;
-    /** Headers exposed to the client in the response. */
-    exposeHeaders?: string[];
-};
+export { GamanORM } from './orm.js';
 /**
- * Middleware for handling Cross-Origin Resource Sharing (CORS).
- * @param options - The options for configuring CORS behavior.
- * @returns Middleware function for handling CORS.
+ * Base model class for defining database models with casting and relations.
  */
-export declare const cors: (options: CorsOptions) => Handler<AppConfig>;
+export { BaseModel, BaseModelOptions } from './model/base.js';
+/**
+ * Interface for database providers that implement the actual database interactions.
+ */
+export { GamanProvider } from './provider/base.js';
+/**
+ * SQLite implementation of the GamanProvider interface.
+ */
+export { SQLiteProvider } from './provider/sqlite.js';

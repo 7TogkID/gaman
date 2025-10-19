@@ -26,7 +26,8 @@
 		"plugins/session",
 		"plugins/rate-limit",
 		"plugins/edge",
-		"plugins/jwt"
+		"plugins/jwt",
+		"plugins/orm"
 	],
 	"author": "angga7togk",
 	"license": "MIT",
