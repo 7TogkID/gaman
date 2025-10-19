@@ -1,10 +1,4 @@
-export interface LikeMail {
-	from: string;
-	to: string;
-	subject: string;
-	text: string;
-	body: string | Response;
-}
+import { Mail as LikeMail } from './types';
 
 export default class Mail {
 	from: string;
@@ -21,8 +15,8 @@ export default class Mail {
 
 		if (typeof mail.body !== 'string') {
 			this.body = await mail.body.text();
+		} else {
+			this.body = mail.body;
 		}
-
-		this.body = mail.body;
 	}
 }

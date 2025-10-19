@@ -15,7 +15,7 @@ export interface Mail {
 	to: string;
 	subject: string;
 	text: string;
-	body: string;
+	body: string | Response;
 }
 
 export interface MailerSentOptions {
