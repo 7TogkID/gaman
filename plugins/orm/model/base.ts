@@ -1,11 +1,43 @@
+/**
+ * @fileoverview Base model class for ORM operations with casting and relations.
+ */
+
 import { GamanORM } from '../orm.js';
 
+/**
+ * Options for configuring a BaseModel instance.
+ * @template T The type of the model data.
+ */
 export interface BaseModelOptions<T extends object> {
 	table: string;
 	validate?: (data: any) => T;
 	casts?: Record<string, string>;
 }
 
+/**
+ * Interface for a model constructor that includes static options.
+ * @template T The type of the model data.
+ */
+export interface ModelConstructor<T extends object> {
+	new (orm: GamanORM, options: BaseModelOptions<T>): BaseModel<T>;
+	options: BaseModelOptions<T>;
+}
+
+/**
+ * Interface for a model constructor that includes a static getOptions method.
+ * @template T The type of the model data.
+ */
+export interface ModelConstructorWithGetOptions<T extends object> {
+	new (orm: GamanORM, options: BaseModelOptions<T>): BaseModel<T>;
+	getOptions(): BaseModelOptions<T>;
+}
+
+/**
+ * Abstract base class for database models in the Gaman ORM.
+ * Provides CRUD operations, data casting, and relation methods.
+ *
+ * @template T The type of the object this model represents.
+ */
 export abstract class BaseModel<T extends object> {
 	protected orm: GamanORM;
 	protected options: BaseModelOptions<T>;
@@ -15,7 +47,6 @@ export abstract class BaseModel<T extends object> {
 		this.options = options;
 	}
 
-	// Casting logic
 	protected castAttribute(key: string, value: any): any {
 		const cast = this.options.casts?.[key];
 		if (!cast) return value;
@@ -49,13 +80,12 @@ export abstract class BaseModel<T extends object> {
 		return casted as T;
 	}
 
-	// CRUD operations
 	async create(data: any): Promise<T> {
 		if (this.options.validate) {
 			data = this.options.validate(data);
 		}
 		await this.orm.insert(this.options.table, data);
-		return this.castAttributes(data) as T;
+		return this.castAttributes(data);
 	}
 
 	async find(query?: Partial<T>): Promise<T[]> {
@@ -79,32 +109,84 @@ export abstract class BaseModel<T extends object> {
 		await this.orm.delete(this.options.table, query);
 	}
 
-	// Relation methods
-	hasMany<Related extends BaseModel<any>>(
-		relatedModel: new (orm: GamanORM, options: any) => Related,
+	/**
+	 * Defines a hasMany relation.
+	 */
+	async hasMany<RelatedData extends object>(
+		relatedOptions: BaseModelOptions<RelatedData>,
+		relatedModel: new (
+			orm: GamanORM,
+			options: BaseModelOptions<RelatedData>,
+		) => BaseModel<RelatedData>,
 		foreignKey: string,
-		localKey: string = 'id',
-	): Related[] {
-		// This would need to be implemented with query builders
-		// For now, return a placeholder
-		return [];
+		localKey = 'id',
+		localKeyValue?: any,
+	): Promise<RelatedData[]> {
+		if (localKeyValue === undefined) {
+			throw new Error('localKeyValue is required for hasMany relation');
+		}
+		const query = { [foreignKey]: localKeyValue } as any;
+		const results = await this.orm.find<RelatedData>(
+			relatedOptions.table,
+			query,
+		);
+		const relatedInstance = new relatedModel(this.orm, relatedOptions);
+		return results.map((result) => relatedInstance.castAttributes(result));
 	}
 
-	belongsTo<Related extends BaseModel<any>>(
-		relatedModel: new (orm: GamanORM, options: any) => Related,
+	/**
+	 * Defines a belongsTo relation.
+	 */
+	async belongsTo<RelatedData extends object>(
+		relatedOptions: BaseModelOptions<RelatedData>,
+		relatedModel: new (
+			orm: GamanORM,
+			options: BaseModelOptions<RelatedData>,
+		) => BaseModel<RelatedData>,
 		foreignKey: string,
-		ownerKey: string = 'id',
-	): Related | null {
-		// Placeholder for belongsTo relation
+		ownerKey = 'id',
+		foreignKeyValue?: any,
+	): Promise<RelatedData | null> {
+		if (foreignKeyValue === undefined) {
+			throw new Error('foreignKeyValue is required for belongsTo relation');
+		}
+		const query = { [ownerKey]: foreignKeyValue } as any;
+		const result = await this.orm.findOne<RelatedData>(
+			relatedOptions.table,
+			query,
+		);
+		if (result) {
+			const relatedInstance = new relatedModel(this.orm, relatedOptions);
+			return relatedInstance.castAttributes(result);
+		}
 		return null;
 	}
 
-	hasOne<Related extends BaseModel<any>>(
-		relatedModel: new (orm: GamanORM, options: any) => Related,
+	/**
+	 * Defines a hasOne relation.
+	 */
+	async hasOne<RelatedData extends object>(
+		relatedOptions: BaseModelOptions<RelatedData>,
+		relatedModel: new (
+			orm: GamanORM,
+			options: BaseModelOptions<RelatedData>,
+		) => BaseModel<RelatedData>,
 		foreignKey: string,
-		localKey: string = 'id',
-	): Related | null {
-		// Placeholder for hasOne relation
+		localKey = 'id',
+		localKeyValue?: any,
+	): Promise<RelatedData | null> {
+		if (localKeyValue === undefined) {
+			throw new Error('localKeyValue is required for hasOne relation');
+		}
+		const query = { [foreignKey]: localKeyValue } as any;
+		const result = await this.orm.findOne<RelatedData>(
+			relatedOptions.table,
+			query,
+		);
+		if (result) {
+			const relatedInstance = new relatedModel(this.orm, relatedOptions);
+			return relatedInstance.castAttributes(result);
+		}
 		return null;
 	}
 }

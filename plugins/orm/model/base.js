@@ -1,9 +1,17 @@
+/**
+ * @fileoverview Base model class for ORM operations with casting and relations.
+ */
+/**
+ * Abstract base class for database models in the Gaman ORM.
+ * Provides CRUD operations, data casting, and relation methods.
+ *
+ * @template T The type of the object this model represents.
+ */
 export class BaseModel {
     constructor(orm, options) {
         this.orm = orm;
         this.options = options;
     }
-    // Casting logic
     castAttribute(key, value) {
         const cast = this.options.casts?.[key];
         if (!cast)
@@ -35,7 +43,6 @@ export class BaseModel {
         }
         return casted;
     }
-    // CRUD operations
     async create(data) {
         if (this.options.validate) {
             data = this.options.validate(data);
@@ -45,7 +52,7 @@ export class BaseModel {
     }
     async find(query) {
         const results = await this.orm.find(this.options.table, query);
-        return results.map(result => this.castAttributes(result));
+        return results.map((result) => this.castAttributes(result));
     }
     async findOne(query) {
         const result = await this.orm.findOne(this.options.table, query);
@@ -60,18 +67,46 @@ export class BaseModel {
     async delete(query) {
         await this.orm.delete(this.options.table, query);
     }
-    // Relation methods
-    hasMany(relatedModel, foreignKey, localKey = 'id') {
-        // This would need to be implemented with query builders
-        // For now, return a placeholder
-        return [];
+    /**
+     * Defines a hasMany relation.
+     */
+    async hasMany(relatedOptions, relatedModel, foreignKey, localKey = 'id', localKeyValue) {
+        if (localKeyValue === undefined) {
+            throw new Error('localKeyValue is required for hasMany relation');
+        }
+        const query = { [foreignKey]: localKeyValue };
+        const results = await this.orm.find(relatedOptions.table, query);
+        const relatedInstance = new relatedModel(this.orm, relatedOptions);
+        return results.map((result) => relatedInstance.castAttributes(result));
     }
-    belongsTo(relatedModel, foreignKey, ownerKey = 'id') {
-        // Placeholder for belongsTo relation
+    /**
+     * Defines a belongsTo relation.
+     */
+    async belongsTo(relatedOptions, relatedModel, foreignKey, ownerKey = 'id', foreignKeyValue) {
+        if (foreignKeyValue === undefined) {
+            throw new Error('foreignKeyValue is required for belongsTo relation');
+        }
+        const query = { [ownerKey]: foreignKeyValue };
+        const result = await this.orm.findOne(relatedOptions.table, query);
+        if (result) {
+            const relatedInstance = new relatedModel(this.orm, relatedOptions);
+            return relatedInstance.castAttributes(result);
+        }
         return null;
     }
-    hasOne(relatedModel, foreignKey, localKey = 'id') {
-        // Placeholder for hasOne relation
+    /**
+     * Defines a hasOne relation.
+     */
+    async hasOne(relatedOptions, relatedModel, foreignKey, localKey = 'id', localKeyValue) {
+        if (localKeyValue === undefined) {
+            throw new Error('localKeyValue is required for hasOne relation');
+        }
+        const query = { [foreignKey]: localKeyValue };
+        const result = await this.orm.findOne(relatedOptions.table, query);
+        if (result) {
+            const relatedInstance = new relatedModel(this.orm, relatedOptions);
+            return relatedInstance.castAttributes(result);
+        }
         return null;
     }
 }

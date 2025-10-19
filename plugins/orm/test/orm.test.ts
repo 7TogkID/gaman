@@ -12,8 +12,8 @@ interface User {
 }
 
 class UserModel extends BaseModel<User> {
-	constructor(orm: GamanORM) {
-		const options: BaseModelOptions<User> = {
+	static getOptions(): BaseModelOptions<User> {
+		return {
 			table: 'users',
 			casts: {
 				id: 'int',
@@ -21,11 +21,20 @@ class UserModel extends BaseModel<User> {
 				settings: 'json',
 			},
 		};
-		super(orm, options);
 	}
 
-	hasManyPosts() {
-		return this.hasMany(PostModel, 'user_id');
+	constructor(orm: GamanORM) {
+		super(orm, UserModel.getOptions());
+	}
+
+	async hasManyPosts(userId: number) {
+		return this.hasMany(
+			PostModel.getOptions(),
+			PostModel,
+			'user_id',
+			'id',
+			userId,
+		);
 	}
 }
 
@@ -38,8 +47,8 @@ interface Post {
 }
 
 class PostModel extends BaseModel<Post> {
-	constructor(orm: GamanORM) {
-		const options: BaseModelOptions<Post> = {
+	static getOptions(): BaseModelOptions<Post> {
+		return {
 			table: 'posts',
 			casts: {
 				id: 'int',
@@ -47,11 +56,20 @@ class PostModel extends BaseModel<Post> {
 				published: 'boolean',
 			},
 		};
-		super(orm, options);
 	}
 
-	belongsToUser() {
-		return this.belongsTo(UserModel, 'user_id');
+	constructor(orm: GamanORM) {
+		super(orm, PostModel.getOptions());
+	}
+
+	async belongsToUser(postId: number) {
+		return this.belongsTo(
+			UserModel.getOptions(),
+			UserModel,
+			'user_id',
+			'id',
+			postId,
+		);
 	}
 }
 
@@ -147,13 +165,13 @@ describe('GamanORM', () => {
 	});
 
 	describe('Relations', () => {
-		it('should have relation methods available', () => {
+		it('should have relation methods available', async () => {
 			const userModel = new UserModel(orm);
 			const postModel = new PostModel(orm);
 
-			// These are placeholders, but should not throw errors
-			expect(() => userModel.hasManyPosts()).not.toThrow();
-			expect(() => postModel.belongsToUser()).not.toThrow();
+			// These methods require key values, so pass dummy values
+			await expect(userModel.hasManyPosts(1)).resolves.not.toThrow();
+			await expect(postModel.belongsToUser(1)).resolves.not.toThrow();
 		});
 	});
 });
