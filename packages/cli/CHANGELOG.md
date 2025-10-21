@@ -1,5 +1,11 @@
 # @gaman/cli
 
+## 1.2.7
+
+### Patch Changes
+
+- d0ebf2e: add glob dependencies
+
 ## 1.2.6
 
 ### Patch Changes
