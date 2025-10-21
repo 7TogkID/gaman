@@ -42,6 +42,9 @@ yalc push
 cd ../edge
 yalc push
 
+cd ../jwt
+yalc push
+
 # Return to the root directory
 cd ../..
 
