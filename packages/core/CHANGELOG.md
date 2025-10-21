@@ -1,5 +1,11 @@
 # @gaman/core
 
+## 1.2.8
+
+### Patch Changes
+
+- f248577: fix autoCompose
+
 ## 1.2.7
 
 ## 1.2.6
