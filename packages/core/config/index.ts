@@ -22,6 +22,11 @@ export interface GamanBuildConfig {
 	rootdir?: string;
 
 	/**
+	 * @ID Static file folder
+	 */
+	staticdir?: string;
+
+	/**
 	 * @ID Kustomisasi esbuild plugins jika builder memakai `esbuild`
 	 */
 	esbuildPlugins?: Plugin[];

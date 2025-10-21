@@ -1,23 +1,17 @@
 import { createReadStream, promises as fsPromises, Stats, statSync } from 'fs';
 import { join } from 'path';
-import { Response } from '@gaman/core/response.js';
 import * as crypto from 'crypto';
 import {
 	DefaultMiddlewareOptions,
 	detectMime,
+	getGamanConfig,
 	Log,
 	Priority,
 } from '@gaman/common';
-import { composeMiddleware } from '@gaman/core';
+import { composeMiddleware, Response } from '@gaman/core';
+import { isDevelopment } from '@gaman/cli/builder/helper.js';
 
-// Tipe opsi konfigurasi middleware
 export interface StaticFileOptions extends DefaultMiddlewareOptions {
-	/**
-	 * @ID direktory path (default: /public)
-	 * @EN directory path (default: /public)
-	 */
-	path?: string;
-
 	/**
 	 * @ID kustom mime type konten (contoh: { 'css': 'text/css' })
 	 * @EN custom content mime type (example: { 'css': 'text/css' })
@@ -65,7 +59,7 @@ export interface StaticFileOptions extends DefaultMiddlewareOptions {
 	 */
 	cacheControl?: string;
 
-	/**
+	/**public
 	 * @ID Jika `true`, fallback ke `index.html` untuk SPA.
 	 * @EN If `true`, return to `index.html` for SPA.
 	 */
@@ -90,7 +84,6 @@ function generateETag(stat: { size: number; mtime: Date }) {
  * - ETag generation for efficient caching (supports 304 Not Modified)
  *
  * ## Options
- * - `path`: Root directory of static assets. Default is `public`.
  * - `mimes`: Custom MIME types. You can map file extensions manually.
  * - `priority`: Determines execution order. Use `'very-high'` if you want static to run early.
  * - `defaultDocument`: Filename to serve when a directory is requested (default: `index.html`).
@@ -103,7 +96,6 @@ function generateETag(stat: { size: number; mtime: Date }) {
  * ## Example
  * ```ts
  * staticServe({
- *   path: 'assets',
  *   rewriteRequestPath: (p) => p.replace(/^\/static/, ''),
  *   fallbackToIndexHTML: true,
  *   mimes: {
@@ -113,7 +105,7 @@ function generateETag(stat: { size: number; mtime: Date }) {
  * ```
  */
 export function staticServe(options: StaticFileOptions = {}) {
-	const staticPath = options.path || 'public';
+	let staticPath;
 	const defaultDocument = options.defaultDocument ?? 'index.html';
 	const cacheControl = options.cacheControl ?? 'public, max-age=3600';
 
@@ -123,6 +115,17 @@ export function staticServe(options: StaticFileOptions = {}) {
 		//? Rewriting path jika disediakan
 		if (options.rewriteRequestPath) {
 			reqPath = options.rewriteRequestPath(reqPath);
+		}
+		if (!staticPath) {
+			const config = await getGamanConfig();
+			staticPath = config.build?.staticdir || 'public'; // ? init staticPath for (development)
+
+			if (!isDevelopment(config.build?.outdir || 'dist')) {
+				/**
+				 * if on production mode staticPath like this: /dist/client/public
+				 */
+				staticPath = join(config.build?.outdir || 'dist', 'client', staticPath);
+			}
 		}
 
 		let filePath = join(process.cwd(), staticPath, reqPath);
@@ -157,8 +160,8 @@ export function staticServe(options: StaticFileOptions = {}) {
 		Log.setMethod('');
 		Log.setStatus(null);
 
-		// Gzip/Brotli: cek Accept-Encoding dan cari file terkompresi
-		const acceptEncoding = ctx.request.headers.get('accept-encoding') || '';
+		// ? Gzip/Brotli: cek Accept-Encoding dan cari file terkompresi
+		const acceptEncoding = ctx.request.header('accept-encoding') || '';
 		let encoding: 'br' | 'gzip' | null = null;
 		let encodedFilePath = filePath;
 
@@ -177,9 +180,13 @@ export function staticServe(options: StaticFileOptions = {}) {
 		}
 
 		//? Buat ETag dan handle conditional GET
-		const etag = generateETag(statSync(encodedFilePath));
-		if (ctx.request.headers.get('if-none-match') === etag) {
-			return Response.text('', { status: 304 });
+		let statForEtag = stats;
+		try {
+			statForEtag = statSync(encodedFilePath);
+		} catch {}
+		const etag = generateETag(statForEtag);
+		if (ctx.request.header('if-none-match') === etag) {
+			return Response.notModified();
 		}
 
 		const contentType =
@@ -199,7 +206,7 @@ export function staticServe(options: StaticFileOptions = {}) {
 		});
 	});
 	return middleware({
-		priority: options.priority === undefined ? Priority.MONITOR : options.priority,
+		priority: options.priority ?? Priority.MONITOR,
 		includes: options.includes,
 		excludes: options.excludes,
 	});

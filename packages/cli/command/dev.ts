@@ -5,87 +5,80 @@ import { Logger } from '@gaman/common/utils/logger.js';
 import chokidar from 'chokidar';
 import path from 'path';
 import { getGamanConfig } from '@gaman/common/index.js';
-import { buildAll, buildFile } from '../utils/esbuild.js';
+import { buildAll, buildFile } from '../builder/index.js';
 
-export class DevCommand extends Command {
-	constructor() {
-		super('dev', 'Run the application in development mode', 'gaman dev', []);
-	}
+export async function run_dev(): Promise<void> {
+	const config = await getGamanConfig();
+	const outdir = `${config.build?.outdir}/server`;
+	const verbose = config.verbose;
+	const rootdir = config.build?.rootdir || 'src';
+	const entryFile = path.join(outdir, 'index.js');
 
-	async execute(): Promise<void> {
-		const config = await getGamanConfig();
-		const outdir = config.build?.outdir || 'dist';
-		const verbose = config.verbose;
-		const rootdir = config.build?.rootdir || 'src';
-		const entryFile = path.join(outdir, 'index.js');
+	// ? awal awal build semua file
+	await buildAll(config, 'development');
 
-		await buildAll(config, 'development');
+	let child: ChildProcess | null = null;
+	const restart = () => {
+		if (child) {
+			Logger.log('Restarting application...');
+			child.kill();
+		}
 
-		let child: ChildProcess | null = null;
-		const restart = () => {
-			if (child) {
-				Logger.log('Restarting application...');
-				child.kill();
+		const devIndex = process.argv.indexOf('dev');
+		const extraArgs = devIndex >= 0 ? process.argv.slice(devIndex + 1) : [];
+		child = spawn(process.execPath, [entryFile, ...extraArgs], {
+			stdio: 'inherit',
+			env: process.env,
+		});
+	};
+
+	restart();
+
+	let changeTimeout: NodeJS.Timeout | null = null;
+	chokidar
+		.watch([rootdir, 'gaman.config.mjs', '.env'], {
+			ignored: config?.build?.excludes,
+		})
+		.on('add', async (file) => {
+			if (/\.(ts|js)$/.test(file)) {
+				if (verbose) Logger.debug(`New file: ${file}`);
+				try {
+					await buildFile(file, config, 'development');
+				} catch (err) {
+					Logger.error(`Build error: ${err}`);
+				}
 			}
-			child = spawn(
-				process.execPath,
-				[entryFile, ...process.argv.slice(3)],
-				{
-					stdio: 'inherit',
-				},
-			);
-		};
-
-		restart();
-
-		let changeTimeout: NodeJS.Timeout | null = null;
-		chokidar
-			.watch(rootdir, {
-				ignored: ['**/node_modules/**', `**/${outdir}/**`],
-			})
-			.on('add', async (file) => {
-				if (/\.(ts|js)$/.test(file)) {
-					if (verbose) Logger.debug(`New file: ${file}`);
+		})
+		.on('change', (file) => {
+			if (/\.(ts|js)$/.test(file)) {
+				if (changeTimeout) clearTimeout(changeTimeout);
+				changeTimeout = setTimeout(async () => {
+					if (verbose) Logger.debug(`Changed: ${file}`);
 					try {
 						await buildFile(file, config, 'development');
+						restart();
 					} catch (err) {
 						Logger.error(`Build error: ${err}`);
 					}
-				}
-			})
-			.on('change', (file) => {
-				if (/\.(ts|js)$/.test(file)) {
-					if (changeTimeout) clearTimeout(changeTimeout);
-					changeTimeout = setTimeout(async () => {
-						if (verbose) Logger.debug(`Changed: ${file}`);
-						try {
-							await buildFile(file, config, 'development');
-							restart();
-						} catch (err) {
-							Logger.error(`Build error: ${err}`);
-						}
-					}, 100); // tunggu 100ms
-				}
-			})
-			.on('unlink', async (file) => {
-				const relPath = path.relative(rootdir, file);
-				const outBase = path.join(outdir, relPath).replace(/\.(ts|js)$/, '');
-				const filesToRemove = [
-					outBase + '.js',
-					outBase + '.js.map',
-					outBase + '.d.ts',
-				];
+				}, 100); // tunggu 100ms
+			}
+		})
+		.on('unlink', async (file) => {
+			const relPath = path.relative(rootdir, file);
+			const outBase = path.join(outdir, relPath).replace(/\.(ts|js)$/, '');
+			const filesToRemove = [
+				outBase + '.js',
+				outBase + '.js.map',
+				outBase + '.d.ts',
+			];
 
-				filesToRemove.forEach((f) => {
-					if (existsSync(f)) {
-						unlinkSync(f);
-						if (verbose) Logger.debug(`Removed: ${f}`);
-					}
-				});
-
-				restart();
+			filesToRemove.forEach((f) => {
+				if (existsSync(f)) {
+					unlinkSync(f);
+					if (verbose) Logger.debug(`Removed: ${f}`);
+				}
 			});
-	}
-}
 
-export default new DevCommand();
+			restart();
+		});
+}

@@ -25,5 +25,8 @@
 		"registry": "https://registry.npmjs.org",
 		"access": "public"
 	},
+	"peerDependencies": {
+		"cac": "^6.7.14"
+	},
 	"gitHead": "f3c12a3d4b0f5638afca69b3bf3f742a8e5a9997"
 }

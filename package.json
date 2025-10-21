@@ -40,6 +40,7 @@
 	"dependencies": {
 		"@types/node": "^24.3.1",
 		"@types/ws": "^8.18.1",
+		"cac": "^6.7.14",
 		"chokidar": "^3.6.0",
 		"cookie": "^1.0.2",
 		"edge.js": "^6.3.0",

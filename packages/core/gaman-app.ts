@@ -18,7 +18,6 @@ import middlewareData from '@gaman/common/data/middleware-data.js';
 import exceptionData from '@gaman/common/data/exception-data.js';
 import routesData from '@gaman/common/data/routes-data.js';
 
-
 export class GamanApp extends Router {
 	private server?: http.Server<
 		typeof http.IncomingMessage,
@@ -45,36 +44,38 @@ export class GamanApp extends Router {
 		http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
 	> {
 		const { args } = parseArgs();
-
 		const DEFAULT_HOST =
-			args['host'] === true
+			args.host === true
 				? '0.0.0.0'
-				: args['host'] || process.env.HOST || '127.0.0.1';
+				: args.host || process.env.HOST || '127.0.0.1';
 
 		const DEFAULT_PORT =
-			args['port'] ||
-			(process.env.PORT ? parseInt(process.env.PORT, 10) : 3431);
+			args.port || (process.env.PORT ? parseInt(process.env.PORT, 10) : 3431);
 
 		let host = DEFAULT_HOST;
 		let port = DEFAULT_PORT;
 
 		if (address) {
 			const [h, p] = address.split(':');
-
 			if (h) host = h;
 			if (p) port = parseInt(p, 10);
 		}
 
-		return new Promise<
-			http.Server<typeof http.IncomingMessage, typeof http.ServerResponse>
-		>((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			try {
 				const server = http.createServer(this.requestHandle.bind(this));
-
 				this.server = server;
+
+				const noServer = process.argv.includes('--no-server');
+				if (noServer || process.env.NO_SERVER === 'true') {
+					// ! kalau dia pakai flag --no-server maka server tidak akan pernah di listen
+					return resolve(server);
+				}
+
 				this.server.listen(port, host == true ? '0.0.0.0' : `${host}`, () => {
 					resolve(server);
-				});
+				});0
+
 				this.server.on('error', reject);
 			} catch (err) {
 				reject(err);

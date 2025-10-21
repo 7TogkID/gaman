@@ -6,8 +6,6 @@ import AppMiddleware from './middlewares/AppMiddleware';
 import { cors } from '@gaman/cors';
 import { WebsocketGateway } from '@gaman/websocket';
 import { session } from '@gaman/session';
-import { nunjucks } from '@gaman/nunjucks';
-import { rateLimit } from '@gaman/rate-limit';
 import { edge } from '@gaman/edge';
 import EdgeHandler from './EdgeHandler';
 import { jwt } from '@gaman/jwt';
