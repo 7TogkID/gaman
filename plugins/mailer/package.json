@@ -1,0 +1,25 @@
+{
+	"name": "@gaman/mailer",
+	"version": "1.0.0",
+	"type": "module",
+	"main": "index.js",
+	"author": "angga7togk",
+	"license": "MIT",
+	"repository": {
+		"url": "git+https://github.com/7TogkID/gaman.git",
+		"directory": "plugins/mailer"
+	},
+	"bugs": {
+		"url": "https://github.com/7TogkID/gaman/issues"
+	},
+	"homepage": "https://gaman.7togk.id",
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org"
+	},
+	"gitHead": "8d1bf3bbac4b72847e9157e2c95d75b5e90c89cf",
+	"peerDependencies": {
+		"@types/nodemailer": "^7.0.2",
+		"nodemailer": "^7.0.9"
+	}
+}
