@@ -1,5 +1,11 @@
 # @gaman/common
 
+## 1.2.6
+
+### Patch Changes
+
+- 026ff30: add builder brotli and gzip
+
 ## 1.2.5
 
 ### Patch Changes
