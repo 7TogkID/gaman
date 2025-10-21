@@ -4,22 +4,21 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { pathToFileURL } from 'url';
 import { getGamanConfig } from '@gaman/common';
+import { GamanConfig } from './config/index.js';
 
 const ROUTE_DIRS = ['routes', 'router'];
 const MIDDLEWARE_DIRS = ['middlewares', 'middleware'];
 const INTERCEPTOR_DIRS = ['interceptors', 'interceptor'];
 const EXCEPTION_DIRS = ['exceptions', 'exception'];
 
-function getProjectDir(dirName: string) {
-	const baseDir = fs.existsSync(path.join(process.cwd(), 'dist'))
-		? 'dist'
-		: 'src';
+function getProjectDir(config: GamanConfig, dirName: string) {
+	const baseDir = path.join(config.build?.outdir || 'dist', 'server');
 	return path.join(process.cwd(), baseDir, dirName);
 }
 
-async function importDirIfExists(dirs: string[]) {
+async function importDirIfExists(config: GamanConfig, dirs: string[]) {
 	for (const dirName of dirs) {
-		const fullPath = getProjectDir(dirName);
+		const fullPath = getProjectDir(config, dirName);
 		if (!fs.existsSync(fullPath)) continue;
 
 		const files = fs.readdirSync(fullPath);
@@ -43,16 +42,16 @@ export async function defineBootstrap(cb: (app: GamanApp) => any) {
 	const config = await getGamanConfig();
 
 	// *** ROUTES ***
-	await importDirIfExists(config.build?.autoComposeDirs?.routes ?? ROUTE_DIRS);
+	await importDirIfExists(config, ROUTE_DIRS);
 
 	// *** MIDDLEWARES ***
-	await importDirIfExists(config.build?.autoComposeDirs?.middlewares ?? MIDDLEWARE_DIRS);
+	await importDirIfExists(config, MIDDLEWARE_DIRS);
 
 	// *** INTERCEPTORS ***
-	await importDirIfExists(config.build?.autoComposeDirs?.interceptors ?? INTERCEPTOR_DIRS);
+	await importDirIfExists(config, INTERCEPTOR_DIRS);
 
 	// *** EXCEPTIONS ***
-	await importDirIfExists(config.build?.autoComposeDirs?.exceptions ?? EXCEPTION_DIRS);
+	await importDirIfExists(config, EXCEPTION_DIRS);
 
 	cb(app);
 }
