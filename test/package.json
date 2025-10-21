@@ -19,6 +19,7 @@
     "@gaman/cors": "file:.yalc/@gaman/cors",
     "@gaman/edge": "file:.yalc/@gaman/edge",
     "@gaman/ejs": "file:.yalc/@gaman/ejs",
+    "@gaman/jwt": "file:.yalc/@gaman/jwt",
     "@gaman/nunjucks": "file:.yalc/@gaman/nunjucks",
     "@gaman/rate-limit": "file:.yalc/@gaman/rate-limit",
     "@gaman/session": "file:.yalc/@gaman/session",

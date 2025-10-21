@@ -1,17 +1,13 @@
 {
-	"name": "@gaman/core",
-	"version": "1.2.5",
+	"name": "@gaman/jwt",
+	"version": "1.0.0",
 	"type": "module",
 	"main": "index.js",
-	"module": "index.js",
-	"engines": {
-		"node": ">=18.20.8"
-	},
-	"author": "angga7togk",
+	"author": "7TogkID",
 	"license": "MIT",
 	"repository": {
 		"url": "git+https://github.com/7TogkID/gaman.git",
-		"directory": "packages/core"
+		"directory": "plugins/jwt"
 	},
 	"bugs": {
 		"url": "https://github.com/7TogkID/gaman/issues"
@@ -20,9 +16,5 @@
 	"publishConfig": {
 		"access": "public",
 		"registry": "https://registry.npmjs.org"
-	},
-	"peerDependencies": {
-		"source-map-support": ">=0.5.21"
-	},
-	"gitHead": "8d1bf3bbac4b72847e9157e2c95d75b5e90c89cf"
+	}
 }
