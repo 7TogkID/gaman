@@ -32,14 +32,12 @@
 	},
 	"include": [
 		"packages/**/*",
-		"plugins/cors",
 		"plugins/nunjucks",
 		"plugins/ejs",
 		"plugins/basic-auth",
 		"plugins/static",
 		"plugins/websocket",
 		"plugins/session",
-		"plugins/rate-limit",
 		"plugins/edge",
 		"plugins/jwt"
 	],
