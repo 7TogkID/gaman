@@ -2,14 +2,14 @@ import { Context } from '@gaman/common/types/types.js';
 
 export class HttpException extends Error {
 	public readonly statusCode: number;
-	public readonly context: Context;
+	public readonly context?: Context;
 	public readonly details?: any;
   public readonly gamanException = true;
 
 	constructor(
 		message: string,
 		statusCode: number,
-		context: Context,
+		context?: Context,
 		details?: any,
 	) {
 		super(message);

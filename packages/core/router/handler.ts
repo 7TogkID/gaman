@@ -117,7 +117,10 @@ export class Router {
 				if (!fn && !done_find_route) {
 					done_find_route = true;
 					// ? mencari route yang cocok
-					const { route: r, params } = routesData.findRoute(url.pathname, method);
+					const { route: r, params } = routesData.findRoute(
+						url.pathname,
+						method,
+					);
 					if (!r?.handler) {
 						return new Response(undefined, { status: 404 });
 					}
@@ -150,19 +153,26 @@ export class Router {
 			const result = await next(0);
 			await this.handleResponse(result as Response, res, ctx);
 		} catch (error: any) {
-			for (const except of [
+			// ? init context on http exception
+			if (error instanceof HttpException) {
+				Object.defineProperty(error, 'context', {
+					value: ctx,
+					writable: true,
+					configurable: true,
+					enumerable: true,
+				});
+			}
+
+			for (const runExceptionHandler of [
 				...exceptionData.getExceptionHandlers(),
 				...(route?.exceptions || []),
 			]) {
-				let response;
-				if (error.gamanException) {
-					response = await except(error);
-				} else {
-					response = await except(
-						new HttpException(error.message, error.status, ctx, error),
-					);
-				}
+				// ? run exception handler
+				const response = await runExceptionHandler(error);
+
 				if (response instanceof Response) {
+					// ? if exception handler have a response like: Res.json or else
+					// ? so handleResponse
 					return await this.handleResponse(response, res, ctx);
 				}
 			}
@@ -179,9 +189,7 @@ export class Router {
 							statusCode: error.statusCode,
 							message: error.message,
 						},
-						{
-							status: error.statusCode,
-						},
+						error.statusCode,
 					),
 					res,
 					ctx,
@@ -213,6 +221,16 @@ export class Router {
 		}
 	}
 
+	/**
+	 * @ID
+	 * Menangani class Response sebelum dikirim ke client
+	 * GamanJS akan memakai class Response sendiri untuk membuat response itu menjadi sederhada, seperti: Res.json Res.text dll
+	 * 
+	 * @param response 
+	 * @param res 
+	 * @param ctx 
+	 * @returns 
+	 */
 	protected async handleResponse(
 		response: Response | undefined,
 		res: http.ServerResponse,
@@ -258,7 +276,7 @@ export class Router {
 			}
 		}
 
-		response.headers.set('X-Powered-By', 'Gaman')
+		response.headers.set('X-Powered-By', 'Gaman');
 
 		res.statusCode = response.status;
 		res.statusMessage = response.statusText;
@@ -270,6 +288,4 @@ export class Router {
 		}
 		return res.end(response.body);
 	}
-
-	
 }
