@@ -11,12 +11,21 @@ const staticRoutes = new Map<string, Map<string, Route>>();
 
 const websocketRoutes = new Map<string, Route>();
 
+
+const pathCheckCache = new Map<string, boolean>();
 function isDynamicPath(path: string): boolean {
-	const parsed = parse(path);
+	const cached = pathCheckCache.get(path);
+	if (cached !== undefined) return cached; // ? if have cache
+
+	const parsed = parse(path); // !
 	const tokens = Array.isArray(parsed) ? parsed : parsed.tokens;
-	return tokens.length > 1;
+
 	// ? Kenapa validasinya length > 1 jika di soalnya  kalau statci tuh cuman gini [ { type: 'text', value: '/anu6' } ]
 	// ? nah kalau dinamic banyak [ { type: 'text', value: '/user/' }, { type: 'param', name: 'name' } ]
+	const result = tokens.length > 1;
+	pathCheckCache.set(path, result); // ! set to cache
+
+	return result;
 }
 
 function register(rts: Routes) {
