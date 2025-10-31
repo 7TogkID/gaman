@@ -4,6 +4,7 @@ import fs from 'fs';
 import { glob } from 'glob';
 import path from 'node:path';
 import { GamanConfig } from '@gaman/core';
+import { Logger } from '@gaman/common';
 
 const compressFile = async (inputPath: string) => {
 	const gzipPath = `${inputPath}.gz`;
@@ -36,7 +37,7 @@ export const compressDistFiles = async (config: GamanConfig) => {
 	for (const file of files) {
 		if (exts.includes(path.extname(file))) {
 			await compressFile(file);
-			console.log(`Compressed: ${file}`);
+			if (config?.verbose) Logger.debug(`Compressed: ${file}`);
 		}
 	}
 };

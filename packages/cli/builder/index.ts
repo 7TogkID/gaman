@@ -2,12 +2,13 @@ import { GamanConfig } from '@gaman/core/config/index.js';
 import fs, { existsSync, rmSync } from 'fs';
 import path from 'path';
 import esbuild from 'esbuild';
-import { Logger } from '@gaman/common/index.js';
+import { defaultConfig, Logger } from '@gaman/common/index.js';
 import fg from 'fast-glob';
 import { addJsExtensionPlugin } from './plugins/addJsExtensionPlugin.js';
 import { createDevelopmentFile, createProductionFile } from './helper.js';
 import { promisify } from 'util';
 import { compressDistFiles } from './gzip-build.js';
+import { buildReactViews } from './react-builder.js';
 
 const mkdir = promisify(fs.mkdir);
 const copyFile = promisify(fs.copyFile);
@@ -39,15 +40,15 @@ async function copyRecursive(src: string, dest: string, verbose?: boolean) {
 async function copyPublicToClient(config: GamanConfig) {
 	const staticDir = config.build?.staticdir || 'public';
 	const srcDir = path.resolve(staticDir);
-	const outDir = path.resolve(`${config.build?.outdir || 'dist'}/client/${staticDir}`);
+	const outDir = path.resolve(`${config.build?.outdir || 'dist'}/client`);
 
 	if (!existsSync(srcDir)) {
-		Logger.warn('Folder "public" not found!, skip copy.');
+		if (config.verbose) Logger.warn('Folder "public" not found!, skip copy.');
 		return;
 	}
 
 	await copyRecursive(srcDir, outDir, config.verbose);
-	Logger.log(`Copied ${staticDir} → ${outDir}`);
+	if (config.verbose) Logger.debug(`Copied ${staticDir} → ${outDir}`);
 }
 
 /**
@@ -66,7 +67,6 @@ export const buildAll = async (
 		if (verbose) Logger.debug('Cleaning previous build...');
 		rmSync(outdir, { recursive: true, force: true });
 	}
-
 	// ! Generate mode file .development or .production
 	if (mode === 'development') {
 		createDevelopmentFile(outdir);
@@ -83,19 +83,32 @@ export const buildAll = async (
 
 	// ? Cari entry file
 	if (verbose) Logger.debug('Searching entry points...');
-	const entryPoints = await fg(config.build?.includes ?? ['src/**/*.{ts,js}'], {
-		ignore: config.build?.excludes,
-	});
+	const entryPoints = await fg(
+		config.build?.includes ?? defaultConfig.build?.includes!,
+		{
+			ignore: config.build?.excludes,
+			cwd: process.cwd(), // tambahkan ini
+			absolute: true, // penting biar path full
+		},
+	);
 	if (verbose) Logger.debug(`Found ${entryPoints.length} entry files`);
-
+	try {
+		await buildReactViews(config, mode);
+	} catch (err) {
+		Logger.error(`Client View build failed`);
+		if (verbose) console.error(err);
+	}
 	// ? Build semua file secara paralel
 	await Promise.all(
 		entryPoints.map(async (file) => {
-			try {
-				await buildFile(file, config, mode);
-			} catch (err) {
-				Logger.error(`Build failed: ${file}`);
-				if (verbose) console.error(err);
+			const ext = path.extname(file);
+			if (!['.jsx', '.tsx'].includes(ext)) {
+				try {
+					await buildFile(file, config, mode);
+				} catch (err) {
+					Logger.error(`Build failed: ${file}`);
+					if (verbose) console.error(err);
+				}
 			}
 		}),
 	);
@@ -124,7 +137,7 @@ export const buildFile = async (
 		target: 'node18',
 		allowOverwrite: true,
 		minify: mode === 'production',
-		sourcemap: mode === 'development',
+		sourcemap: true,
 		legalComments: 'none',
 		packages: 'external',
 		alias: config?.build?.alias,
@@ -136,3 +149,5 @@ export const buildFile = async (
 
 	if (config.verbose) Logger.debug(`Built: ${relPath}`);
 };
+
+

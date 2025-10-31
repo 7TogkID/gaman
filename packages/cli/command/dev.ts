@@ -1,11 +1,11 @@
 import { existsSync, unlinkSync } from 'fs';
 import { spawn, ChildProcess } from 'child_process';
-import { Command } from './command.js';
 import { Logger } from '@gaman/common/utils/logger.js';
 import chokidar from 'chokidar';
 import path from 'path';
 import { getGamanConfig } from '@gaman/common/index.js';
 import { buildAll, buildFile } from '../builder/index.js';
+import { buildReactViews } from '../builder/react-builder.js';
 
 export async function run_dev(): Promise<void> {
 	const config = await getGamanConfig();
@@ -40,25 +40,46 @@ export async function run_dev(): Promise<void> {
 			ignored: config?.build?.excludes,
 		})
 		.on('add', async (file) => {
-			if (/\.(ts|js)$/.test(file)) {
+			if (/\.(ts|js|jsx|tsx)$/.test(file)) {
 				if (verbose) Logger.debug(`New file: ${file}`);
-				try {
-					await buildFile(file, config, 'development');
-				} catch (err) {
-					Logger.error(`Build error: ${err}`);
+				if (file.endsWith('.jsx') || file.endsWith('.tsx')) {
+					try {
+						await buildReactViews(config, 'development');
+					} catch (err) {
+						Logger.error(`Client View build failed: ${file}`);
+						console.error(err);
+					}
+				} else {
+					try {
+						await buildFile(file, config, 'development');
+					} catch (err) {
+						Logger.error(`Build failed: ${file}`);
+						console.error(err);
+					}
 				}
 			}
 		})
 		.on('change', (file) => {
-			if (/\.(ts|js)$/.test(file)) {
+			if (/\.(ts|js|jsx|tsx)$/.test(file)) {
 				if (changeTimeout) clearTimeout(changeTimeout);
 				changeTimeout = setTimeout(async () => {
 					if (verbose) Logger.debug(`Changed: ${file}`);
-					try {
-						await buildFile(file, config, 'development');
-						restart();
-					} catch (err) {
-						Logger.error(`Build error: ${err}`);
+					if (file.endsWith('.jsx') || file.endsWith('.tsx')) {
+						try {
+							await buildReactViews(config, 'development');
+							restart();
+						} catch (err) {
+							Logger.error(`Client View build failed: ${file}`);
+							console.error(err);
+						}
+					} else {
+						try {
+							await buildFile(file, config, 'development');
+							restart();
+						} catch (err) {
+							Logger.error(`Build failed: ${file}`);
+							console.error(err);
+						}
 					}
 				}, 100); // tunggu 100ms
 			}

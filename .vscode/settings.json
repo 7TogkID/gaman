@@ -3,5 +3,7 @@
 		// "**/node_modules": true,
 		// "**/dist": true,
 		// "**/plugins": true,
+		// "**/*.js": true,
+		// "**/*.d.ts": true,
 	}
 }

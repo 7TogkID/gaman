@@ -2,15 +2,15 @@
   "version": "v1",
   "packages": {
     "@gaman/core": {
-      "signature": "3e4764c71699e51ab9d3d79879335ea2",
+      "signature": "9b3451c65c3ec18db2940486d28b423e",
       "file": true
     },
     "@gaman/common": {
-      "signature": "ed1bda98d2431e87629a70c0a5ca0eef",
+      "signature": "8908aaacd5c028b41a2338b8762e4eb1",
       "file": true
     },
     "@gaman/cli": {
-      "signature": "55264f23efe703ca22430b32057afe75",
+      "signature": "c0841f03571b9788d674f303c306ba4a",
       "file": true
     },
     "@gaman/cors": {
@@ -31,7 +31,7 @@
       "file": true
     },
     "@gaman/static": {
-      "signature": "cb76d30e2d4b845ce338eaf836d36666",
+      "signature": "bf7609bb109f0f31db4f9725229407b2",
       "file": true
     },
     "@gaman/websocket": {
