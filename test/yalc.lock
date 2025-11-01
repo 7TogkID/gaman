@@ -1,59 +1,20 @@
 {
   "version": "v1",
   "packages": {
+    "@gaman/static": {
+      "signature": "1362887ac34929dbe928fbe6a211c66b",
+      "file": true
+    },
     "@gaman/core": {
-      "signature": "57a572469fc360872c13744a61fe2de8",
+      "signature": "b204e0353008d28b35aca6927f7f054d",
       "file": true
     },
     "@gaman/common": {
-      "signature": "f068a705598d2cdf3986d2506cbd2ddd",
+      "signature": "dcd135a45d7db9b41c6207bc63805bcf",
       "file": true
     },
-66
-
     "@gaman/cli": {
       "signature": "b14bcef31c258b1b502eea1e8a1bb48c",
-      "file": true
-    },
-    "@gaman/cors": {
-      "signature": "397f67482b9daf8e4b891ab51b9414cb",
-      "file": true,
-      "replaced": "^1.0.1"
-    },
-    "@gaman/nunjucks": {
-      "signature": "cf331c8c0f2f07601dd78ac65aacb10d",
-      "file": true
-    },
-    "@gaman/ejs": {
-      "signature": "54815204d6f25ff2a596f3df5fda2b95",
-      "file": true
-    },
-    "@gaman/basic-auth": {
-      "signature": "e8fee2cad3fe3735a00ababd5626fc44",
-      "file": true
-    },
-    "@gaman/static": {
-      "signature": "67275e44a5cd47757496327231e55aaf",
-      "file": true
-    },
-    "@gaman/websocket": {
-      "signature": "722c8d3da00ec008f2c20a9818e4209a",
-      "file": true
-    },
-    "@gaman/session": {
-      "signature": "3238431621c89a33567e2f919ff74ac0",
-      "file": true
-    },
-    "@gaman/rate-limit": {
-      "signature": "9551807548135657805733927561352a",
-      "file": true
-    },
-    "@gaman/edge": {
-      "signature": "119166e5dc9244c2f7d792294b52037d",
-      "file": true
-    },
-    "@gaman/jwt": {
-      "signature": "8fbdbb65d6caf5f165fddb2088c17a51",
       "file": true
     }
   }
