@@ -22,7 +22,7 @@ export default composeController(() => ({
     window.__GAMAN_DATA__ = ${JSON.stringify(data)};
   </script>
 
-  <script type="module" src="/_gaman/views/components/Layout.js"></script>
+  <script type="module" src="/_gaman/views/Home.js"></script>
 </body>
 </html>
 		`);
