@@ -18,9 +18,6 @@ yalc push
 cd ../cli
 yalc push
 
-cd ../../plugins/cors
-yalc push
-
 cd ../../plugins/static
 yalc push
 
@@ -34,9 +31,6 @@ cd ../websocket
 yalc push
 
 cd ../session
-yalc push
-
-cd ../rate-limit
 yalc push
 
 cd ../edge

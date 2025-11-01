@@ -1,13 +1,13 @@
 import { GamanConfig } from '@gaman/core/config/index.js';
 
-const defaultConfig: GamanConfig = {
+export const defaultConfig: GamanConfig = {
 	verbose: false,
 	build: {
 		outdir: 'dist',
 		rootdir: 'src',
 		staticdir: 'public',
 		excludes: ['**/node_modules/**', '**/dist/**', '**/*.test.*'],
-		includes: ['src/**/*.{ts,js}'],
+		includes: ['src/**/*.{ts,js,jsx,tsx}'],
 	},
 };
 

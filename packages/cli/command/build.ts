@@ -1,4 +1,3 @@
-import { Command } from './command.js';
 import { getGamanConfig, Logger, TextFormat } from '@gaman/common/index.js';
 import { buildAll } from '../builder/index.js';
 

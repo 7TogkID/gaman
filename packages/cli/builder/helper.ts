@@ -26,3 +26,4 @@ export const createProductionFile = (outdir: string) => {
 	const content = `# GamanJS Production Mode\nCreated at: ${new Date().toISOString()}\n`;
 	fs.writeFileSync(filePath, content, 'utf-8');
 };
+

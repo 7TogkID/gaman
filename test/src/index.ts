@@ -26,6 +26,7 @@ defineBootstrap(async (app) => {
 		AppMiddleware(),
 		jwtAuthMiddleware(),
 	);
+	
 
 	const sessionData: Record<string, any> = {};
 	app.mount(
