@@ -21,7 +21,7 @@ yalc push
 cd ../../plugins/cors
 yalc push
 
-cd ../static
+cd ../../plugins/static
 yalc push
 
 cd ../ejs
